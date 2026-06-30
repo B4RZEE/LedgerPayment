@@ -1,0 +1,11 @@
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Claude
+CLAUDE.md
+.claude/
+
+# macOS
+.DS_Store
