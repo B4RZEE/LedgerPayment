@@ -2432,6 +2432,443 @@
 
   [data-theme="light"] .auth-input { background: #f8fafc; border-color: rgba(0,0,0,0.12); }
 
+  /* ============================================================
+     BUSINESS ROI STRIP
+     ============================================================ */
+  .roi-strip {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 0;
+  }
+  @media (min-width: 640px) { .roi-strip { gap: 14px; } }
+
+  .roi-stat {
+    padding: 18px 16px 16px;
+    border-radius: var(--r-md);
+    background: rgba(0,0,0,0.3);
+    border: 1px solid var(--hairline);
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+  .roi-stat::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent, rgba(255,255,255,0.12)), transparent);
+  }
+  .roi-stat.jade { --accent: rgba(52,211,153,0.4); }
+  .roi-stat.lav  { --accent: rgba(165,180,252,0.4); }
+  .roi-stat.amber { --accent: rgba(251,191,36,0.4); }
+  .roi-icon {
+    font-size: 20px;
+    line-height: 1;
+    margin-bottom: 2px;
+  }
+  .roi-label {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text-3);
+  }
+  .roi-value {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1;
+  }
+  .roi-value.jade  { color: var(--jade-1); }
+  .roi-value.lav   { color: var(--lav-1); }
+  .roi-value.amber { color: var(--amber-1); }
+  .roi-sub {
+    font-size: 10.5px;
+    color: var(--text-3);
+    line-height: 1.3;
+  }
+
+  /* ============================================================
+     ACHIEVEMENT BADGES
+     ============================================================ */
+  .achievement-strip {
+    display: flex;
+    gap: 10px;
+    overflow: hidden;
+  }
+  .achievement-mini {
+    flex: 1;
+    min-width: 0;
+    padding: 14px 14px 12px;
+    border-radius: var(--r-md);
+    background: var(--glass);
+    border: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform .2s var(--ease), border-color .2s var(--ease), background .2s var(--ease);
+  }
+  .achievement-mini:hover { transform: translateY(-2px); border-color: var(--border-strong); background: var(--glass-strong); }
+  .achievement-mini-icon {
+    font-size: 22px;
+    line-height: 1;
+  }
+  .achievement-mini-name {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-0);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .achievement-mini-glow {
+    position: absolute;
+    top: -20px; right: -20px;
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    opacity: 0.15;
+    pointer-events: none;
+  }
+
+  .achievements-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  @media (min-width: 560px) { .achievements-grid { grid-template-columns: repeat(3, 1fr); gap: 12px; } }
+  @media (min-width: 880px) { .achievements-grid { grid-template-columns: repeat(4, 1fr); } }
+
+  .achievement-card {
+    padding: 20px 16px 18px;
+    border-radius: var(--r-md);
+    background: var(--glass);
+    border: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transition: transform .2s var(--ease), border-color .2s var(--ease);
+  }
+  .achievement-card.unlocked { cursor: pointer; }
+  .achievement-card.unlocked:hover { transform: translateY(-2px); border-color: var(--border-strong); }
+  .achievement-card.locked {
+    opacity: 0.45;
+    filter: grayscale(0.6);
+  }
+  .achievement-card-glow {
+    position: absolute;
+    top: -30px; right: -30px;
+    width: 110px; height: 110px;
+    border-radius: 50%;
+    opacity: 0.12;
+    pointer-events: none;
+  }
+  .achievement-icon {
+    font-size: 30px;
+    line-height: 1;
+    position: relative;
+    z-index: 1;
+  }
+  .achievement-name {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-0);
+    line-height: 1.2;
+    position: relative;
+    z-index: 1;
+  }
+  .achievement-desc {
+    font-size: 11px;
+    color: var(--text-3);
+    line-height: 1.4;
+    position: relative;
+    z-index: 1;
+  }
+  .achievement-status {
+    margin-top: 4px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    position: relative;
+    z-index: 1;
+  }
+  .achievement-status.unlocked { color: var(--jade-1); }
+  .achievement-status.locked   { color: var(--text-4); }
+
+  .unlock-flash {
+    animation: unlockPop .5s var(--ease-spring) forwards;
+  }
+  @keyframes unlockPop {
+    from { transform: scale(0.9); opacity: 0.5; }
+    to   { transform: scale(1); opacity: 1; }
+  }
+
+  /* ============================================================
+     SHARE CARD OVERLAY
+     ============================================================ */
+  .share-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: rgba(0,0,0,0.85);
+    backdrop-filter: blur(16px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    animation: fadeIn .25s var(--ease);
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+  .share-card-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    max-width: 360px;
+    width: 100%;
+  }
+  .share-card {
+    width: 100%;
+    border-radius: 24px;
+    padding: 36px 28px 32px;
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+    background: linear-gradient(135deg, #0d1018 0%, #0f1420 50%, #0a0d16 100%);
+    border: 1px solid rgba(255,255,255,0.12);
+    box-shadow: 0 40px 80px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.04) inset;
+  }
+  .share-card-aurora {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(ellipse at 20% 0%, rgba(52,211,153,0.3), transparent 55%),
+      radial-gradient(ellipse at 80% 100%, rgba(165,180,252,0.2), transparent 55%);
+  }
+  .share-card-brand {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.35);
+    margin-bottom: 28px;
+    position: relative;
+    z-index: 1;
+  }
+  .share-card-label {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: rgba(255,255,255,0.45);
+    margin-bottom: 10px;
+    position: relative;
+    z-index: 1;
+  }
+  .share-card-amount {
+    font-size: clamp(40px, 14vw, 56px);
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    line-height: 0.95;
+    background: linear-gradient(180deg, #ffffff 0%, #34d399 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    position: relative;
+    z-index: 1;
+    margin-bottom: 8px;
+  }
+  .share-card-firm {
+    font-size: 15px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.7);
+    position: relative;
+    z-index: 1;
+    margin-bottom: 24px;
+  }
+  .share-card-divider {
+    width: 40px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    margin: 0 auto 20px;
+    position: relative;
+    z-index: 1;
+  }
+  .share-card-stats {
+    display: flex;
+    justify-content: center;
+    gap: 28px;
+    position: relative;
+    z-index: 1;
+  }
+  .share-stat { text-align: center; }
+  .share-stat-value {
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: #fff;
+  }
+  .share-stat-label {
+    font-size: 9.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: rgba(255,255,255,0.35);
+    margin-top: 2px;
+    font-weight: 600;
+  }
+  .share-card-tag {
+    margin-top: 22px;
+    font-size: 11px;
+    color: rgba(255,255,255,0.25);
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    position: relative;
+    z-index: 1;
+  }
+  .share-actions {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+  }
+  .share-actions .btn {
+    flex: 1;
+    padding: 14px;
+    font-size: 14px;
+    border-radius: var(--r-md);
+  }
+  .share-hint {
+    font-size: 12px;
+    color: var(--text-3);
+    text-align: center;
+  }
+
+  /* ============================================================
+     MILESTONES / TROPHY ROOM
+     ============================================================ */
+  .milestones-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .milestones-counter {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 5px 12px;
+    border-radius: var(--r-full);
+    background: var(--jade-glow);
+    color: var(--jade-1);
+    border: 1px solid rgba(52,211,153,0.2);
+  }
+  .trophy-room-banner {
+    padding: 28px 24px;
+    border-radius: var(--r-lg);
+    background: linear-gradient(135deg, rgba(52,211,153,0.08) 0%, rgba(165,180,252,0.06) 100%);
+    border: 1px solid rgba(52,211,153,0.15);
+    text-align: center;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .trophy-room-banner::before {
+    content: "";
+    position: absolute;
+    top: -40px; left: 50%;
+    transform: translateX(-50%);
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(52,211,153,0.15), transparent 70%);
+    pointer-events: none;
+  }
+  .trophy-room-icon { font-size: 40px; margin-bottom: 10px; }
+  .trophy-room-title { font-size: 20px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 6px; }
+  .trophy-room-sub { font-size: 13px; color: var(--text-2); }
+
+  /* ============================================================
+     EMPTY STATES (improved)
+     ============================================================ */
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 48px 24px;
+    gap: 12px;
+  }
+  .empty-state-icon {
+    font-size: 44px;
+    margin-bottom: 4px;
+    filter: drop-shadow(0 0 20px currentColor);
+  }
+  .empty-state-title {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--text-0);
+    letter-spacing: -0.01em;
+  }
+  .empty-state-sub {
+    font-size: 13px;
+    color: var(--text-3);
+    max-width: 260px;
+    line-height: 1.6;
+  }
+  .empty-state .btn { margin-top: 8px; }
+
+  /* ============================================================
+     ANALYTICS PAGE EXTRAS
+     ============================================================ */
+  .pass-rate-visual {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 18px 20px;
+    background: rgba(0,0,0,0.2);
+    border-radius: var(--r-md);
+    border: 1px solid var(--hairline);
+    margin-bottom: 14px;
+  }
+  .pass-rate-circle {
+    width: 60px;
+    height: 60px;
+    flex-shrink: 0;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .pass-rate-circle svg { position: absolute; inset: 0; width: 100%; height: 100%; transform: rotate(-90deg); }
+  .pass-rate-circle-text {
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    color: var(--jade-1);
+    position: relative;
+    z-index: 1;
+  }
+  .pass-rate-info { flex: 1; min-width: 0; }
+  .pass-rate-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-3); margin-bottom: 4px; }
+  .pass-rate-detail { font-size: 13px; color: var(--text-1); }
+
 </style>
 </head>
 <body>
@@ -2490,7 +2927,7 @@ function _sym() { return (CURRENCIES[_curKey] || CURRENCIES.GBP).sym; }
 
 // Subscription tier (fetched from Supabase profiles after login)
 let _tier = "free";
-const PRO_PAGES    = new Set(["stats", "finance", "calendar"]);
+const PRO_PAGES    = new Set(["stats", "analytics", "calendar"]);
 const FREE_FIRMS   = 3;
 const FREE_PAYOUTS = 50;
 
@@ -2508,20 +2945,22 @@ let currentPage = "dashboard";
 
 // Pages config — drives the nav drawer and page rendering
 const PAGES = [
-  { id: "dashboard", label: "Dashboard",   icon: "home",     section: "main" },
-  { id: "payouts",   label: "Payouts",     icon: "money",    section: "main" },
-  { id: "finance",   label: "Finance",     icon: "chart",    section: "main" },
-  { id: "firms",     label: "Firms & Accounts", icon: "building", section: "main" },
-  { id: "calendar",  label: "Calendar",    icon: "calendar", section: "main" },
-  { id: "stats",     label: "Statistics",  icon: "stats",    section: "main" },
-  { id: "settings",  label: "Settings",    icon: "settings", section: "account" },
+  { id: "dashboard",  label: "Dashboard",        icon: "home",       section: "main" },
+  { id: "payouts",    label: "Payouts",           icon: "money",      section: "main" },
+  { id: "analytics",  label: "Analytics",         icon: "chart",      section: "main" },
+  { id: "firms",      label: "Firms & Accounts",  icon: "building",   section: "main" },
+  { id: "milestones", label: "Milestones",         icon: "medal",      section: "main" },
+  { id: "calendar",   label: "Calendar",          icon: "calendar",   section: "main" },
+  { id: "stats",      label: "Statistics",        icon: "stats",      section: "main" },
+  { id: "settings",   label: "Settings",          icon: "settings",   section: "account" },
 ];
 
 const DEFAULT_STATE = {
   profile: {
-    name: "",
+    firstName: "",  // set at signup, immutable in-app
+    lastName:  "",  // set at signup, immutable in-app
+    username:  "",  // optional, unique, user-editable
     goals: { daily: 100, weekly: 700, monthly: 5000, annual: 50000 },
-    onboarded: false
   },
   firms: [],     // { id, name }
   accounts: [],  // { id, firmId, label, health }
@@ -2557,6 +2996,12 @@ function loadState() {
           p.status = "awaiting_approval";
         }
       });
+      // Migration: old profile.name → firstName (when upgrading from single-name era)
+      if (state.profile.name !== undefined && !state.profile.firstName) {
+        state.profile.firstName = state.profile.name;
+      }
+      delete state.profile.name;
+      delete state.profile.onboarded;
       // Firms used to carry a `health` field — silently drop it
       state.firms.forEach(f => { delete f.health; });
       // Migration: old account health statuses → new Passed/In Progress/Failed
@@ -2605,12 +3050,13 @@ async function syncToSupabase() {
     await Promise.all([
       supabase.from("profiles").upsert({
         id: userId,
-        name: state.profile.name || null,
+        first_name: state.profile.firstName || null,
+        last_name:  state.profile.lastName  || null,
+        username:   state.profile.username  ? state.profile.username.toLowerCase() : null,
         goals_daily:   state.profile.goals.daily,
         goals_weekly:  state.profile.goals.weekly,
         goals_monthly: state.profile.goals.monthly,
         goals_annual:  state.profile.goals.annual,
-        onboarded: state.profile.onboarded,
       }, { onConflict: "id" }),
       state.firms.length
         ? supabase.from("firms").upsert(
@@ -2684,8 +3130,10 @@ async function syncFromSupabase() {
     if (!hasRemote && !hasLocal) return; // brand-new user — nothing to sync
     state = {
       profile: {
-        name:      pr?.name      || state.profile.name || "",
-        onboarded: pr?.onboarded ?? state.profile.onboarded,
+        // first_name/last_name fall back to old profile.name for users who signed up before this migration
+        firstName: pr?.first_name || (pr?.name && !pr?.first_name ? pr.name : "") || state.profile.firstName || "",
+        lastName:  pr?.last_name  || state.profile.lastName  || "",
+        username:  pr?.username   || state.profile.username  || "",
         goals: {
           daily:   pr?.goals_daily   ?? state.profile.goals.daily,
           weekly:  pr?.goals_weekly  ?? state.profile.goals.weekly,
@@ -2737,7 +3185,7 @@ async function dbDeleteAll() {
     await supabase.from("accounts").delete().eq("user_id", userId);
     await supabase.from("firms").delete().eq("user_id", userId);
     await supabase.from("profiles").upsert({
-      id: userId, name: null, onboarded: false,
+      id: userId, username: null,
       goals_daily:   DEFAULT_STATE.profile.goals.daily,
       goals_weekly:  DEFAULT_STATE.profile.goals.weekly,
       goals_monthly: DEFAULT_STATE.profile.goals.monthly,
@@ -3161,6 +3609,52 @@ function firmLeaderboard() {
   }).sort((a, b) => b.total - a.total);
 }
 
+/* ---- Pass rate & Fee ROI ---- */
+function accountPassRate() {
+  const passed = state.accounts.filter(a => a.health === "passed").length;
+  const failed = state.accounts.filter(a => a.health === "failed").length;
+  const total = passed + failed;
+  if (!total) return null;
+  return { rate: Math.round((passed / total) * 100), passed, failed, total };
+}
+
+function challengeFees() {
+  return state.spending
+    .filter(s => s.category === "account_purchase")
+    .reduce((sum, s) => sum + Number(s.amount || 0), 0);
+}
+
+function feeROI() {
+  const fees = challengeFees();
+  if (!fees) return null;
+  return ((lifetimeWithdrawals() - fees) / fees) * 100;
+}
+
+/* ---- Achievement system ---- */
+const ACHIEVEMENTS = [
+  { id: "first_firm",       name: "Getting Started",  desc: "Add your first firm",                           icon: "🚀", color: "#34d399", check: () => state.firms.length >= 1 },
+  { id: "first_withdrawal", name: "First Win",         desc: "Receive your first payout",                    icon: "🏆", color: "#f59e0b", check: () => received().length >= 1 },
+  { id: "five_payouts",     name: "Momentum",          desc: "Receive 5 payouts",                            icon: "📈", color: "#10b981", check: () => received().length >= 5 },
+  { id: "twenty_payouts",   name: "Power Trader",      desc: "Receive 20 payouts",                           icon: "⚡", color: "#c7d2fe", check: () => received().length >= 20 },
+  { id: "big_score",        name: "Big Score",         desc: "Single payout of £1,000+",                    icon: "💰", color: "#f59e0b", check: () => received().some(p => Number(p.amount) >= 1000) },
+  { id: "high_roller",      name: "High Roller",       desc: "Single payout of £5,000+",                    icon: "💎", color: "#6366f1", check: () => received().some(p => Number(p.amount) >= 5000) },
+  { id: "whale",            name: "Whale",             desc: "Single payout of £10,000+",                   icon: "🐋", color: "#a78bfa", check: () => received().some(p => Number(p.amount) >= 10000) },
+  { id: "streak_2",         name: "Consistent",        desc: "Payouts in 2 consecutive months",              icon: "🔥", color: "#f97316", check: () => withdrawalStreak() >= 2 },
+  { id: "streak_3",         name: "On Fire",           desc: "Payouts in 3 consecutive months",              icon: "🌶️", color: "#ef4444", check: () => withdrawalStreak() >= 3 },
+  { id: "streak_6",         name: "Unstoppable",       desc: "Payouts in 6 consecutive months",              icon: "🌟", color: "#fbbf24", check: () => withdrawalStreak() >= 6 },
+  { id: "ten_k",            name: "Five Figures",      desc: "Lifetime withdrawals hit £10,000",             icon: "💸", color: "#10b981", check: () => lifetimeWithdrawals() >= 10000 },
+  { id: "fifty_k",          name: "Elite Trader",      desc: "Lifetime withdrawals hit £50,000",             icon: "👑", color: "#a78bfa", check: () => lifetimeWithdrawals() >= 50000 },
+  { id: "profitable",       name: "In Profit",         desc: "Withdrawals exceed your challenge fees",       icon: "✅", color: "#34d399", check: () => challengeFees() > 0 && netProfit() > 0 },
+  { id: "multi_firm",       name: "Multi-Firm",        desc: "Receive payouts from 3+ different firms",      icon: "🏢", color: "#0ea5e9", check: () => new Set(received().map(p => p.firmId).filter(Boolean)).size >= 3 },
+  { id: "sharp_eye",        name: "Sharp Eye",         desc: "80%+ challenge pass rate (min 3 attempts)",   icon: "🎯", color: "#34d399", check: () => { const pr = accountPassRate(); return pr && pr.total >= 3 && pr.rate >= 80; } },
+  { id: "journal_7",        name: "Journaling",        desc: "Write 7+ journal entries",                    icon: "📓", color: "#94a3b8", check: () => state.journal.length >= 7 },
+];
+
+function getAchievements() {
+  return ACHIEVEMENTS.map(a => ({ ...a, unlocked: !!a.check() }));
+}
+function unlockedAchievements() { return getAchievements().filter(a => a.unlocked); }
+
 /* ---- Journal helpers ---- */
 function journalForDate(iso) {
   return state.journal.find(j => j.date === iso) || null;
@@ -3217,7 +3711,10 @@ function svgIcon(name) {
     building: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="1"/><path d="M9 3v18M15 3v18M3 9h18M3 15h18"/></svg>',
     calendar: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>',
     stats:    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>',
-    logout:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>'
+    logout:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>',
+    medal:    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="14" r="5"/><path d="M8.5 9.5 7 4h10l-1.5 5.5M12 9v5"/></svg>',
+    share:    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>',
+    target:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>'
   };
   const s = document.createElement("span");
   s.style.display = "inline-flex";
@@ -3231,7 +3728,7 @@ function svgIcon(name) {
 function navigateTo(pageId) {
   if (_tier === "free" && PRO_PAGES.has(pageId)) {
     closeNavDrawer();
-    const names = { stats: "Statistics", finance: "Finance", calendar: "Calendar & Journal" };
+    const names = { stats: "Statistics", analytics: "Analytics", calendar: "Calendar & Journal" };
     showUpgradePrompt(names[pageId] || pageId);
     return;
   }
@@ -3398,8 +3895,8 @@ function renderHero() {
   const monthVal = earnedThisMonth();
   const delta = pctDeltaMonthOverMonth();
   const next = nextPayout();
-  const name = state.profile.name ? state.profile.name : null;
-  const greet = name ? `Hi, ${name}` : "Welcome";
+  const displayName = state.profile.username || state.profile.firstName || null;
+  const greet = displayName ? `Hi, ${displayName}` : "Welcome";
 
   let nextValue = "—";
   let nextMeta = "No upcoming payouts";
@@ -4193,16 +4690,6 @@ function shiftMonth(delta) {
 /* ----------------------------------------------------------------
    ONBOARDING (when empty)
    ---------------------------------------------------------------- */
-function renderWelcome() {
-  return el("section", { class: "section fade-up" },
-    el("div", { class: "card welcome" },
-      el("div", { class: "welcome-mark" }),
-      el("div", { class: "welcome-title" }, "Welcome to Ledger"),
-      el("div", { class: "welcome-sub" }, "A calm home for your trading payouts. Track withdrawals, hit goals, and see what's coming next — all on your device, all yours."),
-      el("button", { class: "empty-btn", onclick: openOnboarding }, "Get started")
-    )
-  );
-}
 
 /* ----------------------------------------------------------------
    MAIN RENDER
@@ -4283,12 +4770,327 @@ function renderLeaderboard() {
    PAGE RENDERERS
    ================================================================ */
 
+/* ----------------------------------------------------------------
+   BUSINESS ROI STRIP
+   ---------------------------------------------------------------- */
+function renderBusinessROI() {
+  const pr = accountPassRate();
+  const streak = withdrawalStreak();
+  const roi = feeROI();
+  const fees = challengeFees();
+
+  const passRateVal = pr ? `${pr.rate}%` : "—";
+  const passRateSub = pr ? `${pr.passed} passed · ${pr.failed} failed` : "Mark accounts as Funded or Failed";
+  const streakSub   = streak > 0 ? `consecutive month${streak === 1 ? "" : "s"}` : "Get a payout this month to start";
+  let roiVal = "—";
+  let roiSub = "Log account purchases to track ROI";
+  let roiColor = "lav";
+  if (fees > 0) {
+    const net = netProfit();
+    roiVal = (net >= 0 ? "+" : "") + roi.toFixed(0) + "%";
+    roiSub = `${fmtGBP(lifetimeWithdrawals(), { short: true })} in vs ${fmtGBP(fees, { short: true })} fees`;
+    roiColor = net >= 0 ? "jade" : "amber";
+  }
+
+  return el("section", { class: "section" },
+    el("div", { class: "card" },
+      el("div", { class: "card-header" },
+        el("div", { class: "card-title" }, "Business Overview"),
+        el("button", { class: "card-action", onclick: () => navigateTo("analytics") }, "Full report →")
+      ),
+      el("div", { class: "roi-strip" },
+        el("div", { class: "roi-stat jade" },
+          el("div", { class: "roi-icon" }, "🎯"),
+          el("div", { class: "roi-label" }, "Pass Rate"),
+          el("div", { class: "roi-value jade" }, passRateVal),
+          el("div", { class: "roi-sub" }, passRateSub)
+        ),
+        el("div", { class: "roi-stat amber" },
+          el("div", { class: "roi-icon" }, "🔥"),
+          el("div", { class: "roi-label" }, "Streak"),
+          el("div", { class: "roi-value amber" }, `${streak} mo`),
+          el("div", { class: "roi-sub" }, streakSub)
+        ),
+        el("div", { class: "roi-stat lav" },
+          el("div", { class: "roi-icon" }, "💹"),
+          el("div", { class: "roi-label" }, "Fee ROI"),
+          el("div", { class: "roi-value " + roiColor }, roiVal),
+          el("div", { class: "roi-sub" }, roiSub)
+        )
+      )
+    )
+  );
+}
+
+/* ----------------------------------------------------------------
+   ACHIEVEMENT STRIP (dashboard preview)
+   ---------------------------------------------------------------- */
+function renderAchievementStrip() {
+  const all = getAchievements();
+  const unlocked = all.filter(a => a.unlocked);
+
+  if (!unlocked.length) {
+    return el("section", { class: "section" },
+      el("div", { class: "card" },
+        el("div", { class: "card-header" },
+          el("div", { class: "card-title" }, "Achievements"),
+          el("button", { class: "card-action", onclick: () => navigateTo("milestones") }, `View all ${all.length}`)
+        ),
+        el("div", { style: "text-align:center;padding:20px 0 8px;color:var(--text-3);font-size:13px;" },
+          "Complete your first payout to start earning badges"
+        )
+      )
+    );
+  }
+
+  const preview = unlocked.slice(-3).reverse();
+  const strip = el("div", { class: "achievement-strip" },
+    ...preview.map(a =>
+      el("div", { class: "achievement-mini", onclick: () => navigateTo("milestones") },
+        el("div", { class: "achievement-mini-glow", style: `background:radial-gradient(circle,${a.color},transparent)` }),
+        el("div", { class: "achievement-mini-icon" }, a.icon),
+        el("div", { class: "achievement-mini-name" }, a.name)
+      )
+    )
+  );
+
+  return el("section", { class: "section" },
+    el("div", { class: "card" },
+      el("div", { class: "card-header" },
+        el("div", { class: "card-title" }, "Achievements"),
+        el("button", { class: "card-action", onclick: () => navigateTo("milestones") },
+          `${unlocked.length}/${all.length} unlocked`)
+      ),
+      strip
+    )
+  );
+}
+
+/* ----------------------------------------------------------------
+   MILESTONES / TROPHY ROOM PAGE
+   ---------------------------------------------------------------- */
+function openShareCard(payout) {
+  const firm = getFirm(payout?.firmId);
+  const firmName = firm?.name || "Prop Firm";
+  const amount = fmtGBP(payout?.amount || 0);
+  const streak = withdrawalStreak();
+  const total = lifetimeWithdrawals();
+
+  const overlay = document.createElement("div");
+  overlay.className = "share-overlay";
+  overlay.addEventListener("click", e => { if (e.target === overlay) overlay.remove(); });
+
+  const wrap = el("div", { class: "share-card-wrap" });
+
+  const card = el("div", { class: "share-card" },
+    el("div", { class: "share-card-aurora" }),
+    el("div", { class: "share-card-brand" }, "LEDGER"),
+    el("div", { class: "share-card-label" }, "Payout received"),
+    el("div", { class: "share-card-amount num" }, amount),
+    el("div", { class: "share-card-firm" }, firmName),
+    el("div", { class: "share-card-divider" }),
+    el("div", { class: "share-card-stats" },
+      el("div", { class: "share-stat" },
+        el("div", { class: "share-stat-value num" }, fmtGBP(total, { short: total >= 1000 })),
+        el("div", { class: "share-stat-label" }, "Lifetime")
+      ),
+      el("div", { class: "share-stat" },
+        el("div", { class: "share-stat-value" }, `${streak}mo`),
+        el("div", { class: "share-stat-label" }, "Streak")
+      ),
+      el("div", { class: "share-stat" },
+        el("div", { class: "share-stat-value" }, received().length.toString()),
+        el("div", { class: "share-stat-label" }, "Payouts")
+      )
+    ),
+    el("div", { class: "share-card-tag" }, "#proptrading #funded #ledgerpayout")
+  );
+
+  const actions = el("div", { class: "share-actions" },
+    el("button", {
+      class: "btn ghost",
+      onclick: () => {
+        const text = `Just got paid ${amount} from ${firmName}! 💰 ${streak > 1 ? `${streak} month streak 🔥 ` : ""}Total: ${fmtGBP(total, { short: true })} #proptrading #funded`;
+        navigator.clipboard?.writeText(text).then(() => toast("Caption copied!")).catch(() => toast("Copied!"));
+      }
+    }, "Copy caption"),
+    el("button", { class: "btn ghost", onclick: () => overlay.remove() }, "Close")
+  );
+
+  const hint = el("div", { class: "share-hint" }, "Screenshot the card above to share");
+
+  wrap.appendChild(card);
+  wrap.appendChild(actions);
+  wrap.appendChild(hint);
+  overlay.appendChild(wrap);
+  document.body.appendChild(overlay);
+}
+
+function renderPageMilestones(app) {
+  const all = getAchievements();
+  const unlocked = all.filter(a => a.unlocked);
+  const locked = all.filter(a => !a.unlocked);
+  const recentPayouts = recentReceived().slice(0, 5);
+
+  // Trophy room banner
+  const bannerTitle = unlocked.length === 0
+    ? "Your Trophy Room"
+    : unlocked.length === all.length
+    ? "🎉 All badges unlocked!"
+    : `${unlocked.length} of ${all.length} badges unlocked`;
+  const bannerSub = unlocked.length === 0
+    ? "Earn badges by hitting milestones. Start by adding a firm and logging your first payout."
+    : `Keep trading to unlock ${locked.length} more`;
+
+  app.appendChild(el("section", { class: "section page-enter" },
+    el("div", { class: "trophy-room-banner" },
+      el("div", { class: "trophy-room-icon" }, unlocked.length > 0 ? "🏆" : "🎖️"),
+      el("div", { class: "trophy-room-title" }, bannerTitle),
+      el("div", { class: "trophy-room-sub" }, bannerSub)
+    )
+  ));
+
+  // Achievement grid — unlocked first, then locked
+  const sorted = [...unlocked, ...locked];
+  const grid = el("div", { class: "achievements-grid" });
+  sorted.forEach(a => {
+    const card = el("div", { class: `achievement-card ${a.unlocked ? "unlocked" : "locked"}` },
+      el("div", { class: "achievement-card-glow", style: `background:radial-gradient(circle,${a.color},transparent)` }),
+      el("div", { class: "achievement-icon" }, a.icon),
+      el("div", { class: "achievement-name" }, a.name),
+      el("div", { class: "achievement-desc" }, a.desc),
+      el("div", { class: `achievement-status ${a.unlocked ? "unlocked" : "locked"}` },
+        a.unlocked ? "✓ Unlocked" : "Locked"
+      )
+    );
+    if (a.unlocked) {
+      card.style.setProperty("--card-color", a.color);
+      card.style.borderColor = `${a.color}30`;
+    }
+    grid.appendChild(card);
+  });
+
+  app.appendChild(el("section", { class: "section page-enter" },
+    el("div", { class: "card" },
+      el("div", { class: "card-header" },
+        el("div", { class: "card-title" }, "All Badges"),
+        el("div", { class: "milestones-counter" }, `${unlocked.length} / ${all.length}`)
+      ),
+      grid
+    )
+  ));
+
+  // Share a payout card section
+  if (recentPayouts.length) {
+    const shareItems = el("div", { class: "timeline" },
+      ...recentPayouts.map(p => {
+        const firm = getFirm(p.firmId);
+        return el("button", {
+          class: "pay-item",
+          onclick: () => openShareCard(p)
+        },
+          el("div", {
+            class: "pay-avatar",
+            style: `background:${firmAvatar(firm)};`
+          }, firmInitials(firm?.name || "?")),
+          el("div", { class: "pay-body" },
+            el("div", { class: "pay-firm" }, firm?.name || "Unknown firm"),
+            el("div", { class: "pay-meta" }, fmtDateLong(p.date))
+          ),
+          el("div", { class: "pay-right" },
+            el("div", { class: "pay-amount received" }, fmtGBP(p.amount)),
+            el("div", { class: "pay-countdown received" }, "Share →")
+          )
+        );
+      })
+    );
+
+    app.appendChild(el("section", { class: "section page-enter" },
+      el("div", { class: "card" },
+        el("div", { class: "card-header" },
+          el("div", { class: "card-title" }, "Share a Win"),
+          el("div", { class: "section-meta" }, "Tap to generate share card")
+        ),
+        shareItems
+      )
+    ));
+  }
+}
+
+/* ----------------------------------------------------------------
+   ANALYTICS PAGE (renamed from Finance)
+   ---------------------------------------------------------------- */
+function renderPassRateSection() {
+  const pr = accountPassRate();
+  const fees = challengeFees();
+  const roi = feeROI();
+
+  if (!pr && !fees) {
+    return el("div", { class: "card" },
+      el("div", { class: "card-header" }, el("div", { class: "card-title" }, "Challenge Analytics")),
+      el("div", { class: "empty-state" },
+        el("div", { class: "empty-state-icon", style: "color:var(--jade-1);" }, "🎯"),
+        el("div", { class: "empty-state-title" }, "Track your pass rate"),
+        el("div", { class: "empty-state-sub" }, "Add accounts and mark them as Funded or Failed to see your challenge pass rate and fee ROI."),
+        el("button", { class: "btn primary", style: "font-size:13px;padding:10px 20px;", onclick: () => navigateTo("firms") }, "Manage accounts")
+      )
+    );
+  }
+
+  const items = [];
+
+  if (pr) {
+    const circumference = 2 * Math.PI * 22;
+    const offset = circumference - (pr.rate / 100) * circumference;
+    const circleWrap = el("div", { class: "pass-rate-circle" });
+    circleWrap.innerHTML = `<svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="22" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="3"/><circle cx="24" cy="24" r="22" fill="none" stroke="var(--jade-2)" stroke-width="3" stroke-dasharray="${circumference.toFixed(1)}" stroke-dashoffset="${offset.toFixed(1)}" stroke-linecap="round" style="transition:stroke-dashoffset 1.2s var(--ease-out);"/></svg><div class="pass-rate-circle-text num">${pr.rate}%</div>`;
+    items.push(
+      el("div", { class: "pass-rate-visual" },
+        circleWrap,
+        el("div", { class: "pass-rate-info" },
+          el("div", { class: "pass-rate-label" }, "Challenge Pass Rate"),
+          el("div", { class: "pass-rate-detail" }, `${pr.passed} funded · ${pr.failed} failed · ${pr.total} total`)
+        )
+      )
+    );
+  }
+
+  if (fees > 0) {
+    const net = netProfit();
+    const roiText = roi != null ? ((roi >= 0 ? "+" : "") + roi.toFixed(0) + "% ROI") : "—";
+    const roiColor = net >= 0 ? "var(--jade-1)" : "var(--rose-1)";
+    items.push(
+      el("div", { class: "pass-rate-visual" },
+        (() => {
+          const d = el("div", { class: "pass-rate-circle", style: "width:60px;height:60px;" });
+          d.innerHTML = `<div style="font-size:18px;font-weight:800;color:${roiColor};letter-spacing:-0.04em;position:relative;z-index:1;">${roiText.split(" ")[0]}</div>`;
+          return d;
+        })(),
+        el("div", { class: "pass-rate-info" },
+          el("div", { class: "pass-rate-label" }, "Fee ROI"),
+          el("div", { class: "pass-rate-detail" },
+            `${fmtGBP(lifetimeWithdrawals(), { short: true })} withdrawn vs ${fmtGBP(fees, { short: true })} in fees — `,
+            el("span", { style: `color:${roiColor};font-weight:600;` }, `${net >= 0 ? "+" : "−"}${fmtGBP(Math.abs(net), { short: true })} net`)
+          )
+        )
+      )
+    );
+  }
+
+  return el("div", { class: "card" },
+    el("div", { class: "card-header" }, el("div", { class: "card-title" }, "Challenge Analytics")),
+    ...items
+  );
+}
+
 function renderPageDashboard(app) {
   app.appendChild(renderHero());
+  app.appendChild(renderBusinessROI());
   app.appendChild(renderRings());
   app.appendChild(renderProjected());
   app.appendChild(renderUpcoming());
   app.appendChild(renderFeatures());
+  app.appendChild(renderAchievementStrip());
 }
 
 function renderPagePayouts(app) {
@@ -4296,7 +5098,8 @@ function renderPagePayouts(app) {
   app.appendChild(renderUpcoming());
 }
 
-function renderPageFinance(app) {
+function renderPageAnalytics(app) {
+  app.appendChild(el("section", { class: "section page-enter" }, renderPassRateSection()));
   app.appendChild(renderChart());
   app.appendChild(renderExpected());
   app.appendChild(renderCosts());
@@ -4331,16 +5134,71 @@ function renderPageSettings(app) {
     );
   }
 
+  // Username save helper (async uniqueness check)
+  let _usernameSaveEl = null;
+  async function saveUsername(val) {
+    const usernameInput = _usernameSaveEl;
+    const normalized = val.toLowerCase().replace(/[^a-z0-9_]/g, "");
+    if (normalized !== val) {
+      if (usernameInput) usernameInput.value = normalized;
+    }
+    if (!normalized) {
+      state.profile.username = "";
+      saveState();
+      return;
+    }
+    if (normalized === state.profile.username) return;
+    if (_currentUser) {
+      const { data } = await supabase
+        .from("profiles").select("id")
+        .eq("username", normalized)
+        .neq("id", _currentUser.id)
+        .limit(1);
+      if (data && data.length > 0) {
+        if (usernameInput) {
+          usernameInput.setCustomValidity("Username already taken");
+          usernameInput.reportValidity();
+          usernameInput.setCustomValidity("");
+        }
+        toast(`"${normalized}" is already taken — try another`);
+        return;
+      }
+    }
+    state.profile.username = normalized;
+    saveState();
+    toast("Username saved");
+  }
+
+  const usernameInput = el("input", {
+    class: "input", type: "text", placeholder: "e.g. traderJoe (optional)",
+    value: state.profile.username || "",
+    oninput: (e) => { e.target.value = e.target.value.replace(/[^a-zA-Z0-9_]/g, ""); }
+  });
+  _usernameSaveEl = usernameInput;
+  usernameInput.addEventListener("blur", () => saveUsername(usernameInput.value.trim()));
+
+  function readOnlyField(label, value) {
+    return el("div", { class: "field" },
+      el("label", { class: "field-label" }, label),
+      el("div", {
+        class: "input",
+        style: "background:var(--surface-2,#222);color:var(--text-2);cursor:default;user-select:text;"
+      }, value || "—")
+    );
+  }
+
   app.appendChild(el("section", { class: "section page-enter" },
     el("div", { class: "card" },
       el("div", { class: "card-header" }, el("div", { class: "card-title" }, "Profile")),
+      readOnlyField("First name", state.profile.firstName),
+      readOnlyField("Last name",  state.profile.lastName),
+      readOnlyField("Email", session?.email || "—"),
       el("div", { class: "field" },
-        el("label", { class: "field-label" }, "Your name"),
-        el("input", {
-          class: "input", type: "text", placeholder: "Your name",
-          value: state.profile.name,
-          oninput: (e) => { state.profile.name = e.target.value; saveState(); }
-        })
+        el("label", { class: "field-label" }, "Username"),
+        el("div", { style: "font-size:11px;color:var(--text-3);margin-bottom:6px;" },
+          "Letters, numbers, underscores only. This is how you'll be greeted."
+        ),
+        usernameInput
       )
     )
   ));
@@ -4386,9 +5244,6 @@ function renderPageSettings(app) {
   app.appendChild(el("section", { class: "section page-enter" },
     el("div", { class: "card" },
       el("div", { class: "card-header" }, el("div", { class: "card-title" }, "Account")),
-      el("div", { style: "font-size:13px;color:var(--text-2);margin-bottom:14px;" },
-        session ? `Logged in as ${session.email}` : ""
-      ),
       el("button", {
         class: "btn ghost",
         onclick: () => logout()
@@ -4432,14 +5287,6 @@ function render() {
   app.innerHTML = "";
   app.appendChild(renderTop());
 
-  if (!state.profile.onboarded && state.payouts.length === 0 && state.firms.length === 0) {
-    app.appendChild(renderWelcome());
-    app.appendChild(renderHero());
-    app.appendChild(renderRings());
-    app.appendChild(renderFirms());
-    return;
-  }
-
   // Add page-enter animation wrapper
   const content = document.createElement("div");
   content.className = "page-enter";
@@ -4447,14 +5294,16 @@ function render() {
   // Dispatch to the correct page renderer
   const pageApp = { appendChild: (el) => app.appendChild(el) };
   switch (currentPage) {
-    case "dashboard": renderPageDashboard(pageApp); break;
-    case "payouts":   renderPagePayouts(pageApp);   break;
-    case "finance":   renderPageFinance(pageApp);   break;
-    case "firms":     renderPageFirms(pageApp);     break;
-    case "calendar":  renderPageCalendar(pageApp);  break;
-    case "stats":     renderPageStats(pageApp);     break;
-    case "settings":  renderPageSettings(pageApp);  break;
-    default:          renderPageDashboard(pageApp);
+    case "dashboard":  renderPageDashboard(pageApp);  break;
+    case "payouts":    renderPagePayouts(pageApp);    break;
+    case "analytics":  renderPageAnalytics(pageApp);  break;
+    case "finance":    renderPageAnalytics(pageApp);  break; // legacy redirect
+    case "firms":      renderPageFirms(pageApp);      break;
+    case "milestones": renderPageMilestones(pageApp); break;
+    case "calendar":   renderPageCalendar(pageApp);   break;
+    case "stats":      renderPageStats(pageApp);      break;
+    case "settings":   renderPageSettings(pageApp);   break;
+    default:           renderPageDashboard(pageApp);
   }
 
   // Trigger animations on next frame
@@ -5163,7 +6012,7 @@ function openSpendingSheet(spendId) {
    ---------------------------------------------------------------- */
 function openSettingsSheet(focus) {
   const draft = {
-    name: state.profile.name,
+    username: state.profile.username || "",
     goals: { ...state.profile.goals }
   };
 
@@ -5172,18 +6021,45 @@ function openSettingsSheet(focus) {
     root.appendChild(sheetHead("Settings"));
     const body = el("div", { class: "sheet-body" });
 
+    // Profile — read-only name/email, editable username
+    const session = getSession();
+    const fullName = [state.profile.firstName, state.profile.lastName].filter(Boolean).join(" ") || "—";
     body.appendChild(el("div", { class: "field" },
-      el("label", { class: "field-label" }, "Your name"),
+      el("label", { class: "field-label" }, "Name"),
+      el("div", {
+        class: "input",
+        style: "background:var(--surface-2,#222);color:var(--text-2);cursor:default;"
+      }, fullName)
+    ));
+    body.appendChild(el("div", { class: "field" },
+      el("label", { class: "field-label" }, "Email"),
+      el("div", {
+        class: "input",
+        style: "background:var(--surface-2,#222);color:var(--text-2);cursor:default;"
+      }, session?.email || "—")
+    ));
+
+    const errEl = el("div", { style: "font-size:12px;color:#f87171;margin-top:4px;min-height:16px;" });
+    body.appendChild(el("div", { class: "field" },
+      el("label", { class: "field-label" }, "Username"),
+      el("div", { style: "font-size:11px;color:var(--text-3);margin-bottom:6px;" },
+        "Letters, numbers, underscores only. Used as your greeting."
+      ),
       el("input", {
-        class: "input", type: "text", placeholder: "What should we call you?",
-        value: draft.name,
-        oninput: (e) => draft.name = e.target.value
-      })
+        class: "input", type: "text", placeholder: "e.g. traderJoe (optional)",
+        value: draft.username,
+        oninput: (e) => {
+          e.target.value = e.target.value.replace(/[^a-zA-Z0-9_]/g, "");
+          draft.username = e.target.value;
+          errEl.textContent = "";
+        }
+      }),
+      errEl
     ));
 
     function moneyInput(key, placeholder) {
       return el("div", { class: "input-prefix-wrap" },
-        el("span", { class: "prefix" }, "£"),
+        el("span", { class: "prefix" }, _sym()),
         el("input", {
           class: "input num", type: "number", inputmode: "decimal", min: "0", step: "1",
           placeholder, value: draft.goals[key],
@@ -5192,7 +6068,7 @@ function openSettingsSheet(focus) {
       );
     }
 
-    body.appendChild(el("div", { class: "section-head", style: "padding:8px 0 4px;" },
+    body.appendChild(el("div", { class: "section-head", style: "padding:18px 0 4px;" },
       el("div", { class: "section-title" }, "Goals")
     ));
     body.appendChild(el("div", { class: "field-row" },
@@ -5217,14 +6093,10 @@ function openSettingsSheet(focus) {
     ));
 
     // Account
-    const session = getSession();
     body.appendChild(el("div", { class: "section-head", style: "padding:18px 0 4px;" },
       el("div", { class: "section-title" }, "Account")
     ));
     body.appendChild(el("div", { class: "field" },
-      el("div", { style: "font-size:13px;color:var(--text-2);margin-bottom:10px;" },
-        session ? `Logged in as ${session.email}` : ""
-      ),
       el("button", {
         class: "btn ghost",
         style: "flex:none;padding:10px 14px;",
@@ -5244,19 +6116,31 @@ function openSettingsSheet(focus) {
       }, isPinSet() ? "🔒 Change / Remove PIN" : "🔒 Set PIN Lock")
     ));
 
-
     root.appendChild(body);
 
     const foot = el("div", { class: "sheet-foot" });
     foot.appendChild(el("button", { class: "btn ghost", onclick: closeSheet }, "Cancel"));
-    foot.appendChild(el("button", { class: "btn primary", onclick: () => {
-      state.profile.name = draft.name.trim();
+    const saveBtn = el("button", { class: "btn primary", onclick: async () => {
+      const normalized = draft.username.toLowerCase().replace(/[^a-z0-9_]/g, "");
+      if (normalized && normalized !== state.profile.username && _currentUser) {
+        const { data } = await supabase
+          .from("profiles").select("id")
+          .eq("username", normalized)
+          .neq("id", _currentUser.id)
+          .limit(1);
+        if (data && data.length > 0) {
+          errEl.textContent = `"${normalized}" is already taken — try another.`;
+          return;
+        }
+      }
+      state.profile.username = normalized;
       state.profile.goals = draft.goals;
       saveState();
       closeSheet();
       rerender();
       toast("Settings saved");
-    } }, "Save"));
+    } }, "Save");
+    foot.appendChild(saveBtn);
     root.appendChild(foot);
 
     return root;
@@ -5338,80 +6222,6 @@ function openDaySheet(iso) {
 /* ----------------------------------------------------------------
    ONBOARDING SHEET
    ---------------------------------------------------------------- */
-function openOnboarding() {
-  const draft = { name: "", goals: { ...DEFAULT_STATE.profile.goals } };
-
-  openSheet(() => {
-    const root = document.createElement("div");
-    root.appendChild(sheetHead("Let's set you up"));
-    const body = el("div", { class: "sheet-body" });
-
-    body.appendChild(el("p", {
-      style: "color:var(--text-2);font-size:14px;margin-bottom:18px;line-height:1.5;"
-    }, "Two quick things, then you're in. You can change either later."));
-
-    body.appendChild(el("div", { class: "field" },
-      el("label", { class: "field-label" }, "What should we call you?"),
-      el("input", {
-        class: "input", type: "text", placeholder: "Your name",
-        oninput: (e) => draft.name = e.target.value
-      })
-    ));
-
-    function moneyInput(key, placeholder) {
-      return el("div", { class: "input-prefix-wrap" },
-        el("span", { class: "prefix" }, "£"),
-        el("input", {
-          class: "input num", type: "number", inputmode: "decimal", min: "0", step: "1",
-          placeholder, value: draft.goals[key],
-          oninput: (e) => draft.goals[key] = parseFloat(e.target.value) || 0
-        })
-      );
-    }
-
-    body.appendChild(el("div", { class: "field-row" },
-      el("div", { class: "field" },
-        el("label", { class: "field-label" }, "Daily goal"),
-        moneyInput("daily", "100")
-      ),
-      el("div", { class: "field" },
-        el("label", { class: "field-label" }, "Weekly goal"),
-        moneyInput("weekly", "700")
-      )
-    ));
-    body.appendChild(el("div", { class: "field-row" },
-      el("div", { class: "field" },
-        el("label", { class: "field-label" }, "Monthly goal"),
-        moneyInput("monthly", "5000")
-      ),
-      el("div", { class: "field" },
-        el("label", { class: "field-label" }, "Annual goal"),
-        moneyInput("annual", "50000")
-      )
-    ));
-
-    root.appendChild(body);
-
-    const foot = el("div", { class: "sheet-foot" });
-    foot.appendChild(el("button", { class: "btn primary", onclick: () => {
-      state.profile.name = draft.name.trim();
-      state.profile.goals = draft.goals;
-      state.profile.onboarded = true;
-      saveState();
-      closeSheet();
-      rerender();
-      // Then prompt to add first firm
-      setTimeout(() => {
-        toast("All set — add a firm to start tracking");
-        setTimeout(() => openFirmSheet(), 800);
-      }, 300);
-    } }, "Continue"));
-    root.appendChild(foot);
-
-    return root;
-  });
-}
-
 /* ================================================================
    BRANDED CONFIRM / ALERT SHEET
    (replaces all native confirm() dialogs)
@@ -5491,7 +6301,7 @@ function isValidEmail(email) {
 
 function getSession() {
   // Returns the cached user object synchronously (set by onAuthStateChange).
-  return _currentUser ? { userId: _currentUser.id, email: _currentUser.email, name: _currentUser.user_metadata?.name || "" } : null;
+  return _currentUser ? { userId: _currentUser.id, email: _currentUser.email } : null;
 }
 function isLoggedIn() { return !!_currentUser; }
 
@@ -5582,13 +6392,15 @@ function buildRegisterForm() {
   sub.className = "auth-sub"; sub.textContent = "Start tracking your payouts";
   wrap.appendChild(title); wrap.appendChild(sub);
 
-  const nameField  = authField("Name", "text", "Your name");
+  const firstField = authField("First name", "text", "Jane");
+  const lastField  = authField("Last name",  "text", "Smith");
   const emailField = authField("Email", "email", "you@example.com");
   const pwField    = authField("Password", "password", "At least 6 characters");
   const pw2Field   = authField("Confirm Password", "password", "Re-enter your password");
   const errEl      = document.createElement("div");
   errEl.className  = "auth-error";
-  wrap.appendChild(nameField.wrap);
+  wrap.appendChild(firstField.wrap);
+  wrap.appendChild(lastField.wrap);
   wrap.appendChild(emailField.wrap);
   wrap.appendChild(pwField.wrap);
   wrap.appendChild(pw2Field.wrap);
@@ -5598,26 +6410,39 @@ function buildRegisterForm() {
   submit.className = "auth-submit";
   submit.textContent = "Sign Up";
   submit.addEventListener("click", async () => {
-    const name  = nameField.input.value.trim();
-    const email = emailField.input.value.trim();
-    const pw    = pwField.input.value;
-    const pw2   = pw2Field.input.value;
+    const firstName = firstField.input.value.trim();
+    const lastName  = lastField.input.value.trim();
+    const email     = emailField.input.value.trim();
+    const pw        = pwField.input.value;
+    const pw2       = pw2Field.input.value;
     errEl.textContent = "";
-    if (!name)                  { errEl.textContent = "Tell us your name."; return; }
-    if (!isValidEmail(email))   { errEl.textContent = "Enter a valid email address."; return; }
-    if (pw.length < 6)          { errEl.textContent = "Password must be at least 6 characters."; return; }
-    if (pw !== pw2)             { errEl.textContent = "Passwords don't match."; return; }
+    if (!firstName)           { errEl.textContent = "First name is required."; return; }
+    if (!lastName)            { errEl.textContent = "Last name is required."; return; }
+    if (!isValidEmail(email)) { errEl.textContent = "Enter a valid email address."; return; }
+    if (pw.length < 6)        { errEl.textContent = "Password must be at least 6 characters."; return; }
+    if (pw !== pw2)           { errEl.textContent = "Passwords don't match."; return; }
     submit.disabled = true; submit.textContent = "Creating account…";
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password: pw,
-      options: { data: { name } }
+      options: { data: { first_name: firstName, last_name: lastName } }
     });
     if (error) {
       errEl.textContent = error.message;
       submit.disabled = false; submit.textContent = "Sign Up";
+      return;
     }
-    // onAuthStateChange fires on success → onAuthSuccess()
+    // Persist first/last name to profiles immediately (session is live after signUp)
+    if (data?.user?.id) {
+      try {
+        await supabase.from("profiles").upsert({
+          id: data.user.id,
+          first_name: firstName,
+          last_name: lastName,
+        }, { onConflict: "id" });
+      } catch (_) {}
+    }
+    // onAuthStateChange fires → onAuthSuccess()
   });
   wrap.appendChild(submit);
 
@@ -5626,7 +6451,7 @@ function buildRegisterForm() {
   switchLink.innerHTML = `Already have an account? <a id="toLogin">Log in</a>`;
   wrap.appendChild(switchLink);
   wrap.querySelector("#toLogin").addEventListener("click", () => { authView = "login"; renderAuthView(); });
-  [nameField.input, emailField.input, pwField.input, pw2Field.input].forEach(inp => {
+  [firstField.input, lastField.input, emailField.input, pwField.input, pw2Field.input].forEach(inp => {
     inp.addEventListener("keydown", e => { if (e.key === "Enter") submit.click(); });
   });
   return wrap;
@@ -5693,10 +6518,14 @@ function authField(label, type, placeholder) {
 
 async function onAuthSuccess() {
   hideAuthScreen();
-  if (state.profile.name === "" && _currentUser?.user_metadata?.name) {
-    state.profile.name = _currentUser.user_metadata.name;
+  // Seed first/last name from auth metadata (set at sign-up) if not yet in state
+  if (!state.profile.firstName && _currentUser?.user_metadata?.first_name) {
+    state.profile.firstName = _currentUser.user_metadata.first_name;
   }
-  // Fetch subscription tier from Supabase profiles table
+  if (!state.profile.lastName && _currentUser?.user_metadata?.last_name) {
+    state.profile.lastName = _currentUser.user_metadata.last_name;
+  }
+  // Fetch subscription tier
   if (_currentUser) {
     try {
       const { data } = await supabase
@@ -5711,12 +6540,9 @@ async function onAuthSuccess() {
   loadState();
   applyTheme(getTheme());
   render();
-  toast(`Welcome${state.profile.name ? ", " + state.profile.name : ""}!`);
-  syncFromSupabase().then(() => {
-    if (!state.profile.onboarded && !state.firms.length && !state.payouts.length) {
-      setTimeout(() => openOnboarding(), 600);
-    }
-  });
+  const greeting = state.profile.username || state.profile.firstName;
+  toast(`Welcome${greeting ? ", " + greeting : ""}!`);
+  syncFromSupabase();
 }
 
 function logout() {
@@ -6057,19 +6883,11 @@ supabase.auth.onAuthStateChange((event, session) => {
     render();
     showPinScreen(() => {
       document.getElementById("app").style.display = "";
-      syncFromSupabase().then(() => {
-        if (!state.profile.onboarded && !state.firms.length && !state.payouts.length) {
-          setTimeout(() => openOnboarding(), 600);
-        }
-      });
+      syncFromSupabase();
     });
   } else {
     render();
-    syncFromSupabase().then(() => {
-      if (!state.profile.onboarded && !state.firms.length && !state.payouts.length) {
-        setTimeout(() => openOnboarding(), 600);
-      }
-    });
+    syncFromSupabase();
   }
 
   document.addEventListener("visibilitychange", () => {
