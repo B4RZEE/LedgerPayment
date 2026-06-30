@@ -2414,22 +2414,25 @@
 
 <div class="toast" id="toast"></div>
 
-<script>
+<script type="module">
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+
+const _SB_URL  = "https://oivtpyqfnfyhofniwygq.supabase.co";
+const _SB_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9pdnRweXFmbmZ5aG9mbml3eWdxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI3NzAxMDksImV4cCI6MjA5ODM0NjEwOX0.bWdFBH1MUT8d092t4-0JRWl4mxnQE-HZTiAXpv9U7WY";
+const supabase = createClient(_SB_URL, _SB_ANON);
+
+let _currentUser = null; // kept in sync by onAuthStateChange
+
 /* ================================================================
    STATE & STORAGE
    ================================================================ */
 const STORAGE_KEY = "ledger_dashboard_v1";
 const THEME_KEY   = "ledger_theme_v1";
 const PIN_KEY     = "ledger_pin_v1";
-const USERS_KEY   = "ledger_users_v1";    // registry of all local accounts: [{ id, email, passwordHash, name, createdAt }]
-const SESSION_KEY = "ledger_session_v1";  // { userId, email, issuedAt }
 
-// Each logged-in user gets their own data namespace, e.g. "ledger_dashboard_v1::u_abc123".
-// This is what makes the app "ready for Supabase" — swap this function's body to read
-// from a remote table keyed by the same userId and nothing else needs to change.
+// Each user gets their own localStorage namespace scoped by Supabase user ID.
 function scopedKey(base) {
-  const session = getSession();
-  return session ? `${base}::${session.userId}` : base;
+  return _currentUser ? `${base}::${_currentUser.id}` : base;
 }
 
 // Search state (not persisted — resets on reload)
@@ -5208,59 +5211,19 @@ function toast(msg) {
 }
 
 /* ================================================================
-   AUTHENTICATION
-   ================================================================
-   Local-only for now (registry + hashed passwords in localStorage).
-   Designed so swapping to Supabase later only means changing the
-   bodies of getUsers/saveUsers/getSession/setSession/clearSession —
-   every call site (login/register/forgot-password UI) stays the same.
+   AUTHENTICATION — Supabase
    ================================================================ */
 
-/* ---- Password hashing (SHA-256 via Web Crypto, salted with email) ---- */
-async function hashPassword(password, salt) {
-  const enc = new TextEncoder();
-  const data = enc.encode(salt + ":" + password);
-  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
-}
-
-/* ---- User registry ---- */
-function getUsers() {
-  try {
-    return JSON.parse(localStorage.getItem(USERS_KEY) || "[]");
-  } catch { return []; }
-}
-function saveUsers(users) {
-  localStorage.setItem(USERS_KEY, JSON.stringify(users));
-}
-function findUserByEmail(email) {
-  const norm = email.trim().toLowerCase();
-  return getUsers().find(u => u.email === norm) || null;
-}
-
-/* ---- Session ---- */
-function getSession() {
-  try {
-    return JSON.parse(localStorage.getItem(SESSION_KEY) || "null");
-  } catch { return null; }
-}
-function setSession(user) {
-  localStorage.setItem(SESSION_KEY, JSON.stringify({
-    userId: user.id, email: user.email, name: user.name, issuedAt: Date.now()
-  }));
-}
-function clearSession() {
-  localStorage.removeItem(SESSION_KEY);
-}
-function isLoggedIn() { return !!getSession(); }
-
-/* ---- Validation helpers ---- */
 function isValidEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
 }
 
-/* ---- Auth screen renderer ---- */
+function getSession() {
+  // Returns the cached user object synchronously (set by onAuthStateChange).
+  return _currentUser ? { userId: _currentUser.id, email: _currentUser.email, name: _currentUser.user_metadata?.name || "" } : null;
+}
+function isLoggedIn() { return !!_currentUser; }
+
 let authView = "login"; // "login" | "register" | "forgot"
 
 function showAuthScreen() {
@@ -5275,26 +5238,20 @@ function hideAuthScreen() {
 function renderAuthView() {
   const screen = document.getElementById("authScreen");
   screen.innerHTML = "";
-
   const card = document.createElement("div");
   card.className = "auth-card";
-
   const brand = document.createElement("div");
   brand.className = "auth-brand";
   brand.innerHTML = `<div class="auth-brand-mark"></div><div class="auth-brand-name">Ledger</div>`;
   card.appendChild(brand);
-
   if (authView === "login")    card.appendChild(buildLoginForm());
   if (authView === "register") card.appendChild(buildRegisterForm());
   if (authView === "forgot")   card.appendChild(buildForgotForm());
-
-  screen.innerHTML = "";
   screen.appendChild(card);
 }
 
 function buildLoginForm() {
   const wrap = document.createElement("div");
-
   const title = document.createElement("div");
   title.className = "auth-title"; title.textContent = "Welcome back";
   const sub = document.createElement("div");
@@ -5302,10 +5259,9 @@ function buildLoginForm() {
   wrap.appendChild(title); wrap.appendChild(sub);
 
   const emailField = authField("Email", "email", "you@example.com");
-  const pwField = authField("Password", "password", "••••••••");
-  const errEl = document.createElement("div");
-  errEl.className = "auth-error";
-
+  const pwField    = authField("Password", "password", "••••••••");
+  const errEl      = document.createElement("div");
+  errEl.className  = "auth-error";
   wrap.appendChild(emailField.wrap);
   wrap.appendChild(pwField.wrap);
   wrap.appendChild(errEl);
@@ -5315,27 +5271,17 @@ function buildLoginForm() {
   submit.textContent = "Log In";
   submit.addEventListener("click", async () => {
     const email = emailField.input.value.trim();
-    const pw = pwField.input.value;
+    const pw    = pwField.input.value;
     errEl.textContent = "";
-
     if (!email || !pw) { errEl.textContent = "Enter your email and password."; return; }
-
     submit.disabled = true; submit.textContent = "Logging in…";
-    const user = findUserByEmail(email);
-    if (!user) {
-      errEl.textContent = "No account found with that email.";
+    const { error } = await supabase.auth.signInWithPassword({ email, password: pw });
+    if (error) {
+      errEl.textContent = error.message === "Invalid login credentials"
+        ? "Incorrect email or password." : error.message;
       submit.disabled = false; submit.textContent = "Log In";
-      return;
     }
-    const hash = await hashPassword(pw, user.email);
-    if (hash !== user.passwordHash) {
-      errEl.textContent = "Incorrect password.";
-      submit.disabled = false; submit.textContent = "Log In";
-      return;
-    }
-
-    setSession(user);
-    onAuthSuccess();
+    // onAuthStateChange fires automatically on success → onAuthSuccess()
   });
   wrap.appendChild(submit);
 
@@ -5351,18 +5297,14 @@ function buildLoginForm() {
 
   wrap.querySelector("#toForgot").addEventListener("click", () => { authView = "forgot"; renderAuthView(); });
   wrap.querySelector("#toRegister").addEventListener("click", () => { authView = "register"; renderAuthView(); });
-
-  // Allow Enter key to submit
   [emailField.input, pwField.input].forEach(inp => {
-    inp.addEventListener("keydown", (e) => { if (e.key === "Enter") submit.click(); });
+    inp.addEventListener("keydown", e => { if (e.key === "Enter") submit.click(); });
   });
-
   return wrap;
 }
 
 function buildRegisterForm() {
   const wrap = document.createElement("div");
-
   const title = document.createElement("div");
   title.className = "auth-title"; title.textContent = "Create your account";
   const sub = document.createElement("div");
@@ -5373,9 +5315,8 @@ function buildRegisterForm() {
   const emailField = authField("Email", "email", "you@example.com");
   const pwField    = authField("Password", "password", "At least 6 characters");
   const pw2Field   = authField("Confirm Password", "password", "Re-enter your password");
-  const errEl = document.createElement("div");
-  errEl.className = "auth-error";
-
+  const errEl      = document.createElement("div");
+  errEl.className  = "auth-error";
   wrap.appendChild(nameField.wrap);
   wrap.appendChild(emailField.wrap);
   wrap.appendChild(pwField.wrap);
@@ -5386,28 +5327,26 @@ function buildRegisterForm() {
   submit.className = "auth-submit";
   submit.textContent = "Sign Up";
   submit.addEventListener("click", async () => {
-    const name = nameField.input.value.trim();
+    const name  = nameField.input.value.trim();
     const email = emailField.input.value.trim();
-    const pw = pwField.input.value;
-    const pw2 = pw2Field.input.value;
+    const pw    = pwField.input.value;
+    const pw2   = pw2Field.input.value;
     errEl.textContent = "";
-
-    if (!name) { errEl.textContent = "Tell us your name."; return; }
-    if (!isValidEmail(email)) { errEl.textContent = "Enter a valid email address."; return; }
-    if (pw.length < 6) { errEl.textContent = "Password must be at least 6 characters."; return; }
-    if (pw !== pw2) { errEl.textContent = "Passwords don't match."; return; }
-    if (findUserByEmail(email)) { errEl.textContent = "An account with that email already exists."; return; }
-
+    if (!name)                  { errEl.textContent = "Tell us your name."; return; }
+    if (!isValidEmail(email))   { errEl.textContent = "Enter a valid email address."; return; }
+    if (pw.length < 6)          { errEl.textContent = "Password must be at least 6 characters."; return; }
+    if (pw !== pw2)             { errEl.textContent = "Passwords don't match."; return; }
     submit.disabled = true; submit.textContent = "Creating account…";
-    const normEmail = email.toLowerCase();
-    const passwordHash = await hashPassword(pw, normEmail);
-    const user = { id: uid(), email: normEmail, passwordHash, name, createdAt: Date.now() };
-    const users = getUsers();
-    users.push(user);
-    saveUsers(users);
-
-    setSession(user);
-    onAuthSuccess();
+    const { error } = await supabase.auth.signUp({
+      email,
+      password: pw,
+      options: { data: { name } }
+    });
+    if (error) {
+      errEl.textContent = error.message;
+      submit.disabled = false; submit.textContent = "Sign Up";
+    }
+    // onAuthStateChange fires on success → onAuthSuccess()
   });
   wrap.appendChild(submit);
 
@@ -5416,17 +5355,14 @@ function buildRegisterForm() {
   switchLink.innerHTML = `Already have an account? <a id="toLogin">Log in</a>`;
   wrap.appendChild(switchLink);
   wrap.querySelector("#toLogin").addEventListener("click", () => { authView = "login"; renderAuthView(); });
-
   [nameField.input, emailField.input, pwField.input, pw2Field.input].forEach(inp => {
-    inp.addEventListener("keydown", (e) => { if (e.key === "Enter") submit.click(); });
+    inp.addEventListener("keydown", e => { if (e.key === "Enter") submit.click(); });
   });
-
   return wrap;
 }
 
 function buildForgotForm() {
   const wrap = document.createElement("div");
-
   const back = document.createElement("div");
   back.className = "auth-back";
   back.innerHTML = `← Back to login`;
@@ -5440,37 +5376,39 @@ function buildForgotForm() {
   wrap.appendChild(title); wrap.appendChild(sub);
 
   const emailField = authField("Email", "email", "you@example.com");
-  const msgEl = document.createElement("div");
-  msgEl.className = "auth-error";
-
+  const msgEl      = document.createElement("div");
+  msgEl.className  = "auth-error";
   wrap.appendChild(emailField.wrap);
   wrap.appendChild(msgEl);
 
   const submit = document.createElement("button");
   submit.className = "auth-submit";
   submit.textContent = "Send Reset Link";
-  submit.addEventListener("click", () => {
+  submit.addEventListener("click", async () => {
     const email = emailField.input.value.trim();
     if (!isValidEmail(email)) { msgEl.className = "auth-error"; msgEl.textContent = "Enter a valid email address."; return; }
-
-    // Placeholder — no backend email service wired up yet.
-    // Once Supabase is connected this calls supabase.auth.resetPasswordForEmail(email).
-    msgEl.className = "auth-success";
-    msgEl.textContent = "If an account exists for that email, a reset link has been sent.";
-    submit.disabled = true;
-    submit.textContent = "Link Sent";
+    submit.disabled = true; submit.textContent = "Sending…";
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: window.location.origin
+    });
+    if (error) {
+      msgEl.className = "auth-error"; msgEl.textContent = error.message;
+      submit.disabled = false; submit.textContent = "Send Reset Link";
+    } else {
+      msgEl.className = "auth-success";
+      msgEl.textContent = "If an account exists for that email, a reset link has been sent.";
+      submit.textContent = "Link Sent";
+    }
   });
   wrap.appendChild(submit);
-
-  emailField.input.addEventListener("keydown", (e) => { if (e.key === "Enter") submit.click(); });
-
+  emailField.input.addEventListener("keydown", e => { if (e.key === "Enter") submit.click(); });
   return wrap;
 }
 
 function authField(label, type, placeholder) {
-  const wrap = document.createElement("div");
+  const wrap  = document.createElement("div");
   wrap.className = "auth-field";
-  const lbl = document.createElement("label");
+  const lbl   = document.createElement("label");
   lbl.className = "auth-label"; lbl.textContent = label;
   const input = document.createElement("input");
   input.className = "auth-input";
@@ -5482,10 +5420,11 @@ function authField(label, type, placeholder) {
   return { wrap, input };
 }
 
-/* ---- Called once login/register succeeds ---- */
 function onAuthSuccess() {
   hideAuthScreen();
-  // Load this user's own data namespace and boot the app fresh
+  if (state.profile.name === "" && _currentUser?.user_metadata?.name) {
+    state.profile.name = _currentUser.user_metadata.name;
+  }
   loadState();
   applyTheme(getTheme());
   render();
@@ -5495,9 +5434,10 @@ function onAuthSuccess() {
   toast(`Welcome${state.profile.name ? ", " + state.profile.name : ""}!`);
 }
 
-function logout() {
+async function logout() {
   if (!confirm("Log out of Ledger?")) return;
-  clearSession();
+  await supabase.auth.signOut();
+  _currentUser = null;
   document.getElementById("app").innerHTML = "";
   authView = "login";
   showAuthScreen();
@@ -5794,13 +5734,26 @@ function renderSearch() {
 /* ================================================================
    BOOT
    ================================================================ */
-(function init() {
-  // Apply saved theme immediately (before any render to avoid flash)
+// Listen for auth state changes (login, logout, token refresh)
+supabase.auth.onAuthStateChange((event, session) => {
+  _currentUser = session?.user ?? null;
+  if (event === "SIGNED_IN" && document.getElementById("authScreen").style.display !== "none") {
+    onAuthSuccess();
+  }
+  if (event === "SIGNED_OUT") {
+    document.getElementById("app").innerHTML = "";
+    authView = "login";
+    showAuthScreen();
+  }
+});
+
+(async function init() {
   applyTheme(getTheme());
 
-  if (!isLoggedIn()) {
-    // No valid session — show auth screen and stop. loadState/render only
-    // happen after a successful login/register (see onAuthSuccess).
+  const { data: { session } } = await supabase.auth.getSession();
+  _currentUser = session?.user ?? null;
+
+  if (!_currentUser) {
     authView = "login";
     showAuthScreen();
     return;
@@ -5808,12 +5761,9 @@ function renderSearch() {
 
   loadState();
 
-  // If PIN is set, show lock screen before rendering
   if (isPinSet()) {
-    // Render the app behind the PIN screen so it's ready when unlocked
     render();
     showPinScreen(() => {
-      // Unlocked — app is already rendered, just ensure it's visible
       document.getElementById("app").style.display = "";
     });
   } else {
@@ -5823,16 +5773,11 @@ function renderSearch() {
     }
   }
 
-  // Re-lock on page visibility change (phone screen off then back on)
   document.addEventListener("visibilitychange", () => {
-    if (document.hidden) return; // screen going off — nothing to do
+    if (document.hidden) return;
     if (!isPinSet()) return;
-    // Only re-lock if the app was hidden for more than 60 seconds
     const hiddenAt = parseInt(sessionStorage.getItem("ledger_hidden_at") || "0");
-    const elapsed  = Date.now() - hiddenAt;
-    if (elapsed > 60000) {
-      showPinScreen(null);
-    }
+    if (Date.now() - hiddenAt > 60000) showPinScreen(null);
   });
   document.addEventListener("visibilitychange", () => {
     if (document.hidden) sessionStorage.setItem("ledger_hidden_at", Date.now());
