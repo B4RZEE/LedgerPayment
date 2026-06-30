@@ -4425,26 +4425,6 @@ function renderPageSettings(app) {
     )
   ));
 
-  app.appendChild(el("section", { class: "section page-enter" },
-    el("div", { class: "card" },
-      el("div", { class: "card-header" }, el("div", { class: "card-title" }, "Data")),
-      el("div", { style: "display:flex;gap:10px;flex-wrap:wrap;" },
-        el("button", { class: "btn ghost", onclick: exportData }, "Back up"),
-        el("button", { class: "btn ghost", onclick: importData }, "Restore"),
-        el("button", { class: "btn danger", onclick: () => {
-          alertSheet({ title: "Reset All Data", body: "This will permanently delete your firms, accounts, payouts, and costs. This cannot be undone.", buttons: [{ label: "Reset Everything", variant: "danger", action: () => {
-            if (saveTimer) { clearTimeout(saveTimer); saveTimer = null; }
-            if (_sbSyncTimer) { clearTimeout(_sbSyncTimer); _sbSyncTimer = null; }
-            state = structuredClone(DEFAULT_STATE);
-            try { localStorage.removeItem(scopedKey(STORAGE_KEY)); } catch {}
-            dbDeleteAll();
-            rerender();
-            toast("Data reset");
-          }}] });
-        }}, "Reset Data")
-      )
-    )
-  ));
 }
 
 function render() {
@@ -5264,27 +5244,6 @@ function openSettingsSheet(focus) {
       }, isPinSet() ? "🔒 Change / Remove PIN" : "🔒 Set PIN Lock")
     ));
 
-    // Data management
-    body.appendChild(el("div", { class: "section-head", style: "padding:18px 0 4px;" },
-      el("div", { class: "section-title" }, "Data")
-    ));
-    body.appendChild(el("div", { class: "field", style: "display:flex;gap:8px;flex-wrap:wrap;" },
-      el("button", { class: "btn ghost", style: "flex:none;padding:10px 14px;", onclick: exportData }, "Back up"),
-      el("button", { class: "btn ghost", style: "flex:none;padding:10px 14px;", onclick: importData }, "Restore"),
-      el("button", { class: "btn danger", style: "flex:none;padding:10px 14px;", onclick: () => {
-        alertSheet({ title: "Reset Everything", body: "Your name, goals, firms, accounts, payouts and costs will all be permanently cleared. This cannot be undone.", buttons: [{ label: "Reset Everything", variant: "danger", action: () => {
-          if (saveTimer) { clearTimeout(saveTimer); saveTimer = null; }
-          if (_sbSyncTimer) { clearTimeout(_sbSyncTimer); _sbSyncTimer = null; }
-          state = structuredClone(DEFAULT_STATE);
-          try { localStorage.removeItem(scopedKey(STORAGE_KEY)); } catch {}
-          dbDeleteAll();
-          closeSheet();
-          rerender();
-          toast("Everything reset");
-          setTimeout(() => openOnboarding(), 450);
-        }}]});
-      } }, "Reset")
-    ));
 
     root.appendChild(body);
 
@@ -5509,95 +5468,6 @@ function showUpgradePrompt(feature) {
 /* ================================================================
    DATA EXPORT/IMPORT
    ================================================================ */
-function exportData() {
-  if (_tier === "free") { showUpgradePrompt("Data export"); return; }
-  const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = `ledger-backup-${todayISO()}.json`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-  toast("Exported");
-}
-
-function importData() {
-  const input = document.createElement("input");
-  input.type = "file";
-  input.accept = "application/json";
-  input.onchange = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    try {
-      const text = await file.text();
-      const parsed = JSON.parse(text);
-      if (!parsed.profile || !Array.isArray(parsed.firms)) throw new Error("Invalid file");
-
-      const safeStr  = v => (typeof v === "string" ? v.slice(0, 500) : "");
-      const safeNum  = v => { const n = Number(v); return Number.isFinite(n) && n >= 0 ? n : 0; };
-      const safeDate = v => /^\d{4}-\d{2}-\d{2}$/.test(v) ? v : today();
-      const safeId   = v => (typeof v === "string" && /^[\w-]{1,64}$/.test(v) ? v : uid());
-
-      const sanitisedFirms = (parsed.firms || []).map(f => ({
-        id: safeId(f.id), name: safeStr(f.name)
-      }));
-      const sanitisedAccounts = (parsed.accounts || []).map(a => ({
-        id: safeId(a.id), firmId: safeStr(a.firmId), label: safeStr(a.label), health: safeStr(a.health)
-      }));
-      const sanitisedPayouts = (parsed.payouts || []).map(p => ({
-        id: safeId(p.id), firmId: safeStr(p.firmId), accountId: safeStr(p.accountId),
-        amount: safeNum(p.amount), date: safeDate(p.date), status: safeStr(p.status), notes: safeStr(p.notes)
-      }));
-      const sanitisedSpending = (parsed.spending || []).map(s => ({
-        id: safeId(s.id), firmId: safeStr(s.firmId), accountId: safeStr(s.accountId),
-        amount: safeNum(s.amount), date: safeDate(s.date), category: safeStr(s.category), notes: safeStr(s.notes)
-      }));
-
-      // Use alertSheet for branded confirm; wrap rest of import in a local fn
-      const doImport = async () => {
-        const p = parsed.profile || {};
-        const g = p.goals || {};
-        state = {
-          profile: {
-            ...DEFAULT_STATE.profile,
-            name: safeStr(p.name),
-            onboarded: !!p.onboarded,
-            goals: {
-              daily:   safeNum(g.daily)   || DEFAULT_STATE.profile.goals.daily,
-              weekly:  safeNum(g.weekly)  || DEFAULT_STATE.profile.goals.weekly,
-              monthly: safeNum(g.monthly) || DEFAULT_STATE.profile.goals.monthly,
-              annual:  safeNum(g.annual)  || DEFAULT_STATE.profile.goals.annual,
-            }
-          },
-          firms:    sanitisedFirms,
-          accounts: sanitisedAccounts,
-          payouts:  sanitisedPayouts,
-          spending: sanitisedSpending,
-          ui: { ...DEFAULT_STATE.ui }
-        };
-        saveState();
-        closeSheet();
-        rerender();
-        toast("Imported successfully");
-        // Replace Supabase data with the imported set
-        await dbDeleteAll();
-        await syncToSupabase();
-      };
-      const firmCount = sanitisedFirms.length;
-      const payCount  = sanitisedPayouts.length;
-      alertSheet({
-        title: "Restore from Backup",
-        body: `Replace your current data with this file? It contains ${firmCount} firm${firmCount !== 1 ? "s" : ""} and ${payCount} payout${payCount !== 1 ? "s" : ""}. This can't be undone.`,
-        buttons: [{ label: "Restore", variant: "primary", action: doImport }]
-      });
-    } catch (err) {
-      toast("Couldn't import — invalid file");
-    }
-  };
-  input.click();
-}
 
 /* ================================================================
    TOAST
@@ -5945,7 +5815,7 @@ function showPinScreen(onSuccess, opts = {}) {
     if (!isSetup && !isChange) {
       const cancel = document.createElement("div");
       cancel.className = "pin-change-link";
-      cancel.textContent = "Forgot PIN? Use Back up to restore data";
+      cancel.textContent = "Forgot PIN? Log in again to reset it";
       screen.appendChild(cancel);
     }
   }
