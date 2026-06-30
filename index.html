@@ -650,6 +650,31 @@ img { max-width: 100%; display: block; }
   font-size: 11px; font-weight: 700; color: var(--jade-1);
 }
 
+/* Currency selector */
+.currency-row {
+  display: flex; justify-content: center; margin-bottom: 20px;
+}
+.cur-group {
+  display: inline-flex;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  border-radius: var(--r-full);
+  padding: 4px;
+  gap: 2px;
+}
+.cur-btn {
+  padding: 7px 18px; border-radius: var(--r-full);
+  font-size: 13px; font-weight: 600; color: var(--text-3);
+  transition: all .18s var(--ease);
+  white-space: nowrap;
+}
+.cur-btn:hover { color: var(--text-1); }
+.cur-btn.active {
+  background: var(--glass-strong);
+  border: 1px solid var(--border-strong);
+  color: var(--text-0);
+}
+
 .pricing-grid {
   display: grid; grid-template-columns: 1fr;
   gap: 16px; align-items: start;
@@ -1136,7 +1161,15 @@ footer {
     <h2 class="section-title reveal reveal-d1" style="text-align:center;">Simple, transparent pricing</h2>
     <p class="section-sub reveal reveal-d2" style="text-align:center;margin:0 auto 0;">Start free. Upgrade when you're ready. No hidden fees, no lock-in.</p>
 
-    <div class="pricing-toggle reveal reveal-d3">
+    <div class="currency-row reveal reveal-d3">
+      <div class="cur-group">
+        <button class="cur-btn active" data-cur="GBP">£ GBP</button>
+        <button class="cur-btn" data-cur="USD">$ USD</button>
+        <button class="cur-btn" data-cur="EUR">€ EUR</button>
+      </div>
+    </div>
+
+    <div class="pricing-toggle reveal reveal-d3" style="margin-top:0;">
       <span class="pricing-toggle-label active" id="monthly-lbl">Monthly</span>
       <div class="toggle-pill" id="billing-toggle">
         <div class="toggle-pill-thumb"></div>
@@ -1149,7 +1182,7 @@ footer {
       <!-- FREE -->
       <div class="price-card reveal reveal-d1">
         <div class="price-tier">Free</div>
-        <div class="price-amount"><sup>£</sup>0<span class="period">/mo</span></div>
+        <div class="price-amount" id="free-price"><sup>£</sup>0<span class="period">/mo</span></div>
         <div class="price-annual-note"></div>
         <div class="price-desc">Everything you need to get started tracking your funded trading income.</div>
         <div class="price-divider"></div>
@@ -1254,37 +1287,62 @@ const observer = new IntersectionObserver((entries) => {
 }, { threshold: 0.12 });
 document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
-// Pricing toggle
+// Trigger visible on hero elements immediately (they're already in viewport)
+document.querySelectorAll('.hero .reveal').forEach((el, i) => {
+  setTimeout(() => el.classList.add('visible'), i * 120);
+});
+
+// ── Pricing: currency × billing period ──────────────────────────────────────
+const PRICES = {
+  GBP: { sym: '£', proMo: 9,  proYr: 7,  proYrTotal: 79,  maxMo: 19, maxYr: 14, maxYrTotal: 159 },
+  USD: { sym: '$', proMo: 12, proYr: 9,  proYrTotal: 99,  maxMo: 24, maxYr: 18, maxYrTotal: 199 },
+  EUR: { sym: '€', proMo: 10, proYr: 8,  proYrTotal: 89,  maxMo: 21, maxYr: 16, maxYrTotal: 169 },
+};
+
 let annual = false;
-const toggle = document.getElementById('billing-toggle');
+let curKey  = 'GBP';
+
+const toggle     = document.getElementById('billing-toggle');
 const monthlyLbl = document.getElementById('monthly-lbl');
 const annualLbl  = document.getElementById('annual-lbl');
+const freePrice  = document.getElementById('free-price');
 const proPrice   = document.getElementById('pro-price');
 const maxPrice   = document.getElementById('max-price');
 const proNote    = document.getElementById('pro-annual-note');
 const maxNote    = document.getElementById('max-annual-note');
 
+function renderPrices() {
+  const p = PRICES[curKey];
+  freePrice.innerHTML = `<sup>${p.sym}</sup>0<span class="period">/mo</span>`;
+  if (annual) {
+    proPrice.innerHTML = `<sup>${p.sym}</sup>${p.proYr}<span class="period">/mo</span>`;
+    maxPrice.innerHTML = `<sup>${p.sym}</sup>${p.maxYr}<span class="period">/mo</span>`;
+    proNote.textContent = `Billed ${p.sym}${p.proYrTotal}/year`;
+    maxNote.textContent = `Billed ${p.sym}${p.maxYrTotal}/year`;
+  } else {
+    proPrice.innerHTML = `<sup>${p.sym}</sup>${p.proMo}<span class="period">/mo</span>`;
+    maxPrice.innerHTML = `<sup>${p.sym}</sup>${p.maxMo}<span class="period">/mo</span>`;
+    proNote.textContent = '';
+    maxNote.textContent = '';
+  }
+}
+
+// Billing toggle
 toggle.addEventListener('click', () => {
   annual = !annual;
   toggle.classList.toggle('annual', annual);
   monthlyLbl.classList.toggle('active', !annual);
   annualLbl.classList.toggle('active', annual);
-  if (annual) {
-    proPrice.innerHTML = '<sup>£</sup>7<span class="period">/mo</span>';
-    maxPrice.innerHTML = '<sup>£</sup>14<span class="period">/mo</span>';
-    proNote.textContent = 'Billed £79/year';
-    maxNote.textContent = 'Billed £159/year';
-  } else {
-    proPrice.innerHTML = '<sup>£</sup>9<span class="period">/mo</span>';
-    maxPrice.innerHTML = '<sup>£</sup>19<span class="period">/mo</span>';
-    proNote.textContent = '';
-    maxNote.textContent = '';
-  }
+  renderPrices();
 });
 
-// Trigger visible on hero elements immediately
-document.querySelectorAll('.hero .reveal').forEach((el, i) => {
-  setTimeout(() => el.classList.add('visible'), i * 120);
+// Currency selector
+document.querySelectorAll('.cur-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    curKey = btn.dataset.cur;
+    document.querySelectorAll('.cur-btn').forEach(b => b.classList.toggle('active', b === btn));
+    renderPrices();
+  });
 });
 </script>
 </body>

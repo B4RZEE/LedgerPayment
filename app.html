@@ -2457,9 +2457,27 @@ let _currentUser = null; // kept in sync by onAuthStateChange
 /* ================================================================
    STATE & STORAGE
    ================================================================ */
-const STORAGE_KEY = "ledger_dashboard_v1";
-const THEME_KEY   = "ledger_theme_v1";
-const PIN_KEY     = "ledger_pin_v1";
+const STORAGE_KEY   = "ledger_dashboard_v1";
+const THEME_KEY     = "ledger_theme_v1";
+const PIN_KEY       = "ledger_pin_v1";
+const CURRENCY_KEY  = "ledger_currency_v1";
+
+// Currency display (symbol only — no conversion; amounts stored as-is in the user's chosen currency)
+const CURRENCIES = {
+  GBP: { sym: "£", label: "£ GBP" },
+  USD: { sym: "$", label: "$ USD" },
+  EUR: { sym: "€", label: "€ EUR" },
+};
+function getCurKey() { return localStorage.getItem(CURRENCY_KEY) || "GBP"; }
+function setCurKey(k) { localStorage.setItem(CURRENCY_KEY, k); _curKey = k; }
+let _curKey = getCurKey();
+function _sym() { return (CURRENCIES[_curKey] || CURRENCIES.GBP).sym; }
+
+// Subscription tier (fetched from Supabase profiles after login)
+let _tier = "free";
+const PRO_PAGES    = new Set(["stats", "finance", "calendar"]);
+const FREE_FIRMS   = 3;
+const FREE_PAYOUTS = 50;
 
 // Each user gets their own localStorage namespace scoped by Supabase user ID.
 function scopedKey(base) {
@@ -2556,33 +2574,35 @@ const uid = () => Math.random().toString(36).slice(2, 10) + Date.now().toString(
 /* ================================================================
    FORMATTERS & DATE HELPERS
    ================================================================ */
-const GBP = new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP", maximumFractionDigits: 2 });
-const GBP0 = new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP", maximumFractionDigits: 0 });
+const _nf2 = new Intl.NumberFormat("en-GB", { maximumFractionDigits: 2, minimumFractionDigits: 2 });
+const _nf0 = new Intl.NumberFormat("en-GB", { maximumFractionDigits: 0 });
 
 function fmtGBP(n, opts = {}) {
-  if (n == null || isNaN(n)) return "£0";
-  if (opts.short) return GBP0.format(n);
-  return GBP.format(n);
+  if (n == null || isNaN(n)) return _sym() + "0";
+  const abs  = Math.abs(n);
+  const sign = n < 0 ? "−" : "";
+  return sign + _sym() + (opts.short ? _nf0 : _nf2).format(abs);
 }
 
 function compactGBP(n) {
   // For tight slots (calendar cells): £850, £1.2k, £27.8k, £250k, £1.5M
   if (n == null || isNaN(n) || n === 0) return "";
-  const abs = Math.abs(n);
+  const s    = _sym();
+  const abs  = Math.abs(n);
   const sign = n < 0 ? "−" : "";
-  if (abs >= 1000000) return sign + "£" + (abs/1000000).toFixed(1).replace(/\.0$/,'') + "M";
-  if (abs >= 100000)  return sign + "£" + Math.round(abs/1000) + "k";
-  if (abs >= 1000)    return sign + "£" + (abs/1000).toFixed(1).replace(/\.0$/,'') + "k";
-  return sign + "£" + Math.round(abs);
+  if (abs >= 1000000) return sign + s + (abs/1000000).toFixed(1).replace(/\.0$/,'') + "M";
+  if (abs >= 100000)  return sign + s + Math.round(abs/1000) + "k";
+  if (abs >= 1000)    return sign + s + (abs/1000).toFixed(1).replace(/\.0$/,'') + "k";
+  return sign + s + Math.round(abs);
 }
 
 function fmtAmountParts(n) {
   // Returns { whole: "£27,840", pence: ".62" } for hero display
-  if (n == null || isNaN(n)) return { whole: "£0", pence: "" };
+  if (n == null || isNaN(n)) return { whole: _sym() + "0", pence: "" };
   const fixed = n.toFixed(2);
   const [intStr, decStr] = fixed.split(".");
   const withCommas = Number(intStr).toLocaleString("en-GB");
-  return { whole: "£" + withCommas, pence: "." + decStr };
+  return { whole: _sym() + withCommas, pence: "." + decStr };
 }
 
 function localISO(d) {
@@ -3032,6 +3052,12 @@ function svgIcon(name) {
    NAVIGATION DRAWER
    ================================================================ */
 function navigateTo(pageId) {
+  if (_tier === "free" && PRO_PAGES.has(pageId)) {
+    closeNavDrawer();
+    const names = { stats: "Statistics", finance: "Finance", calendar: "Calendar & Journal" };
+    showUpgradePrompt(names[pageId] || pageId);
+    return;
+  }
   currentPage = pageId;
   closeNavDrawer();
   render();
@@ -3076,9 +3102,10 @@ function openNavDrawer() {
       lastSection = page.section;
     }
 
+    const isLocked = _tier === "free" && PRO_PAGES.has(page.id);
     const item = document.createElement("button");
     item.className = "nav-item" + (currentPage === page.id ? " active" : "");
-    item.innerHTML = `${svgIcon(page.icon).outerHTML || ""}<span>${page.label}</span>`;
+    item.innerHTML = `${svgIcon(page.icon).outerHTML || ""}<span>${page.label}</span>${isLocked ? '<span style="margin-left:auto;font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px;background:var(--jade-glow);color:var(--jade-1);border:1px solid rgba(52,211,153,0.2);">Pro</span>' : ''}`;
     item.addEventListener("click", () => navigateTo(page.id));
     list.appendChild(item);
   });
@@ -4118,7 +4145,7 @@ function renderPageSettings(app) {
 
   function moneyInput(key, placeholder) {
     return el("div", { class: "input-prefix-wrap" },
-      el("span", { class: "prefix" }, "£"),
+      el("span", { class: "prefix" }, _sym()),
       el("input", {
         class: "input num", type: "number", inputmode: "decimal", min: "0",
         placeholder, value: g[key] || "",
@@ -4137,6 +4164,30 @@ function renderPageSettings(app) {
           value: state.profile.name,
           oninput: (e) => { state.profile.name = e.target.value; saveState(); }
         })
+      )
+    )
+  ));
+
+  // Currency / Display card
+  app.appendChild(el("section", { class: "section page-enter" },
+    el("div", { class: "card" },
+      el("div", { class: "card-header" }, el("div", { class: "card-title" }, "Display")),
+      el("div", { class: "field" },
+        el("label", { class: "field-label" }, "Currency symbol"),
+        el("div", { style: "display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;" },
+          ...Object.entries(CURRENCIES).map(([key, cur]) => {
+            const active = _curKey === key;
+            const btn = el("button", {
+              class: "btn ghost",
+              style: "font-weight:600;font-size:14px;" + (active ? "border-color:var(--jade-2);color:var(--jade-1);background:var(--jade-glow);" : ""),
+              onclick: () => { setCurKey(key); rerender(); }
+            }, cur.label);
+            return btn;
+          })
+        ),
+        el("div", { style: "font-size:12px;color:var(--text-3);margin-top:10px;line-height:1.5;" },
+          "Sets the symbol shown throughout the app. Enter amounts in your chosen currency."
+        )
       )
     )
   ));
@@ -4171,6 +4222,29 @@ function renderPageSettings(app) {
           onclick: () => { closeNavDrawer(); setTimeout(() => openPinSettings(), 100); }
         }, isPinSet() ? "🔒 Change / Remove PIN" : "🔒 Set PIN Lock")
       )
+    )
+  ));
+
+  // Subscription card
+  const tierLabel = { free: "Free", pro: "Pro", max: "Max" }[_tier] || "Free";
+  const tierColor = { free: "var(--text-3)", pro: "var(--jade-1)", max: "var(--lav-1)" }[_tier] || "var(--text-3)";
+  app.appendChild(el("section", { class: "section page-enter" },
+    el("div", { class: "card" },
+      el("div", { class: "card-header" }, el("div", { class: "card-title" }, "Subscription")),
+      el("div", { style: "display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;" },
+        el("div", {},
+          el("div", { style: "font-size:13px;color:var(--text-2);" }, "Current plan"),
+          el("div", { style: "font-size:20px;font-weight:700;color:" + tierColor + ";margin-top:3px;" }, tierLabel)
+        ),
+        _tier === "free" ? el("a", {
+          href: "/#pricing",
+          class: "btn primary",
+          style: "text-decoration:none;font-size:13px;padding:8px 16px;"
+        }, "Upgrade →") : el("div", { style: "font-size:12px;color:var(--text-3);" }, "Active")
+      ),
+      _tier === "free" ? el("div", { style: "font-size:12px;color:var(--text-3);line-height:1.5;border-top:1px solid var(--hairline);padding-top:12px;" },
+        "Free plan: up to " + FREE_FIRMS + " firms, " + FREE_PAYOUTS + " payouts. Upgrade to Pro for unlimited access."
+      ) : null
     )
   ));
 
@@ -4301,6 +4375,10 @@ function sheetHead(title, onClose) {
    ---------------------------------------------------------------- */
 function openPayoutSheet(payoutId, opts = {}) {
   const editing = payoutId ? state.payouts.find(p => p.id === payoutId) : null;
+  if (!editing && _tier === "free" && state.payouts.length >= FREE_PAYOUTS) {
+    showUpgradePrompt("More than " + FREE_PAYOUTS + " payouts");
+    return;
+  }
 
   // For new payouts, default to the first firm that has at least one account,
   // so the user lands on a workable state instead of immediately hitting the empty-account prompt.
@@ -4518,6 +4596,10 @@ function openPayoutSheet(payoutId, opts = {}) {
    ---------------------------------------------------------------- */
 function openFirmSheet(firmId) {
   const editing = firmId ? getFirm(firmId) : null;
+  if (!editing && _tier === "free" && state.firms.length >= FREE_FIRMS) {
+    showUpgradePrompt("More than " + FREE_FIRMS + " firms");
+    return;
+  }
   const draft = editing ? { ...editing } : { id: uid(), name: "" };
 
   openSheet(() => {
@@ -5182,9 +5264,40 @@ function openOnboarding() {
 }
 
 /* ================================================================
+   UPGRADE PROMPT
+   ================================================================ */
+function showUpgradePrompt(feature) {
+  openSheet(() => {
+    const root = document.createElement("div");
+    root.appendChild(sheetHead("Upgrade to Pro"));
+    const body = el("div", { class: "sheet-body", style: "text-align:center;padding:32px 16px 24px;" },
+      el("div", { style: "font-size:44px;margin-bottom:18px;line-height:1;" }, "🔒"),
+      el("div", { style: "font-size:18px;font-weight:700;letter-spacing:-0.01em;margin-bottom:10px;" },
+        feature + " is a Pro feature"
+      ),
+      el("div", { style: "font-size:14px;color:var(--text-2);line-height:1.65;margin-bottom:28px;max-width:280px;margin-left:auto;margin-right:auto;" },
+        "Unlock unlimited firms & payouts, full statistics, calendar & journal, finance tracking, and data export with Ledger Pro."
+      ),
+      el("a", {
+        href: "/#pricing",
+        class: "btn primary",
+        style: "display:inline-flex;align-items:center;gap:8px;text-decoration:none;",
+        onclick: () => closeSheet()
+      }, "View Plans →"),
+      el("div", { style: "margin-top:14px;" },
+        el("button", { class: "btn ghost", onclick: () => closeSheet() }, "Maybe later")
+      )
+    );
+    root.appendChild(body);
+    return root;
+  });
+}
+
+/* ================================================================
    DATA EXPORT/IMPORT
    ================================================================ */
 function exportData() {
+  if (_tier === "free") { showUpgradePrompt("Data export"); return; }
   const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
@@ -5484,11 +5597,23 @@ function authField(label, type, placeholder) {
   return { wrap, input };
 }
 
-function onAuthSuccess() {
+async function onAuthSuccess() {
   hideAuthScreen();
   if (state.profile.name === "" && _currentUser?.user_metadata?.name) {
     state.profile.name = _currentUser.user_metadata.name;
   }
+  // Fetch subscription tier from Supabase profiles table
+  if (_currentUser) {
+    try {
+      const { data } = await supabase
+        .from("profiles")
+        .select("subscription_tier")
+        .eq("id", _currentUser.id)
+        .single();
+      if (data?.subscription_tier) _tier = data.subscription_tier;
+    } catch (_) {}
+  }
+  _curKey = getCurKey();
   loadState();
   applyTheme(getTheme());
   render();
