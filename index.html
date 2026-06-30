@@ -4,9 +4,27 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <link rel="manifest" href="/manifest.json">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <meta name="theme-color" content="#07080c">
-<title>Ledger — Track Your Trading Payouts</title>
-<meta name="description" content="One dashboard for every prop firm payout. Track withdrawals, hit income goals, and see what your funded trading business actually earns.">
+<title>Ledger — Track Your Prop Firm Payouts</title>
+<meta name="description" content="One dashboard for every prop firm payout. Track withdrawals across FTMO, Apex, TopStep and more. Hit income goals and see what your funded trading business actually earns.">
+<!-- Open Graph -->
+<meta property="og:type"        content="website">
+<meta property="og:title"       content="Ledger — Track Your Prop Firm Payouts">
+<meta property="og:description" content="One dashboard for every prop firm payout. Track withdrawals, hit income goals, and see what your funded trading business actually earns.">
+<meta property="og:url"         content="https://ledgerpayout.vercel.app/">
+<meta property="og:image"       content="https://ledgerpayout.vercel.app/og-image.png">
+<meta property="og:image:width"  content="1200">
+<meta property="og:image:height" content="630">
+<!-- Twitter / X -->
+<meta name="twitter:card"        content="summary_large_image">
+<meta name="twitter:title"       content="Ledger — Track Your Prop Firm Payouts">
+<meta name="twitter:description" content="One dashboard for every prop firm payout. Track withdrawals, hit income goals, and see what your funded trading business actually earns.">
+<meta name="twitter:image"       content="https://ledgerpayout.vercel.app/og-image.png">
+<!-- Canonical -->
+<link rel="canonical" href="https://ledgerpayout.vercel.app/">
 <style>
 /* ============================================================
    TOKENS (shared with app)
@@ -815,6 +833,28 @@ footer {
   .phone-frame { width: 240px; }
   .mock-screen { font-size: 8px; min-height: 440px; }
 }
+
+/* Focus states */
+:focus-visible {
+  outline: 2px solid var(--jade-2);
+  outline-offset: 3px;
+}
+.btn-ghost:focus-visible, .btn-jade:focus-visible,
+.cta-primary:focus-visible, .cta-secondary:focus-visible,
+.cur-btn:focus-visible, .toggle-pill:focus-visible,
+.price-cta:focus-visible, .nav-links a:focus-visible { outline: 2px solid var(--jade-2); }
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .atmosphere::before, .atmosphere::after,
+  .phone-frame, .goal-mock-fill::after { animation: none !important; }
+  .reveal { opacity: 1; transform: none; }
+}
 </style>
 </head>
 <body>
@@ -1182,7 +1222,7 @@ footer {
       <!-- FREE -->
       <div class="price-card reveal reveal-d1">
         <div class="price-tier">Free</div>
-        <div class="price-amount" id="free-price"><sup>£</sup>0<span class="period">/mo</span></div>
+        <div class="price-amount" id="free-price"><sup>£</sup>0<span class="period" style="font-size:14px;"> forever</span></div>
         <div class="price-annual-note"></div>
         <div class="price-desc">Everything you need to get started tracking your funded trading income.</div>
         <div class="price-divider"></div>
@@ -1215,7 +1255,7 @@ footer {
           <li><span class="check">✓</span> Cost & expense tracking</li>
           <li><span class="check">✓</span> CSV & JSON export</li>
           <li><span class="check">✓</span> Data backup & restore</li>
-          <li><span class="check">✓</span> Tax estimate card</li>
+          <li><span class="check">✓</span> Tax estimate <span style="font-size:10px;padding:1px 6px;border-radius:99px;background:rgba(165,180,252,0.15);color:var(--lav-2);font-weight:700;margin-left:4px;">Soon</span></li>
           <li><span class="check">✓</span> Priority email support</li>
           <li class="dim"><span class="cross">–</span> Community benchmarks</li>
         </ul>
@@ -1231,11 +1271,11 @@ footer {
         <div class="price-divider"></div>
         <ul class="price-features">
           <li><span class="check">✓</span> Everything in Pro</li>
-          <li><span class="check">✓</span> Community benchmarking</li>
-          <li><span class="check">✓</span> Push notifications</li>
-          <li><span class="check">✓</span> Peer payout comparison</li>
-          <li><span class="check">✓</span> White-label PDF reports</li>
-          <li><span class="check">✓</span> API access</li>
+          <li><span class="check">✓</span> Community benchmarking <span style="font-size:10px;padding:1px 6px;border-radius:99px;background:rgba(165,180,252,0.15);color:var(--lav-2);font-weight:700;margin-left:4px;">Soon</span></li>
+          <li><span class="check">✓</span> Push notifications <span style="font-size:10px;padding:1px 6px;border-radius:99px;background:rgba(165,180,252,0.15);color:var(--lav-2);font-weight:700;margin-left:4px;">Soon</span></li>
+          <li><span class="check">✓</span> Peer payout comparison <span style="font-size:10px;padding:1px 6px;border-radius:99px;background:rgba(165,180,252,0.15);color:var(--lav-2);font-weight:700;margin-left:4px;">Soon</span></li>
+          <li><span class="check">✓</span> White-label PDF reports <span style="font-size:10px;padding:1px 6px;border-radius:99px;background:rgba(165,180,252,0.15);color:var(--lav-2);font-weight:700;margin-left:4px;">Soon</span></li>
+          <li><span class="check">✓</span> API access <span style="font-size:10px;padding:1px 6px;border-radius:99px;background:rgba(165,180,252,0.15);color:var(--lav-2);font-weight:700;margin-left:4px;">Soon</span></li>
           <li><span class="check">✓</span> Early feature access</li>
           <li><span class="check">✓</span> Priority live chat support</li>
         </ul>
@@ -1313,7 +1353,7 @@ const maxNote    = document.getElementById('max-annual-note');
 
 function renderPrices() {
   const p = PRICES[curKey];
-  freePrice.innerHTML = `<sup>${p.sym}</sup>0<span class="period">/mo</span>`;
+  freePrice.innerHTML = `<sup>${p.sym}</sup>0<span class="period" style="font-size:14px;"> forever</span>`;
   if (annual) {
     proPrice.innerHTML = `<sup>${p.sym}</sup>${p.proYr}<span class="period">/mo</span>`;
     maxPrice.innerHTML = `<sup>${p.sym}</sup>${p.maxYr}<span class="period">/mo</span>`;

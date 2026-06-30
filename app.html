@@ -1498,6 +1498,21 @@
     .atmosphere::before, .atmosphere::after { animation: none; }
   }
 
+  /* ── Focus states for keyboard navigation ── */
+  :focus-visible {
+    outline: 2px solid var(--jade-2);
+    outline-offset: 2px;
+  }
+  .btn:focus-visible, .icon-btn:focus-visible, .nav-item:focus-visible,
+  .tab-btn:focus-visible, .pay-item:focus-visible, .cal-day:focus-visible {
+    outline: 2px solid var(--jade-2);
+    outline-offset: 2px;
+    border-radius: inherit;
+  }
+  .input:focus-visible, .select:focus-visible, .textarea:focus-visible {
+    outline: none; /* already styled with border-color */
+  }
+
   /* ============================================================
      ONBOARDING / WELCOME
      ============================================================ */
@@ -3414,7 +3429,7 @@ function renderUpcoming() {
       timeline.appendChild(makeSwipeable(
         payoutItem(p),
         () => openPayoutSheet(p.id),
-        () => { if (confirm("Delete this payout?")) { state.payouts = state.payouts.filter(x => x.id !== p.id); saveState(); rerender(); toast("Deleted"); } }
+        () => alertSheet({ title: "Delete Payout", body: "Remove this payout? This can't be undone.", buttons: [{ label: "Delete Payout", variant: "danger", action: () => { state.payouts = state.payouts.filter(x => x.id !== p.id); saveState(); rerender(); toast("Deleted"); } }] })
       ));
     });
     content = timeline;
@@ -3460,7 +3475,7 @@ function renderRecent() {
       timeline.appendChild(makeSwipeable(
         payoutItem(p),
         () => openPayoutSheet(p.id),
-        () => { if (confirm("Delete this payout?")) { state.payouts = state.payouts.filter(x => x.id !== p.id); saveState(); rerender(); toast("Deleted"); } }
+        () => alertSheet({ title: "Delete Payout", body: "Remove this payout? This can't be undone.", buttons: [{ label: "Delete Payout", variant: "danger", action: () => { state.payouts = state.payouts.filter(x => x.id !== p.id); saveState(); rerender(); toast("Deleted"); } }] })
       ));
     });
     if (isFiltering && items.length > 40) {
@@ -4254,13 +4269,14 @@ function renderPageSettings(app) {
       el("div", { style: "display:flex;gap:10px;flex-wrap:wrap;" },
         el("button", { class: "btn ghost", onclick: exportData }, "Back up"),
         el("button", { class: "btn ghost", onclick: importData }, "Restore"),
-        el("button", { class: "btn danger", onclick: async () => {
-          if (!confirm("Reset all your data? This cannot be undone.")) return;
-          if (saveTimer) { clearTimeout(saveTimer); saveTimer = null; }
-          state = structuredClone(DEFAULT_STATE);
-          try { localStorage.removeItem(scopedKey(STORAGE_KEY)); } catch {}
-          rerender();
-          toast("Data reset");
+        el("button", { class: "btn danger", onclick: () => {
+          alertSheet({ title: "Reset All Data", body: "This will permanently delete your firms, accounts, payouts, and costs. This cannot be undone.", buttons: [{ label: "Reset Everything", variant: "danger", action: () => {
+            if (saveTimer) { clearTimeout(saveTimer); saveTimer = null; }
+            state = structuredClone(DEFAULT_STATE);
+            try { localStorage.removeItem(scopedKey(STORAGE_KEY)); } catch {}
+            rerender();
+            toast("Data reset");
+          }}] });
         }}, "Reset Data")
       )
     )
@@ -4550,13 +4566,13 @@ function openPayoutSheet(payoutId, opts = {}) {
     const foot = el("div", { class: "sheet-foot" });
     if (editing) {
       foot.appendChild(el("button", { class: "btn danger", onclick: () => {
-        if (confirm("Delete this payout? This can't be undone.")) {
+        alertSheet({ title: "Delete Payout", body: "Remove this payout? This can't be undone.", buttons: [{ label: "Delete Payout", variant: "danger", action: () => {
           state.payouts = state.payouts.filter(p => p.id !== editing.id);
           saveState();
           closeSheet();
           rerender();
           toast("Payout deleted");
-        }
+        }}] });
       } }, "Delete"));
       // Duplicate — copies the payout with a new id, pre-set to today, re-opens the sheet
       foot.appendChild(el("button", { class: "btn-duplicate", onclick: () => {
@@ -4685,9 +4701,9 @@ function openFirmSheet(firmId) {
       foot.appendChild(el("button", { class: "btn danger", onclick: () => {
         const accts = accountsForFirm(editing.id).length;
         const pays = payoutsForFirm(editing.id).length;
-        let msg = `Delete "${editing.name}"?`;
-        if (accts || pays) msg += `\n\nThis will also remove ${accts} account${accts === 1 ? "" : "s"} and ${pays} payout${pays === 1 ? "" : "s"}.`;
-        if (confirm(msg)) {
+        let msg = `Remove "${editing.name}"?`;
+        if (accts || pays) msg += ` This will also delete ${[accts && `${accts} account${accts === 1 ? "" : "s"}`, pays && `${pays} payout${pays === 1 ? "" : "s"}`].filter(Boolean).join(" and ")}.`;
+        alertSheet({ title: "Delete Firm", body: msg, buttons: [{ label: "Delete Firm", variant: "danger", action: () => {
           state.firms = state.firms.filter(f => f.id !== editing.id);
           state.accounts = state.accounts.filter(a => a.firmId !== editing.id);
           state.payouts = state.payouts.filter(p => p.firmId !== editing.id);
@@ -4695,7 +4711,7 @@ function openFirmSheet(firmId) {
           closeSheet();
           rerender();
           toast("Firm deleted");
-        }
+        }}]});
       } }, "Delete"));
     }
     foot.appendChild(el("button", { class: "btn ghost", onclick: closeSheet }, "Cancel"));
@@ -4792,15 +4808,14 @@ function openAccountSheet(accountId, defaultFirmId) {
     const foot = el("div", { class: "sheet-foot" });
     if (editing) {
       foot.appendChild(el("button", { class: "btn danger", onclick: () => {
-        if (confirm(`Delete account "${editing.label}"?`)) {
+        alertSheet({ title: "Delete Account", body: `Remove "${editing.label}"? Payouts linked to this account will be kept but unlinked.`, buttons: [{ label: "Delete Account", variant: "danger", action: () => {
           state.accounts = state.accounts.filter(a => a.id !== editing.id);
-          // Unlink payouts but keep them under the firm
           state.payouts = state.payouts.map(p => p.accountId === editing.id ? { ...p, accountId: "" } : p);
           saveState();
           closeSheet();
           rerender();
           toast("Account deleted");
-        }
+        }}]});
       } }, "Delete"));
     }
     foot.appendChild(el("button", { class: "btn ghost", onclick: closeSheet }, "Cancel"));
@@ -4956,13 +4971,13 @@ function openSpendingSheet(spendId) {
     const foot = el("div", { class: "sheet-foot" });
     if (editing) {
       foot.appendChild(el("button", { class: "btn danger", onclick: () => {
-        if (confirm("Delete this cost? This can't be undone.")) {
+        alertSheet({ title: "Delete Cost", body: "Remove this cost entry? This can't be undone.", buttons: [{ label: "Delete Cost", variant: "danger", action: () => {
           state.spending = state.spending.filter(s => s.id !== editing.id);
           saveState();
           closeSheet();
           rerender();
           toast("Cost deleted");
-        }
+        }}]});
       } }, "Delete"));
     }
     foot.appendChild(el("button", { class: "btn ghost", onclick: closeSheet }, "Cancel"));
@@ -5081,18 +5096,15 @@ function openSettingsSheet(focus) {
       el("button", { class: "btn ghost", style: "flex:none;padding:10px 14px;", onclick: exportData }, "Back up"),
       el("button", { class: "btn ghost", style: "flex:none;padding:10px 14px;", onclick: importData }, "Restore"),
       el("button", { class: "btn danger", style: "flex:none;padding:10px 14px;", onclick: () => {
-        if (!confirm("Reset everything? Your name, goals, firms, accounts, payouts and costs will be cleared.")) return;
-        // 1) Cancel any pending debounced save so it can't overwrite us a moment later
-        if (saveTimer) { clearTimeout(saveTimer); saveTimer = null; }
-        // 2) Reset in-memory state immediately
-        state = structuredClone(DEFAULT_STATE);
-        // 3) Wipe localStorage — synchronous, no race condition possible
-        try { localStorage.removeItem(scopedKey(STORAGE_KEY)); } catch {}
-        // 4) Close sheet, repaint, and walk the user back through setup
-        closeSheet();
-        rerender();
-        toast("Everything reset");
-        setTimeout(() => openOnboarding(), 450);
+        alertSheet({ title: "Reset Everything", body: "Your name, goals, firms, accounts, payouts and costs will all be permanently cleared. This cannot be undone.", buttons: [{ label: "Reset Everything", variant: "danger", action: () => {
+          if (saveTimer) { clearTimeout(saveTimer); saveTimer = null; }
+          state = structuredClone(DEFAULT_STATE);
+          try { localStorage.removeItem(scopedKey(STORAGE_KEY)); } catch {}
+          closeSheet();
+          rerender();
+          toast("Everything reset");
+          setTimeout(() => openOnboarding(), 450);
+        }}]});
       } }, "Reset")
     ));
 
@@ -5264,6 +5276,29 @@ function openOnboarding() {
 }
 
 /* ================================================================
+   BRANDED CONFIRM / ALERT SHEET
+   (replaces all native confirm() dialogs)
+   ================================================================ */
+function alertSheet({ title, body: bodyText, buttons = [], cancelLabel = "Cancel", showCancel = true }) {
+  openSheet(() => {
+    const root = document.createElement("div");
+    root.appendChild(sheetHead(title));
+    const content = el("div", { class: "sheet-body", style: "padding:4px 0 0;" },
+      el("p", { style: "font-size:15px;color:var(--text-1);line-height:1.65;margin-bottom:24px;" }, bodyText),
+      el("div", { style: "display:flex;flex-direction:column;gap:8px;" },
+        ...buttons.map(b => el("button", {
+          class: "btn " + (b.variant || "ghost"),
+          onclick: () => { closeSheet(); if (b.action) b.action(); }
+        }, b.label)),
+        ...(showCancel ? [el("button", { class: "btn ghost", onclick: () => closeSheet() }, cancelLabel)] : [])
+      )
+    );
+    root.appendChild(content);
+    return root;
+  });
+}
+
+/* ================================================================
    UPGRADE PROMPT
    ================================================================ */
 function showUpgradePrompt(feature) {
@@ -5342,7 +5377,8 @@ function importData() {
         amount: safeNum(s.amount), date: safeDate(s.date), category: safeStr(s.category), notes: safeStr(s.notes)
       }));
 
-      if (confirm("Replace your current data with the imported file? This can't be undone.")) {
+      // Use alertSheet for branded confirm; wrap rest of import in a local fn
+      const doImport = () => {
         const p = parsed.profile || {};
         const g = p.goals || {};
         state = {
@@ -5367,7 +5403,14 @@ function importData() {
         closeSheet();
         rerender();
         toast("Imported successfully");
-      }
+      };
+      const firmCount = sanitisedFirms.length;
+      const payCount  = sanitisedPayouts.length;
+      alertSheet({
+        title: "Restore from Backup",
+        body: `Replace your current data with this file? It contains ${firmCount} firm${firmCount !== 1 ? "s" : ""} and ${payCount} payout${payCount !== 1 ? "s" : ""}. This can't be undone.`,
+        buttons: [{ label: "Restore", variant: "primary", action: doImport }]
+      });
     } catch (err) {
       toast("Couldn't import — invalid file");
     }
@@ -5623,13 +5666,18 @@ async function onAuthSuccess() {
   toast(`Welcome${state.profile.name ? ", " + state.profile.name : ""}!`);
 }
 
-async function logout() {
-  if (!confirm("Log out of Ledger?")) return;
-  await supabase.auth.signOut();
-  _currentUser = null;
-  document.getElementById("app").innerHTML = "";
-  authView = "login";
-  showAuthScreen();
+function logout() {
+  alertSheet({
+    title: "Log Out",
+    body: "You'll be returned to the login screen. Your data stays saved.",
+    buttons: [{ label: "Log Out", variant: "danger", action: async () => {
+      await supabase.auth.signOut();
+      _currentUser = null;
+      document.getElementById("app").innerHTML = "";
+      authView = "login";
+      showAuthScreen();
+    }}]
+  });
 }
 
 /* ================================================================
@@ -5769,14 +5817,15 @@ function openPinSettings() {
   if (isPinSet()) {
     // Ask to verify first, then offer change or remove
     showPinScreen(() => {
-      const action = confirm("PIN is set.\n\nOK = Change PIN\nCancel = Remove PIN");
-      if (action) {
-        showPinScreen(() => {}, { change: true, setup: false });
-      } else {
-        setPin("");
-        toast("PIN removed");
-        rerender();
-      }
+      alertSheet({
+        title: "PIN Lock",
+        body: "Your PIN is set. Would you like to change it or remove it?",
+        cancelLabel: "Keep PIN",
+        buttons: [
+          { label: "Change PIN", variant: "ghost", action: () => showPinScreen(() => {}, { change: true, setup: false }) },
+          { label: "Remove PIN", variant: "danger", action: () => { setPin(""); toast("PIN removed"); rerender(); } }
+        ]
+      });
     }, { change: true });
   } else {
     showPinScreen(() => { rerender(); }, { setup: true });
