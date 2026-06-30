@@ -2582,6 +2582,168 @@ function saveState() {
       console.error("save failed", e);
     }
   }, 200);
+  queueSupabaseSync();
+}
+
+/* ================================================================
+   SUPABASE DATA SYNC
+   ================================================================ */
+let _sbSyncTimer = null;
+function queueSupabaseSync() {
+  if (!_currentUser) return;
+  if (_sbSyncTimer) clearTimeout(_sbSyncTimer);
+  _sbSyncTimer = setTimeout(syncToSupabase, 1000);
+}
+
+async function syncToSupabase() {
+  if (!_currentUser) return;
+  const userId = _currentUser.id;
+  const firmIds    = new Set(state.firms.map(f => f.id));
+  const accountIds = new Set(state.accounts.map(a => a.id));
+  try {
+    // Step 1 — profile + firms (no deps on each other)
+    await Promise.all([
+      supabase.from("profiles").upsert({
+        id: userId,
+        name: state.profile.name || null,
+        goals_daily:   state.profile.goals.daily,
+        goals_weekly:  state.profile.goals.weekly,
+        goals_monthly: state.profile.goals.monthly,
+        goals_annual:  state.profile.goals.annual,
+        onboarded: state.profile.onboarded,
+      }, { onConflict: "id" }),
+      state.firms.length
+        ? supabase.from("firms").upsert(
+            state.firms.map(f => ({ id: f.id, user_id: userId, name: f.name })),
+            { onConflict: "id" }
+          )
+        : Promise.resolve(),
+    ]);
+    // Step 2 — accounts (FK firms)
+    if (state.accounts.length) {
+      await supabase.from("accounts").upsert(
+        state.accounts.map(a => ({ id: a.id, user_id: userId, firm_id: a.firmId, label: a.label, health: a.health || "active" })),
+        { onConflict: "id" }
+      );
+    }
+    // Step 3 — payouts, spending, journal (FK firms + accounts)
+    await Promise.all([
+      state.payouts.length
+        ? supabase.from("payouts").upsert(
+            state.payouts.map(p => ({
+              id: p.id, user_id: userId,
+              firm_id:    firmIds.has(p.firmId)    ? p.firmId    : null,
+              account_id: accountIds.has(p.accountId) ? p.accountId : null,
+              amount: p.amount, date: p.date, status: p.status, notes: p.notes || null,
+            })),
+            { onConflict: "id" }
+          )
+        : Promise.resolve(),
+      state.spending.length
+        ? supabase.from("spending").upsert(
+            state.spending.map(s => ({
+              id: s.id, user_id: userId,
+              firm_id:    firmIds.has(s.firmId)    ? s.firmId    : null,
+              account_id: accountIds.has(s.accountId) ? s.accountId : null,
+              amount: s.amount, date: s.date, category: s.category || "other", notes: s.notes || null,
+            })),
+            { onConflict: "id" }
+          )
+        : Promise.resolve(),
+      state.journal.length
+        ? supabase.from("journal").upsert(
+            state.journal.map(j => ({ user_id: userId, date: j.date, text: j.text })),
+            { onConflict: "user_id,date" }
+          )
+        : Promise.resolve(),
+    ]);
+  } catch (e) { console.warn("syncToSupabase failed:", e); }
+}
+
+async function syncFromSupabase() {
+  if (!_currentUser) return;
+  try {
+    const [profileRes, firmsRes, acctRes, payRes, spendRes, jRes] = await Promise.all([
+      supabase.from("profiles").select("*").eq("id", _currentUser.id).single(),
+      supabase.from("firms").select("*").eq("user_id", _currentUser.id),
+      supabase.from("accounts").select("*").eq("user_id", _currentUser.id),
+      supabase.from("payouts").select("*").eq("user_id", _currentUser.id),
+      supabase.from("spending").select("*").eq("user_id", _currentUser.id),
+      supabase.from("journal").select("*").eq("user_id", _currentUser.id),
+    ]);
+    const pr       = profileRes.data;
+    const firms    = firmsRes.data    || [];
+    const accounts = acctRes.data     || [];
+    const payouts  = payRes.data      || [];
+    const spending = spendRes.data    || [];
+    const journal  = jRes.data        || [];
+    if (pr?.subscription_tier) _tier = pr.subscription_tier;
+    const hasRemote = firms.length || accounts.length || payouts.length || spending.length;
+    const hasLocal  = state.firms.length || state.payouts.length || state.spending.length;
+    if (!hasRemote && hasLocal) { await syncToSupabase(); return; }
+    if (!hasRemote && !hasLocal) return; // brand-new user — nothing to sync
+    state = {
+      profile: {
+        name:      pr?.name      || state.profile.name || "",
+        onboarded: pr?.onboarded ?? state.profile.onboarded,
+        goals: {
+          daily:   pr?.goals_daily   ?? state.profile.goals.daily,
+          weekly:  pr?.goals_weekly  ?? state.profile.goals.weekly,
+          monthly: pr?.goals_monthly ?? state.profile.goals.monthly,
+          annual:  pr?.goals_annual  ?? state.profile.goals.annual,
+        },
+      },
+      firms:    firms.map(f => ({ id: f.id, name: f.name })),
+      accounts: accounts.map(a => ({ id: a.id, firmId: a.firm_id, label: a.label, health: a.health })),
+      payouts:  payouts.map(p => ({ id: p.id, firmId: p.firm_id || "", accountId: p.account_id || "", amount: Number(p.amount), date: p.date, status: p.status, notes: p.notes || "" })),
+      spending: spending.map(s => ({ id: s.id, firmId: s.firm_id || "", accountId: s.account_id || "", amount: Number(s.amount), date: s.date, category: s.category, notes: s.notes || "" })),
+      journal:  journal.map(j => ({ id: String(j.id), date: j.date, text: j.text })),
+      ui: state.ui,
+    };
+    // Apply the same status migrations as loadState
+    state.payouts.forEach(p => {
+      if (p.status === "needs_trading_days" || p.status === "being_paid") p.status = "awaiting_approval";
+    });
+    state.accounts.forEach(a => {
+      if (a.health === "eligible" || a.health === "ready") a.health = "passed";
+      else if (a.health === "building" || a.health === "needs_days") a.health = "in_progress";
+    });
+    // Cache locally without triggering another Supabase push
+    try { localStorage.setItem(scopedKey(STORAGE_KEY), JSON.stringify(state)); } catch {}
+    render();
+  } catch (e) { console.warn("syncFromSupabase failed:", e); }
+}
+
+async function dbDelete(table, id) {
+  if (!_currentUser) return;
+  try { await supabase.from(table).delete().eq("id", id); } catch {}
+}
+
+async function dbDeleteJournal(date) {
+  if (!_currentUser) return;
+  try { await supabase.from("journal").delete().eq("user_id", _currentUser.id).eq("date", date); } catch {}
+}
+
+async function dbDeleteAll() {
+  if (!_currentUser) return;
+  const userId = _currentUser.id;
+  try {
+    // Delete children before parents to respect FK constraints
+    await Promise.all([
+      supabase.from("journal").delete().eq("user_id", userId),
+      supabase.from("spending").delete().eq("user_id", userId),
+      supabase.from("payouts").delete().eq("user_id", userId),
+    ]);
+    await supabase.from("accounts").delete().eq("user_id", userId);
+    await supabase.from("firms").delete().eq("user_id", userId);
+    await supabase.from("profiles").upsert({
+      id: userId, name: null, onboarded: false,
+      goals_daily:   DEFAULT_STATE.profile.goals.daily,
+      goals_weekly:  DEFAULT_STATE.profile.goals.weekly,
+      goals_monthly: DEFAULT_STATE.profile.goals.monthly,
+      goals_annual:  DEFAULT_STATE.profile.goals.annual,
+    }, { onConflict: "id" });
+  } catch (e) { console.warn("dbDeleteAll failed:", e); }
 }
 
 const uid = () => Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4);
@@ -3007,7 +3169,7 @@ function saveJournalEntry(iso, text) {
   const existing = state.journal.findIndex(j => j.date === iso);
   if (text.trim() === "") {
     // Delete empty entries
-    if (existing !== -1) state.journal.splice(existing, 1);
+    if (existing !== -1) { state.journal.splice(existing, 1); dbDeleteJournal(iso); }
   } else if (existing !== -1) {
     state.journal[existing].text = text;
   } else {
@@ -3429,7 +3591,7 @@ function renderUpcoming() {
       timeline.appendChild(makeSwipeable(
         payoutItem(p),
         () => openPayoutSheet(p.id),
-        () => alertSheet({ title: "Delete Payout", body: "Remove this payout? This can't be undone.", buttons: [{ label: "Delete Payout", variant: "danger", action: () => { state.payouts = state.payouts.filter(x => x.id !== p.id); saveState(); rerender(); toast("Deleted"); } }] })
+        () => alertSheet({ title: "Delete Payout", body: "Remove this payout? This can't be undone.", buttons: [{ label: "Delete Payout", variant: "danger", action: () => { state.payouts = state.payouts.filter(x => x.id !== p.id); dbDelete("payouts", p.id); saveState(); rerender(); toast("Deleted"); } }] })
       ));
     });
     content = timeline;
@@ -3475,7 +3637,7 @@ function renderRecent() {
       timeline.appendChild(makeSwipeable(
         payoutItem(p),
         () => openPayoutSheet(p.id),
-        () => alertSheet({ title: "Delete Payout", body: "Remove this payout? This can't be undone.", buttons: [{ label: "Delete Payout", variant: "danger", action: () => { state.payouts = state.payouts.filter(x => x.id !== p.id); saveState(); rerender(); toast("Deleted"); } }] })
+        () => alertSheet({ title: "Delete Payout", body: "Remove this payout? This can't be undone.", buttons: [{ label: "Delete Payout", variant: "danger", action: () => { state.payouts = state.payouts.filter(x => x.id !== p.id); dbDelete("payouts", p.id); saveState(); rerender(); toast("Deleted"); } }] })
       ));
     });
     if (isFiltering && items.length > 40) {
@@ -4272,8 +4434,10 @@ function renderPageSettings(app) {
         el("button", { class: "btn danger", onclick: () => {
           alertSheet({ title: "Reset All Data", body: "This will permanently delete your firms, accounts, payouts, and costs. This cannot be undone.", buttons: [{ label: "Reset Everything", variant: "danger", action: () => {
             if (saveTimer) { clearTimeout(saveTimer); saveTimer = null; }
+            if (_sbSyncTimer) { clearTimeout(_sbSyncTimer); _sbSyncTimer = null; }
             state = structuredClone(DEFAULT_STATE);
             try { localStorage.removeItem(scopedKey(STORAGE_KEY)); } catch {}
+            dbDeleteAll();
             rerender();
             toast("Data reset");
           }}] });
@@ -4568,6 +4732,7 @@ function openPayoutSheet(payoutId, opts = {}) {
       foot.appendChild(el("button", { class: "btn danger", onclick: () => {
         alertSheet({ title: "Delete Payout", body: "Remove this payout? This can't be undone.", buttons: [{ label: "Delete Payout", variant: "danger", action: () => {
           state.payouts = state.payouts.filter(p => p.id !== editing.id);
+          dbDelete("payouts", editing.id);
           saveState();
           closeSheet();
           rerender();
@@ -4704,9 +4869,15 @@ function openFirmSheet(firmId) {
         let msg = `Remove "${editing.name}"?`;
         if (accts || pays) msg += ` This will also delete ${[accts && `${accts} account${accts === 1 ? "" : "s"}`, pays && `${pays} payout${pays === 1 ? "" : "s"}`].filter(Boolean).join(" and ")}.`;
         alertSheet({ title: "Delete Firm", body: msg, buttons: [{ label: "Delete Firm", variant: "danger", action: () => {
-          state.firms = state.firms.filter(f => f.id !== editing.id);
-          state.accounts = state.accounts.filter(a => a.firmId !== editing.id);
-          state.payouts = state.payouts.filter(p => p.firmId !== editing.id);
+          const fid = editing.id;
+          // Explicitly delete payouts from Supabase (schema is ON DELETE SET NULL, not cascade)
+          state.payouts.filter(p => p.firmId === fid).forEach(p => dbDelete("payouts", p.id));
+          state.firms    = state.firms.filter(f => f.id !== fid);
+          state.accounts = state.accounts.filter(a => a.firmId !== fid);
+          state.payouts  = state.payouts.filter(p => p.firmId !== fid);
+          // Clear orphaned FK reference in spending (firm_id set null by Supabase cascade)
+          state.spending = state.spending.map(s => s.firmId === fid ? { ...s, firmId: "" } : s);
+          dbDelete("firms", fid); // Supabase cascade deletes accounts
           saveState();
           closeSheet();
           rerender();
@@ -4809,8 +4980,12 @@ function openAccountSheet(accountId, defaultFirmId) {
     if (editing) {
       foot.appendChild(el("button", { class: "btn danger", onclick: () => {
         alertSheet({ title: "Delete Account", body: `Remove "${editing.label}"? Payouts linked to this account will be kept but unlinked.`, buttons: [{ label: "Delete Account", variant: "danger", action: () => {
-          state.accounts = state.accounts.filter(a => a.id !== editing.id);
-          state.payouts = state.payouts.map(p => p.accountId === editing.id ? { ...p, accountId: "" } : p);
+          const aid = editing.id;
+          state.accounts = state.accounts.filter(a => a.id !== aid);
+          state.payouts  = state.payouts.map(p => p.accountId === aid ? { ...p, accountId: "" } : p);
+          // Clear orphaned FK in spending (account_id set null by Supabase cascade)
+          state.spending = state.spending.map(s => s.accountId === aid ? { ...s, accountId: "" } : s);
+          dbDelete("accounts", aid);
           saveState();
           closeSheet();
           rerender();
@@ -4973,6 +5148,7 @@ function openSpendingSheet(spendId) {
       foot.appendChild(el("button", { class: "btn danger", onclick: () => {
         alertSheet({ title: "Delete Cost", body: "Remove this cost entry? This can't be undone.", buttons: [{ label: "Delete Cost", variant: "danger", action: () => {
           state.spending = state.spending.filter(s => s.id !== editing.id);
+          dbDelete("spending", editing.id);
           saveState();
           closeSheet();
           rerender();
@@ -5098,8 +5274,10 @@ function openSettingsSheet(focus) {
       el("button", { class: "btn danger", style: "flex:none;padding:10px 14px;", onclick: () => {
         alertSheet({ title: "Reset Everything", body: "Your name, goals, firms, accounts, payouts and costs will all be permanently cleared. This cannot be undone.", buttons: [{ label: "Reset Everything", variant: "danger", action: () => {
           if (saveTimer) { clearTimeout(saveTimer); saveTimer = null; }
+          if (_sbSyncTimer) { clearTimeout(_sbSyncTimer); _sbSyncTimer = null; }
           state = structuredClone(DEFAULT_STATE);
           try { localStorage.removeItem(scopedKey(STORAGE_KEY)); } catch {}
+          dbDeleteAll();
           closeSheet();
           rerender();
           toast("Everything reset");
@@ -5378,7 +5556,7 @@ function importData() {
       }));
 
       // Use alertSheet for branded confirm; wrap rest of import in a local fn
-      const doImport = () => {
+      const doImport = async () => {
         const p = parsed.profile || {};
         const g = p.goals || {};
         state = {
@@ -5403,6 +5581,9 @@ function importData() {
         closeSheet();
         rerender();
         toast("Imported successfully");
+        // Replace Supabase data with the imported set
+        await dbDeleteAll();
+        await syncToSupabase();
       };
       const firmCount = sanitisedFirms.length;
       const payCount  = sanitisedPayouts.length;
@@ -5660,10 +5841,12 @@ async function onAuthSuccess() {
   loadState();
   applyTheme(getTheme());
   render();
-  if (!state.profile.onboarded && !state.firms.length && !state.payouts.length) {
-    setTimeout(() => openOnboarding(), 600);
-  }
   toast(`Welcome${state.profile.name ? ", " + state.profile.name : ""}!`);
+  syncFromSupabase().then(() => {
+    if (!state.profile.onboarded && !state.firms.length && !state.payouts.length) {
+      setTimeout(() => openOnboarding(), 600);
+    }
+  });
 }
 
 function logout() {
@@ -6004,12 +6187,19 @@ supabase.auth.onAuthStateChange((event, session) => {
     render();
     showPinScreen(() => {
       document.getElementById("app").style.display = "";
+      syncFromSupabase().then(() => {
+        if (!state.profile.onboarded && !state.firms.length && !state.payouts.length) {
+          setTimeout(() => openOnboarding(), 600);
+        }
+      });
     });
   } else {
     render();
-    if (!state.profile.onboarded && !state.firms.length && !state.payouts.length) {
-      setTimeout(() => openOnboarding(), 600);
-    }
+    syncFromSupabase().then(() => {
+      if (!state.profile.onboarded && !state.firms.length && !state.payouts.length) {
+        setTimeout(() => openOnboarding(), 600);
+      }
+    });
   }
 
   document.addEventListener("visibilitychange", () => {
