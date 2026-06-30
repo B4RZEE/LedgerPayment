@@ -9,3 +9,5 @@ CLAUDE.md
 
 # macOS
 .DS_Store
+.vercel
+.env*
