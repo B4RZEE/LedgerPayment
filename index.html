@@ -2271,6 +2271,37 @@
     max-width: 400px;
     margin: auto;
   }
+
+  /* Desktop — let the atmosphere breathe through and wrap card in glass */
+  @media (min-width: 640px) {
+    .auth-screen {
+      background: rgba(7, 8, 12, 0.72);
+    }
+    .auth-card {
+      max-width: 460px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      border-radius: var(--r-xl);
+      padding: 44px 44px 40px;
+      backdrop-filter: blur(28px) saturate(150%);
+      -webkit-backdrop-filter: blur(28px) saturate(150%);
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,0.06) inset,
+        0 32px 80px rgba(0,0,0,0.55),
+        0 0 120px rgba(16,185,129,0.06);
+      position: relative;
+    }
+    .auth-card::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.14), transparent);
+      border-radius: var(--r-xl) var(--r-xl) 0 0;
+      pointer-events: none;
+    }
+  }
+  [data-theme="light"] .auth-screen { background: rgba(241,245,249,0.85); }
+  [data-theme="light"] .auth-card { background: rgba(255,255,255,0.7); border-color: rgba(0,0,0,0.08); }
   .auth-brand {
     display: flex;
     align-items: center;
