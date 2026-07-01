@@ -2322,13 +2322,13 @@
   .sidebar {
     position: fixed;
     top: 0; left: 0; bottom: 0;
-    width: 224px;
+    width: 64px;
     background: var(--bg-1);
     border-right: 1px solid var(--border);
     display: flex;
     flex-direction: column;
     z-index: 30;
-    overflow-y: auto;
+    overflow: hidden;
     padding-bottom: env(safe-area-inset-bottom);
   }
   @media (max-width: 767px) { .sidebar { display: none; } }
@@ -2336,50 +2336,58 @@
   .sidebar-brand {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 20px 16px 16px;
+    justify-content: center;
+    padding: 16px 0;
     border-bottom: 1px solid var(--hairline);
     flex-shrink: 0;
   }
   .sidebar-mark {
-    width: 28px; height: 28px;
-    border-radius: 8px;
+    width: 34px; height: 34px;
+    border-radius: 10px;
     background: radial-gradient(circle at 30% 25%, var(--jade-1), var(--jade-3) 65%);
-    box-shadow: 0 4px 12px var(--jade-glow);
+    box-shadow: 0 0 14px var(--jade-glow), 0 4px 12px rgba(0,0,0,0.3);
     flex-shrink: 0;
   }
-  .sidebar-name {
-    font-weight: 700;
-    font-size: 16px;
-    letter-spacing: -0.01em;
-    color: var(--text-0);
-  }
+  .sidebar-name { display: none; }
 
   .sidebar-nav {
     flex: 1;
     overflow-y: auto;
-    padding: 8px 10px;
+    overflow-x: hidden;
+    padding: 8px 6px;
     display: flex;
     flex-direction: column;
     gap: 2px;
   }
   .sidebar-footer {
     border-top: 1px solid var(--hairline);
-    padding: 10px 10px;
+    padding: 8px 6px;
     display: flex;
     flex-direction: column;
     gap: 2px;
   }
-  .sidebar-user {
-    font-size: 11px;
-    color: var(--text-4);
-    padding: 4px 12px 8px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
+  .sidebar-user { display: none; }
 
-  /* Reuse existing .nav-section-label and .nav-item styles */
+  /* Sidebar nav items — icon only */
+  .nav-item.sidebar-nav-item {
+    justify-content: center;
+    padding: 11px 0;
+    gap: 0;
+    border-radius: 10px;
+    color: var(--text-4);
+    position: relative;
+  }
+  .nav-item.sidebar-nav-item span { display: none; }
+  .nav-item.sidebar-nav-item svg { width: 20px; height: 20px; opacity: 1; }
+  .nav-item.sidebar-nav-item:hover { background: var(--glass); color: var(--text-2); }
+  .nav-item.sidebar-nav-item.active {
+    background: rgba(255,51,51,0.1);
+    color: var(--jade-1);
+    box-shadow: inset 3px 0 0 var(--jade-1);
+  }
+  .nav-item.sidebar-nav-item.active svg { opacity: 1; }
+  .sidebar .nav-section-label { display: none; }
+  .sidebar .sidebar-nav-item[data-pro] { display: none; }
 
   /* ============================================================
      BOTTOM NAV (mobile only)
@@ -2428,7 +2436,7 @@
   }
   @media (min-width: 768px) {
     .app {
-      margin-left: 224px;
+      margin-left: 64px;
       max-width: none;
       padding: 24px 32px 80px;
     }
@@ -3268,19 +3276,81 @@
      ============================================================ */
 
   /* Page header */
-  .ov-header {
+  /* Dashboard topbar header */
+  .ov-header { padding: 4px 0 20px; }
+  .ov-topbar {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
     padding: 4px 0 20px;
+    gap: 12px;
+  }
+  .ov-page-eyebrow {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--jade-1);
+    margin-bottom: 5px;
   }
   .ov-title {
-    font-size: 24px;
+    font-size: 26px;
     font-weight: 800;
     letter-spacing: -0.03em;
     color: var(--text-0);
-    margin-bottom: 2px;
+    margin-bottom: 3px;
+    line-height: 1.1;
   }
+  .ov-title-name { color: var(--jade-1); }
   .ov-subtitle {
     font-size: 13px;
     color: var(--text-3);
+  }
+  .ov-topbar-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+    padding-top: 2px;
+  }
+  .ov-date-pill {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 12px;
+    border-radius: 99px;
+    border: 1px solid var(--border);
+    background: var(--glass);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-2);
+    cursor: default;
+    white-space: nowrap;
+    letter-spacing: -0.01em;
+  }
+  .ov-date-pill svg { flex-shrink: 0; opacity: 0.5; }
+  @media (max-width: 640px) { .ov-date-pill { display: none; } }
+  .ov-ctrl-btn {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: var(--glass);
+    border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    color: var(--text-2);
+    position: relative;
+    transition: background .15s, color .15s;
+    flex-shrink: 0;
+  }
+  .ov-ctrl-btn:hover { background: var(--glass-strong); color: var(--text-0); }
+  .ov-ctrl-btn svg { width: 15px; height: 15px; pointer-events: none; }
+  .ov-notif-badge {
+    position: absolute;
+    top: 1px; right: 1px;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--jade-1);
+    border: 1.5px solid var(--bg-0);
   }
 
   /* KPI strip */
@@ -3297,13 +3367,29 @@
   @media (max-width: 540px) { .kpi-strip { grid-template-columns: repeat(2, 1fr); } }
 
   .kpi-item {
-    padding: 14px 16px;
+    padding: 14px 14px 14px 14px;
     border-right: 1px solid var(--border);
     display: flex;
     flex-direction: column;
     gap: 5px;
     min-width: 0;
+    position: relative;
   }
+  .kpi-icon {
+    position: absolute;
+    top: 12px; right: 12px;
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    background: rgba(255,51,51,0.07);
+    border: 1px solid rgba(255,51,51,0.1);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--jade-2);
+    flex-shrink: 0;
+  }
+  .kpi-icon svg, .kpi-icon span { width: 15px; height: 15px; display: flex; }
+  .kpi-icon span { align-items: center; justify-content: center; }
+  .kpi-icon span svg { width: 15px; height: 15px; }
+  .kpi-label { padding-right: 40px; }
   .kpi-item:last-child { border-right: none; }
   @media (max-width: 900px) {
     .kpi-item:nth-child(4n) { border-right: none; }
@@ -3396,7 +3482,7 @@
     line-height: 1;
     margin-bottom: 4px;
   }
-  .ov-hero-amount.pos { color: #3b82f6; }
+  .ov-hero-amount.pos { color: var(--jade-1); }
   .ov-hero-amount.neg { color: var(--jade-1); }
   .ov-hero-amount.neutral { color: var(--text-0); }
   .ov-hero-meta {
@@ -3450,43 +3536,64 @@
     color: var(--text-0);
   }
 
-  /* Month earnings rings (replaces bar chart inside hero) */
-  .month-rings {
+  /* Monthly earnings bar chart */
+  .month-bars {
     display: flex;
-    align-items: center;
+    align-items: flex-end;
     justify-content: space-around;
-    padding: 8px 20px 20px;
-    gap: 4px;
+    padding: 4px 20px 20px;
+    gap: 6px;
+    min-height: 88px;
   }
-  .month-ring-item {
+  .month-bar-item {
     flex: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 5px;
+    gap: 4px;
     min-width: 0;
     transition: opacity .15s;
   }
-  .month-ring-item:hover { opacity: 0.8; }
-  .mr-val {
+  .month-bar-item:hover { opacity: 0.75; }
+  .mb-val {
     font-size: 9px;
     font-weight: 700;
     font-variant-numeric: tabular-nums;
-    color: var(--text-3);
+    color: var(--text-4);
     letter-spacing: -0.01em;
     min-height: 12px;
     text-align: center;
+    white-space: nowrap;
   }
-  .month-ring-item.current .mr-val { color: #3b82f6; font-size: 10px; }
-  .mr-svg { display: block; overflow: visible; }
-  .mr-label {
+  .month-bar-item.current .mb-val { color: var(--jade-1); font-size: 10px; }
+  .mb-track {
+    width: 100%;
+    height: 56px;
+    display: flex;
+    align-items: flex-end;
+    position: relative;
+  }
+  .mb-bar {
+    width: 100%;
+    background: rgba(255,51,51,0.22);
+    border-radius: 4px 4px 0 0;
+    min-height: 3px;
+    height: 0;
+    transition: height .9s cubic-bezier(0.16,1,0.3,1);
+  }
+  .month-bar-item.current .mb-bar {
+    background: var(--jade-1);
+    box-shadow: 0 0 10px rgba(255,51,51,0.35);
+  }
+  .mb-label {
     font-size: 9px;
     font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.07em;
     color: var(--text-4);
+    text-align: center;
   }
-  .month-ring-item.current .mr-label { color: var(--text-0); font-weight: 700; }
+  .month-bar-item.current .mb-label { color: var(--text-1); font-weight: 700; }
 
   /* Recent payouts panel */
   .ov-recent {
@@ -3601,7 +3708,7 @@
     content: "";
     position: absolute;
     inset: 0;
-    background: radial-gradient(ellipse at 50% 0%, rgba(59,130,246,0.06), transparent 60%);
+    background: radial-gradient(ellipse at 50% 0%, rgba(255,51,51,0.06), transparent 60%);
     pointer-events: none;
   }
   .ov-pnl-top {
@@ -3625,7 +3732,7 @@
     letter-spacing: -0.04em;
     font-variant-numeric: tabular-nums;
   }
-  .ov-pnl-value.pos { color: #3b82f6; }
+  .ov-pnl-value.pos { color: var(--jade-1); }
   .ov-pnl-value.neg { color: var(--jade-1); }
   .ov-pnl-value.neutral { color: var(--text-0); }
   .ov-pnl-subdesc {
@@ -3684,7 +3791,7 @@
   .ov-pnl-tooltip.visible { opacity: 1; }
   .ov-pnl-tip-date { font-size: 10px; color: var(--text-3); margin-bottom: 3px; font-weight: 600; }
   .ov-pnl-tip-val { font-size: 14px; font-weight: 800; letter-spacing: -0.03em; }
-  .ov-pnl-tip-val.pos { color: #3b82f6; }
+  .ov-pnl-tip-val.pos { color: var(--jade-1); }
   .ov-pnl-tip-val.neg { color: var(--jade-1); }
   .ov-pnl-empty {
     padding: 40px 20px;
@@ -3693,14 +3800,15 @@
     font-size: 13px;
   }
 
-  /* Goals 2-col grid */
+  /* Goals 4-col grid */
   .ov-goals-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(4, 1fr);
     gap: 10px;
     margin-bottom: 14px;
   }
-  @media (max-width: 540px) { .ov-goals-grid { grid-template-columns: 1fr; } }
+  @media (max-width: 900px) { .ov-goals-grid { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 480px) { .ov-goals-grid { grid-template-columns: 1fr; } }
 
   .ov-goal-card {
     background: var(--glass);
@@ -4853,25 +4961,16 @@ function renderSidebar() {
   brand.innerHTML = `<div class="sidebar-mark"></div><div class="sidebar-name">Ledger</div>`;
   sidebar.appendChild(brand);
 
-  // Nav list
+  // Nav list (icon-only in slim sidebar)
   const nav = document.createElement("div");
   nav.className = "sidebar-nav";
 
-  let lastSection = "";
   PAGES.forEach(page => {
-    if (page.section !== lastSection) {
-      const lbl = document.createElement("div");
-      lbl.className = "nav-section-label";
-      lbl.textContent = page.section === "account" ? "Account" : "Navigation";
-      nav.appendChild(lbl);
-      lastSection = page.section;
-    }
-
-    const isLocked = isFree() && PRO_PAGES.has(page.id);
     const item = document.createElement("button");
     item.className = "nav-item sidebar-nav-item" + (currentPage === page.id ? " active" : "");
     item.dataset.page = page.id;
-    item.innerHTML = `${svgIcon(page.icon).outerHTML || ""}<span>${page.label}</span>${isLocked ? `<span style="margin-left:auto;font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px;background:var(--jade-glow);color:var(--jade-1);">Pro</span>` : ""}`;
+    item.title = page.label;
+    item.appendChild(svgIcon(page.icon));
     item.addEventListener("click", () => navigateTo(page.id));
     nav.appendChild(item);
   });
@@ -4882,18 +4981,11 @@ function renderSidebar() {
   const footer = document.createElement("div");
   footer.className = "sidebar-footer";
 
-  const session = getSession();
-  if (session) {
-    const userInfo = document.createElement("div");
-    userInfo.className = "sidebar-user";
-    userInfo.textContent = session.email;
-    footer.appendChild(userInfo);
-  }
-
   const logoutBtn = document.createElement("button");
-  logoutBtn.className = "nav-item";
+  logoutBtn.className = "nav-item sidebar-nav-item";
+  logoutBtn.title = "Log Out";
   logoutBtn.style.color = "var(--rose-1)";
-  logoutBtn.innerHTML = `${svgIcon("logout").outerHTML || ""}<span>Log Out</span>`;
+  logoutBtn.appendChild(svgIcon("logout"));
   logoutBtn.addEventListener("click", () => logout());
   footer.appendChild(logoutBtn);
 
@@ -6564,9 +6656,9 @@ function renderOvPNLChart() {
   const net = netProfit();
   const netClass = net > 0 ? "pos" : net < 0 ? "neg" : "neutral";
   const netSign = net >= 0 ? "+" : "−";
-  const lineColor = net >= 0 ? "#3b82f6" : "#ff3333";
-  const glowColor = net >= 0 ? "rgba(59,130,246,0.5)" : "rgba(255,51,51,0.5)";
-  const gradStop  = net >= 0 ? "rgba(59,130,246,0.18)" : "rgba(255,51,51,0.18)";
+  const lineColor = net >= 0 ? "#ff3333" : "#fb7185";
+  const glowColor = net >= 0 ? "rgba(255,51,51,0.5)" : "rgba(251,113,133,0.5)";
+  const gradStop  = net >= 0 ? "rgba(255,51,51,0.18)" : "rgba(251,113,133,0.18)";
 
   const card = el("div", { class: "ov-pnl-card" });
 
@@ -6839,10 +6931,48 @@ function renderPageDashboard(app) {
 
 function renderOvHeader() {
   const displayName = state.profile.username || state.profile.firstName || null;
-  const greet = displayName ? `Hi, ${displayName}` : "Dashboard";
-  return el("div", { class: "ov-header" },
-    el("div", { class: "ov-title" }, greet),
-    el("div", { class: "ov-subtitle" }, "Overview of your funded trading performance")
+  const pendingCount = state.payouts.filter(p => p.status === "awaiting_approval").length;
+
+  const now = new Date();
+  const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+  const dateRange = `${startOfMonth.getDate()} ${MONTHS[startOfMonth.getMonth()]} – ${now.getDate()} ${MONTHS[now.getMonth()]} ${now.getFullYear()}`;
+
+  const isDark = getTheme() !== "light";
+
+  const left = el("div", {});
+  if (displayName) {
+    left.appendChild(el("div", { class: "ov-page-eyebrow" }, "Dashboard"));
+    left.appendChild(el("div", { class: "ov-title" },
+      "Hi, ",
+      el("span", { class: "ov-title-name" }, displayName)
+    ));
+  } else {
+    left.appendChild(el("div", { class: "ov-title" }, "Dashboard"));
+  }
+  left.appendChild(el("div", { class: "ov-subtitle" }, "Overview of your funded trading performance"));
+
+  const datePill = el("div", { class: "ov-date-pill",
+    html: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" width="13" height="13"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>${dateRange}`
+  });
+
+  const themeBtn = el("button", { class: "ov-ctrl-btn", title: "Toggle theme", onclick: () => { toggleTheme(); render(); },
+    html: isDark
+      ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" width="15" height="15"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>`
+      : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" width="15" height="15"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`
+  });
+
+  const bellBtn = el("button", {
+    class: "ov-ctrl-btn",
+    title: pendingCount > 0 ? `${pendingCount} pending payout${pendingCount > 1 ? "s" : ""}` : "Notifications",
+    onclick: () => navigateTo("payouts"),
+    html: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>`
+  });
+  if (pendingCount > 0) bellBtn.appendChild(el("span", { class: "ov-notif-badge" }));
+
+  return el("div", { class: "ov-topbar" },
+    left,
+    el("div", { class: "ov-topbar-controls" }, datePill, themeBtn, bellBtn)
   );
 }
 
@@ -6862,22 +6992,25 @@ function renderOvKPI() {
   const roiClass = roi === null ? "" : roi >= 0 ? "pos" : "neg";
 
   const kpis = [
-    { label: "Total Payouts", value: fmtGBP(lifetime, { short: lifetime >= 1000 }), sub: `${received().length} withdrawals`, cls: "" },
-    { label: "Total Spend", value: fmtGBP(spend, { short: spend >= 1000 }), sub: "fees & purchases", cls: spend > 0 ? "neg" : "" },
-    { label: "Net P&L", value: (net !== 0 || lifetime > 0 || spend > 0) ? netSign + fmtGBP(Math.abs(net), { short: Math.abs(net) >= 1000 }) : "—", sub: "payouts minus costs", cls: netClass },
-    { label: "Fee ROI", value: roi !== null ? (roi >= 0 ? "+" : "") + roi.toFixed(0) + "%" : "—", sub: "return on challenge fees", cls: roiClass },
-    { label: "Pass Rate", value: pr ? pr.rate + "%" : "—", sub: pr ? `${pr.passed}/${pr.total} accounts` : "no data yet", cls: "lav" },
-    { label: "Streak", value: streak > 0 ? `${streak} mo` : "—", sub: "consecutive months", cls: "" },
-    { label: "Avg Payout", value: avg > 0 ? fmtGBP(avg, { short: avg >= 1000 }) : "—", sub: "per withdrawal", cls: "" },
-    { label: "Firms", value: activeFirms > 0 ? String(activeFirms) : "—", sub: `${state.accounts.length} account${state.accounts.length !== 1 ? "s" : ""}`, cls: "" },
+    { label: "Total Payouts", value: fmtGBP(lifetime, { short: lifetime >= 1000 }), sub: `${received().length} withdrawals`, cls: "", icon: "money" },
+    { label: "Total Spend",   value: fmtGBP(spend, { short: spend >= 1000 }), sub: "fees & purchases", cls: spend > 0 ? "neg" : "", icon: "coin" },
+    { label: "Net P&L",       value: (net !== 0 || lifetime > 0 || spend > 0) ? netSign + fmtGBP(Math.abs(net), { short: Math.abs(net) >= 1000 }) : "—", sub: "payouts minus costs", cls: netClass, icon: "trend" },
+    { label: "Fee ROI",       value: roi !== null ? (roi >= 0 ? "+" : "") + roi.toFixed(0) + "%" : "—", sub: "return on challenge fees", cls: roiClass, icon: "target" },
+    { label: "Pass Rate",     value: pr ? pr.rate + "%" : "—", sub: pr ? `${pr.passed}/${pr.total} accounts` : "no data yet", cls: "lav", icon: "medal" },
+    { label: "Streak",        value: streak > 0 ? `${streak} mo` : "—", sub: "consecutive months", cls: "", icon: "flame" },
+    { label: "Avg Payout",    value: avg > 0 ? fmtGBP(avg, { short: avg >= 1000 }) : "—", sub: "per withdrawal", cls: "", icon: "chart" },
+    { label: "Firms",         value: activeFirms > 0 ? String(activeFirms) : "—", sub: `${state.accounts.length} account${state.accounts.length !== 1 ? "s" : ""}`, cls: "", icon: "building" },
   ];
 
   const strip = el("div", { class: "kpi-strip" });
-  kpis.forEach(({ label, value, sub, cls }) => {
+  kpis.forEach(({ label, value, sub, cls, icon }) => {
+    const iconWrap = el("div", { class: "kpi-icon" });
+    iconWrap.appendChild(svgIcon(icon));
     strip.appendChild(
       el("div", { class: "kpi-item" },
+        iconWrap,
         el("div", { class: "kpi-label" }, label),
-        el("div", { class: `kpi-value${cls ? " " + cls : ""}` }, value),
+        el("div", { class: `kpi-value num${cls ? " " + cls : ""}` }, value),
         el("div", { class: "kpi-sub" }, sub)
       )
     );
@@ -6949,12 +7082,12 @@ function renderOvHero() {
   top.appendChild(stats);
 
   heroCard.appendChild(top);
-  heroCard.appendChild(renderMonthRings());
+  heroCard.appendChild(renderMonthBars());
 
   return heroCard;
 }
 
-function renderMonthRings() {
+function renderMonthBars() {
   const data = monthlyEarningsSeries(6);
   const maxVal = Math.max(1, ...data.map(d => d.total));
   const currentIdx = data.length - 1;
@@ -6975,56 +7108,26 @@ function renderMonthRings() {
     )
   );
 
-  const ringsRow = el("div", { class: "month-rings" });
-  const R = 20, CX = 26, CY = 26, SZ = 52;
-  const CIRC = +(2 * Math.PI * R).toFixed(2);
+  const barsRow = el("div", { class: "month-bars" });
 
   data.forEach((d, i) => {
     const isCurrent = i === currentIdx;
     const pct = d.total > 0 ? Math.min(1, d.total / maxVal) : 0;
-    const dashLen = +(pct * CIRC).toFixed(2);
+    const barH = Math.max(3, Math.round(pct * 56));
 
-    const ns = "http://www.w3.org/2000/svg";
-    const svg = document.createElementNS(ns, "svg");
-    svg.setAttribute("viewBox", `0 0 ${SZ} ${SZ}`);
-    svg.setAttribute("width", SZ); svg.setAttribute("height", SZ);
-    svg.classList.add("mr-svg");
-
-    const track = document.createElementNS(ns, "circle");
-    track.setAttribute("cx", CX); track.setAttribute("cy", CY); track.setAttribute("r", R);
-    track.setAttribute("fill", "none");
-    track.setAttribute("stroke", "rgba(255,255,255,0.07)");
-    track.setAttribute("stroke-width", isCurrent ? "4.5" : "4");
-    svg.appendChild(track);
-
-    if (pct > 0) {
-      const arc = document.createElementNS(ns, "circle");
-      arc.setAttribute("cx", CX); arc.setAttribute("cy", CY); arc.setAttribute("r", R);
-      arc.setAttribute("fill", "none");
-      arc.setAttribute("stroke-width", isCurrent ? "4.5" : "4");
-      arc.setAttribute("stroke-linecap", "round");
-      arc.setAttribute("stroke-dasharray", `${CIRC}`);
-      arc.setAttribute("stroke-dashoffset", `${CIRC}`);
-      arc.setAttribute("transform", `rotate(-90 ${CX} ${CY})`);
-      arc.setAttribute("data-ring-final", `${CIRC - dashLen}`);
-      arc.style.stroke = isCurrent ? "#3b82f6" : "rgba(59,130,246,0.45)";
-      if (isCurrent) arc.style.filter = "drop-shadow(0 0 4px #3b82f6)";
-      svg.appendChild(arc);
-    }
-
-    const valText = d.total > 0 ? compactGBP(d.total) : "";
-    ringsRow.appendChild(
-      el("div", { class: "month-ring-item" + (isCurrent ? " current" : "") },
-        el("div", { class: "mr-val" }, valText),
-        svg,
-        el("div", { class: "mr-label" }, d.label)
+    const bar = el("div", { class: "mb-bar", "data-bar-h": barH, style: "height:0" });
+    barsRow.appendChild(
+      el("div", { class: "month-bar-item" + (isCurrent ? " current" : "") },
+        el("div", { class: "mb-val" }, d.total > 0 ? compactGBP(d.total) : ""),
+        el("div", { class: "mb-track" }, bar),
+        el("div", { class: "mb-label" }, d.label)
       )
     );
   });
 
   const wrap = el("div", {});
   wrap.appendChild(header);
-  wrap.appendChild(ringsRow);
+  wrap.appendChild(barsRow);
   return wrap;
 }
 
@@ -7165,9 +7268,10 @@ function renderOvGoals() {
   const grid = el("div", { class: "ov-goals-grid" });
   goals.forEach(({ label, current, target }) => {
     const hasGoal = target > 0;
-    const pct = hasGoal ? Math.min((current / target) * 100, 100) : 0;
-    const pctDisplay = !hasGoal ? "—" : (pct >= 100 ? "✓" : pct.toFixed(0) + "%");
-    const done = hasGoal && pct >= 100;
+    const realPct = hasGoal ? (current / target) * 100 : 0;
+    const pct = Math.min(realPct, 100);
+    const pctDisplay = !hasGoal ? "—" : realPct.toFixed(0) + "%";
+    const done = hasGoal && realPct >= 100;
 
     const card = el("div", { class: "ov-goal-card" },
       el("div", { class: "ov-goal-row" },
@@ -7741,6 +7845,9 @@ function render() {
     });
     document.querySelectorAll(".bc-bar[data-target-height]").forEach(b => {
       b.style.height = b.getAttribute("data-target-height") + "%";
+    });
+    document.querySelectorAll(".mb-bar[data-bar-h]").forEach(b => {
+      b.style.height = b.getAttribute("data-bar-h") + "px";
     });
     // SVG ring + donut animations need double rAF to ensure initial state is painted first
     requestAnimationFrame(() => {
