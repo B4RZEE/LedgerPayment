@@ -1,0 +1,343 @@
+@import "tailwindcss";
+
+/* ── Design tokens ──────────────────────────────────────────────── */
+:root {
+  --bg-0: #07080c;
+  --bg-1: #0a0c12;
+  --bg-2: #0d1018;
+  --glass: rgba(255, 255, 255, 0.025);
+  --glass-strong: rgba(255, 255, 255, 0.05);
+  --border: rgba(255, 255, 255, 0.07);
+  --border-strong: rgba(255, 255, 255, 0.14);
+  --hairline: rgba(255, 255, 255, 0.05);
+
+  --jade-1: #34d399;
+  --jade-2: #10b981;
+  --jade-3: #059669;
+  --jade-glow: rgba(16, 185, 129, 0.18);
+
+  --lav-1: #c7d2fe;
+  --lav-2: #a5b4fc;
+  --lav-3: #818cf8;
+  --lav-glow: rgba(165, 180, 252, 0.16);
+
+  --amber-1: #fbbf24;
+  --amber-glow: rgba(245, 158, 11, 0.18);
+
+  --rose-1: #fb7185;
+  --rose-glow: rgba(244, 63, 94, 0.18);
+
+  --text-0: #fafafa;
+  --text-1: #e4e4e7;
+  --text-2: #b4b4bc;
+  --text-3: #8e8e99;
+  --text-4: #6b6b78;
+
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ── Tailwind theme extension (Tailwind v4) ─────────────────────── */
+@theme inline {
+  --font-sans: var(--font-inter);
+  --color-jade-1: #34d399;
+  --color-jade-2: #10b981;
+  --color-jade-3: #059669;
+  --color-lav-1: #c7d2fe;
+  --color-lav-2: #a5b4fc;
+  --color-lav-3: #818cf8;
+  --color-amber-1: #fbbf24;
+  --color-rose-1: #fb7185;
+  --color-text-0: #fafafa;
+  --color-text-1: #e4e4e7;
+  --color-text-2: #b4b4bc;
+  --color-text-3: #8e8e99;
+  --color-text-4: #6b6b78;
+  --color-bg-0: #07080c;
+  --color-bg-1: #0a0c12;
+  --color-bg-2: #0d1018;
+}
+
+/* ── Base ───────────────────────────────────────────────────────── */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--bg-0);
+  color: var(--text-0);
+  font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, "SF Pro Display",
+    system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* ── Atmosphere ─────────────────────────────────────────────────── */
+.atmosphere {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.atmosphere::before {
+  content: "";
+  position: absolute;
+  top: -20%;
+  left: -10%;
+  width: 65vw;
+  height: 65vw;
+  max-width: 1000px;
+  max-height: 1000px;
+  background: radial-gradient(circle at 30% 30%, var(--jade-1), transparent 60%);
+  filter: blur(140px);
+  opacity: 0.5;
+  animation: drift1 26s ease-in-out infinite alternate;
+}
+
+.atmosphere::after {
+  content: "";
+  position: absolute;
+  top: -5%;
+  right: -15%;
+  width: 60vw;
+  height: 60vw;
+  max-width: 900px;
+  max-height: 900px;
+  background: radial-gradient(circle at 70% 30%, var(--lav-3), transparent 60%);
+  filter: blur(140px);
+  opacity: 0.45;
+  animation: drift2 32s ease-in-out infinite alternate;
+}
+
+.grain {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.03;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+}
+
+/* ── Scroll reveal ──────────────────────────────────────────────── */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.7s var(--ease-out), transform 0.7s var(--ease-out);
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── Mobile menu ────────────────────────────────────────────────── */
+.mobile-menu {
+  transform: translateX(100%);
+  transition: transform 0.3s var(--ease);
+}
+
+.mobile-menu.open {
+  transform: translateX(0);
+}
+
+/* ── Firms ticker ───────────────────────────────────────────────── */
+.ticker-track {
+  display: flex;
+  width: max-content;
+  animation: ticker 28s linear infinite;
+}
+
+.ticker-track:hover {
+  animation-play-state: paused;
+}
+
+/* ── Goal bar sheen ─────────────────────────────────────────────── */
+.bar-fill::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -30%;
+  width: 30%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  animation: bar-sheen 3s ease-in-out infinite;
+}
+
+/* ── Keyframes ──────────────────────────────────────────────────── */
+@keyframes drift1 {
+  from { transform: translate(0, 0) scale(1); opacity: 0.4; }
+  to   { transform: translate(8vw, 6vh) scale(1.2); opacity: 0.65; }
+}
+
+@keyframes drift2 {
+  from { transform: translate(0, 0) scale(1.1); opacity: 0.55; }
+  to   { transform: translate(-6vw, 8vh) scale(1); opacity: 0.35; }
+}
+
+@keyframes float-phone {
+  0%, 100% { transform: translateY(0) rotate(-1deg); }
+  50%       { transform: translateY(-14px) rotate(-1deg); }
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50%       { opacity: 1; transform: scale(1.4); }
+}
+
+@keyframes bar-sheen {
+  0%   { left: -30%; }
+  100% { left: 130%; }
+}
+
+@keyframes ticker {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+/* ── Button & interactive element styles ────────────────────────── */
+.btn-primary {
+  background: linear-gradient(135deg, var(--jade-1), var(--jade-2));
+  color: #052e1d;
+  box-shadow: 0 8px 32px var(--jade-glow);
+  transition: filter 0.15s ease, box-shadow 0.15s ease, transform 0.1s ease;
+}
+.btn-primary:hover {
+  filter: brightness(1.08);
+  box-shadow: 0 12px 40px rgba(52, 211, 153, 0.35);
+}
+.btn-primary:active {
+  transform: scale(0.97);
+}
+
+.btn-ghost {
+  color: var(--text-1);
+  border: 1px solid var(--border);
+  background: var(--glass);
+  backdrop-filter: blur(12px);
+  transition: all 0.2s ease;
+}
+.btn-ghost:hover {
+  border-color: var(--border-strong);
+  background: var(--glass-strong);
+  color: var(--text-0);
+}
+
+.btn-nav-ghost {
+  color: var(--text-1);
+  border: 1px solid var(--border);
+  background: var(--glass);
+  transition: all 0.2s ease;
+}
+.btn-nav-ghost:hover {
+  background: var(--glass-strong);
+  border-color: var(--border-strong);
+  color: var(--text-0);
+}
+
+.btn-nav-jade {
+  background: linear-gradient(135deg, var(--jade-1), var(--jade-2));
+  color: #052e1d;
+  box-shadow: 0 4px 14px var(--jade-glow);
+  transition: filter 0.15s;
+}
+.btn-nav-jade:hover {
+  filter: brightness(1.08);
+}
+
+.btn-jade-solid {
+  background: linear-gradient(135deg, var(--jade-1), var(--jade-2));
+  color: #052e1d;
+  box-shadow: 0 6px 24px var(--jade-glow);
+  transition: filter 0.15s;
+}
+.btn-jade-solid:hover {
+  filter: brightness(1.08);
+}
+
+.btn-lav-solid {
+  background: linear-gradient(135deg, var(--lav-2), var(--lav-3));
+  color: white;
+  box-shadow: 0 6px 24px var(--lav-glow);
+  transition: filter 0.15s;
+}
+.btn-lav-solid:hover {
+  filter: brightness(1.08);
+}
+
+.btn-outline {
+  border: 1px solid var(--border);
+  color: var(--text-1);
+  background: var(--glass);
+  transition: all 0.2s ease;
+}
+.btn-outline:hover {
+  border-color: var(--border-strong);
+  background: var(--glass-strong);
+}
+
+.nav-link {
+  color: var(--text-3);
+  transition: color 0.15s;
+}
+.nav-link:hover {
+  color: var(--text-0);
+}
+
+.footer-link {
+  color: var(--text-3);
+  transition: color 0.15s;
+}
+.footer-link:hover {
+  color: var(--text-0);
+}
+
+.feature-card {
+  background: var(--glass);
+  border: 1px solid var(--border);
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+.feature-card:hover {
+  border-color: var(--border-strong);
+  transform: translateY(-2px);
+}
+
+.price-card {
+  transition: transform 0.2s ease;
+}
+.price-card:hover {
+  transform: translateY(-3px);
+}
+
+/* ── Focus ──────────────────────────────────────────────────────── */
+:focus-visible {
+  outline: 2px solid var(--jade-2);
+  outline-offset: 3px;
+}
+
+/* ── Reduced motion ─────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .reveal {
+    opacity: 1;
+    transform: none;
+  }
+}

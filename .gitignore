@@ -9,5 +9,11 @@ CLAUDE.md
 
 # macOS
 .DS_Store
+
+# Next.js
+.next/
+node_modules/
+out/
+
+# Vercel
 .vercel
-.env*
