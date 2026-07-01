@@ -1,0 +1,3 @@
+/* Dashboard-only styles — imported by app/app/(app)/layout.tsx only, not the root layout.
+   Holds what's too bespoke for Tailwind utilities: keyframe animations, certificate styling,
+   gradient-text effects, chart-adjacent CSS, and light-theme overrides. */
