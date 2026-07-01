@@ -1467,6 +1467,7 @@
     text-align: center;
     border: 1px solid transparent;
   }
+  .btn:disabled { opacity: 0.6; cursor: default; pointer-events: none; }
   .btn.primary {
     background: linear-gradient(180deg, var(--jade-1), var(--jade-2));
     color: var(--bg-0);
@@ -3098,6 +3099,13 @@
     font-size: 7.5px; font-weight: 600; letter-spacing: 0.2em;
     color: rgba(255,255,255,0.28); text-transform: uppercase; margin-bottom: 14px;
   }
+  .cert-ach-icon-big { font-size: 52px; line-height: 1; margin-bottom: 8px; filter: drop-shadow(0 0 18px rgba(255,30,30,0.4)); }
+  .cert-ach-name {
+    font-size: clamp(22px, 8vw, 30px); font-weight: 900; letter-spacing: -0.01em; line-height: 1.15;
+    background: linear-gradient(180deg, #ff5555 0%, #dd1111 55%, #991111 100%);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 18px rgba(255,30,30,0.55)); margin-bottom: 5px; padding: 0 6px;
+  }
   .cert-info-box {
     background: rgba(255,255,255,0.03); border: 1px solid rgba(180,0,0,0.2);
     border-radius: 10px; padding: 14px 6px;
@@ -3351,6 +3359,57 @@
     border-radius: 50%;
     background: var(--jade-1);
     border: 1.5px solid var(--bg-0);
+  }
+
+  /* ============================================================
+     NOTIFICATION INBOX PANEL
+     ============================================================ */
+  .notif-panel {
+    position: fixed;
+    width: min(380px, calc(100vw - 32px));
+    max-height: min(520px, calc(100vh - 110px));
+    background: var(--bg-1);
+    border: 1px solid var(--border-strong);
+    border-radius: 16px;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.5), 0 2px 8px rgba(0,0,0,0.3);
+    overflow: hidden;
+    z-index: 300;
+    display: flex;
+    flex-direction: column;
+    transform-origin: top right;
+    animation: addDropIn .15s cubic-bezier(0.16,1,0.3,1);
+  }
+  [data-theme="light"] .notif-panel { background: #fff; }
+  .notif-panel-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 16px; border-bottom: 1px solid var(--hairline); flex-shrink: 0;
+  }
+  .notif-panel-title { font-size: 14px; font-weight: 700; color: var(--text-0); }
+  .notif-panel-mark { font-size: 12px; font-weight: 600; color: var(--jade-1); cursor: pointer; }
+  .notif-panel-mark:hover { text-decoration: underline; }
+  .notif-panel-list { overflow-y: auto; flex: 1; }
+  .notif-item {
+    display: flex; gap: 10px; width: 100%; text-align: left;
+    padding: 12px 16px; border-bottom: 1px solid var(--hairline);
+    background: none; cursor: pointer; transition: background .12s;
+  }
+  .notif-item:last-child { border-bottom: none; }
+  .notif-item:hover { background: rgba(255,255,255,0.04); }
+  [data-theme="light"] .notif-item:hover { background: rgba(0,0,0,0.03); }
+  .notif-item.unread { background: rgba(255,51,51,0.05); }
+  .notif-item-icon {
+    width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; font-size: 15px;
+    background: var(--glass-strong);
+  }
+  .notif-item-body { flex: 1; min-width: 0; }
+  .notif-item-title { font-size: 13px; font-weight: 600; color: var(--text-1); margin-bottom: 2px; }
+  .notif-item.unread .notif-item-title { color: var(--text-0); font-weight: 700; }
+  .notif-item-desc { font-size: 12px; color: var(--text-3); line-height: 1.4; }
+  .notif-item-time { font-size: 10.5px; color: var(--text-4); margin-top: 4px; }
+  .notif-item-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--jade-1); flex-shrink: 0; margin-top: 5px; }
+  .notif-panel-empty {
+    padding: 40px 20px; text-align: center; color: var(--text-3); font-size: 13px;
   }
 
   /* KPI strip */
@@ -4162,12 +4221,14 @@ const DEFAULT_STATE = {
     lastName:  "",  // set at signup, immutable in-app
     username:  "",  // optional, unique, user-editable
     goals: { daily: 100, weekly: 700, monthly: 5000, annual: 50000 },
+    unlockedAchievementIds: [], // achievement ids already notified — prevents re-notifying on every unlock check
   },
   firms: [],     // { id, name }
   accounts: [],  // { id, firmId, label, health }
   payouts: [],   // { id, firmId, accountId, amount, date, status, notes }
   spending: [],  // { id, amount, date, category, firmId?, accountId?, notes? }
   journal: [],   // { id, date, text }  ← new: freeform daily notes
+  notifications: [], // { id, type, title, body, payload, read, createdAt }
   ui: {
     calendarMonth: null // YYYY-MM
   }
@@ -4189,6 +4250,7 @@ function loadState() {
         payouts: saved.payouts || [],
         spending: saved.spending || [],
         journal: saved.journal || [],
+        notifications: saved.notifications || [],
         ui: { ...DEFAULT_STATE.ui, ...(saved.ui || {}) }
       };
       // Migration: retired statuses ("needs_trading_days", "being_paid") collapse into "awaiting_approval"
@@ -4197,6 +4259,13 @@ function loadState() {
           p.status = "awaiting_approval";
         }
       });
+      // Migration: users upgrading from before achievement notifications existed already have
+      // unlocked badges — backfill silently so they aren't flooded with "unlocked" notifications
+      // for things they earned long ago.
+      if ((saved.profile || {}).unlockedAchievementIds === undefined &&
+          (state.firms.length || state.payouts.length || state.journal.length)) {
+        state.profile.unlockedAchievementIds = unlockedAchievements().map(a => a.id);
+      }
       // Migration: old profile.name → firstName (when upgrading from single-name era)
       if (state.profile.name !== undefined && !state.profile.firstName) {
         state.profile.firstName = state.profile.name;
@@ -4221,6 +4290,7 @@ function loadState() {
 let saveTimer = null;
 function saveState() {
   if (saveTimer) clearTimeout(saveTimer);
+  checkAchievementUnlocks();
   saveTimer = setTimeout(() => {
     try {
       localStorage.setItem(scopedKey(STORAGE_KEY), JSON.stringify(state));
@@ -4258,6 +4328,7 @@ async function syncToSupabase() {
         goals_weekly:  state.profile.goals.weekly,
         goals_monthly: state.profile.goals.monthly,
         goals_annual:  state.profile.goals.annual,
+        unlocked_achievements: state.profile.unlockedAchievementIds || [],
       }, { onConflict: "id" }),
       state.firms.length
         ? supabase.from("firms").upsert(
@@ -4303,6 +4374,16 @@ async function syncToSupabase() {
             { onConflict: "user_id,date" }
           )
         : Promise.resolve(),
+      state.notifications.length
+        ? supabase.from("notifications").upsert(
+            state.notifications.map(n => ({
+              id: n.id, user_id: userId, type: n.type, title: n.title,
+              body: n.body || null, payload: n.payload || null,
+              read: n.read, created_at: n.createdAt,
+            })),
+            { onConflict: "id" }
+          )
+        : Promise.resolve(),
     ]);
   } catch (e) { console.warn("syncToSupabase failed:", e); }
 }
@@ -4310,13 +4391,14 @@ async function syncToSupabase() {
 async function syncFromSupabase() {
   if (!_currentUser) return;
   try {
-    const [profileRes, firmsRes, acctRes, payRes, spendRes, jRes] = await Promise.all([
+    const [profileRes, firmsRes, acctRes, payRes, spendRes, jRes, notifRes] = await Promise.all([
       supabase.from("profiles").select("*").eq("id", _currentUser.id).single(),
       supabase.from("firms").select("*").eq("user_id", _currentUser.id),
       supabase.from("accounts").select("*").eq("user_id", _currentUser.id),
       supabase.from("payouts").select("*").eq("user_id", _currentUser.id),
       supabase.from("spending").select("*").eq("user_id", _currentUser.id),
       supabase.from("journal").select("*").eq("user_id", _currentUser.id),
+      supabase.from("notifications").select("*").eq("user_id", _currentUser.id).order("created_at", { ascending: false }),
     ]);
     const pr       = profileRes.data;
     const firms    = firmsRes.data    || [];
@@ -4324,6 +4406,7 @@ async function syncFromSupabase() {
     const payouts  = payRes.data      || [];
     const spending = spendRes.data    || [];
     const journal  = jRes.data        || [];
+    const notifs   = notifRes.data    || [];
     if (pr?.subscription_tier) _tier = pr.subscription_tier;
     const hasRemote = firms.length || accounts.length || payouts.length || spending.length;
     const hasLocal  = state.firms.length || state.payouts.length || state.spending.length;
@@ -4341,12 +4424,16 @@ async function syncFromSupabase() {
           monthly: pr?.goals_monthly ?? state.profile.goals.monthly,
           annual:  pr?.goals_annual  ?? state.profile.goals.annual,
         },
+        unlockedAchievementIds: (Array.isArray(pr?.unlocked_achievements) && pr.unlocked_achievements.length)
+          ? pr.unlocked_achievements
+          : (state.profile.unlockedAchievementIds || []),
       },
       firms:    firms.map(f => ({ id: f.id, name: f.name })),
       accounts: accounts.map(a => ({ id: a.id, firmId: a.firm_id, label: a.label, health: a.health })),
       payouts:  payouts.map(p => ({ id: p.id, firmId: p.firm_id || "", accountId: p.account_id || "", amount: Number(p.amount), date: p.date, status: p.status, notes: p.notes || "" })),
       spending: spending.map(s => ({ id: s.id, firmId: s.firm_id || "", accountId: s.account_id || "", amount: Number(s.amount), date: s.date, category: s.category, notes: s.notes || "" })),
       journal:  journal.map(j => ({ id: String(j.id), date: j.date, text: j.text })),
+      notifications: notifs.map(n => ({ id: n.id, type: n.type, title: n.title, body: n.body || "", payload: n.payload || null, read: !!n.read, createdAt: n.created_at })),
       ui: state.ui,
     };
     // Apply the same status migrations as loadState
@@ -4357,6 +4444,12 @@ async function syncFromSupabase() {
       if (a.health === "eligible" || a.health === "ready") a.health = "passed";
       else if (a.health === "building" || a.health === "needs_days") a.health = "in_progress";
     });
+    // Migration: remote `unlocked_achievements` is empty (new column, or never synced) but the
+    // user already has real trading history — backfill silently, same reasoning as loadState.
+    if (!state.profile.unlockedAchievementIds.length &&
+        (state.firms.length || state.payouts.length || state.journal.length)) {
+      state.profile.unlockedAchievementIds = unlockedAchievements().map(a => a.id);
+    }
     // Cache locally without triggering another Supabase push
     try { localStorage.setItem(scopedKey(STORAGE_KEY), JSON.stringify(state)); } catch {}
     render();
@@ -4855,6 +4948,43 @@ function getAchievements() {
   return ACHIEVEMENTS.map(a => ({ ...a, unlocked: !!a.check() }));
 }
 function unlockedAchievements() { return getAchievements().filter(a => a.unlocked); }
+
+/* ---- Notifications inbox ---- */
+function pushNotification(type, title, body, payload) {
+  state.notifications.unshift({
+    id: uid(),
+    type,
+    title,
+    body: body || "",
+    payload: payload || null,
+    read: false,
+    createdAt: new Date().toISOString(),
+  });
+  // Cap the inbox so it can't grow unbounded for long-lived accounts
+  if (state.notifications.length > 200) state.notifications.length = 200;
+}
+function unreadNotificationCount() { return state.notifications.filter(n => !n.read).length; }
+function markNotificationRead(id) {
+  const n = state.notifications.find(n => n.id === id);
+  if (n && !n.read) { n.read = true; saveState(); }
+}
+function markAllNotificationsRead() {
+  let changed = false;
+  state.notifications.forEach(n => { if (!n.read) { n.read = true; changed = true; } });
+  if (changed) saveState();
+}
+
+// Diffs currently-unlocked achievements against what's already been notified, and files a
+// notification for anything newly earned. Called from saveState() so it re-checks on every
+// mutation — cheap (16 pure boolean checks) and catches unlocks regardless of what changed.
+function checkAchievementUnlocks() {
+  const seen = new Set(state.profile.unlockedAchievementIds || []);
+  unlockedAchievements().forEach(a => {
+    if (seen.has(a.id)) return;
+    state.profile.unlockedAchievementIds = [...(state.profile.unlockedAchievementIds || []), a.id];
+    pushNotification("achievement_unlocked", `Achievement unlocked: ${a.name}`, a.desc, { achievementId: a.id });
+  });
+}
 
 /* ---- Journal helpers ---- */
 function journalForDate(iso) {
@@ -6255,6 +6385,13 @@ function fmtCertDate(dateStr) {
   return isNaN(d) ? "—" : `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
 }
 
+// Every certificate (payout or achievement) should show the user's real name,
+// falling back to their username before ever falling back to a generic label.
+function certTraderName() {
+  const full = ((state.profile.firstName || "") + " " + (state.profile.lastName || "")).trim();
+  return full || state.profile.username || "Funded Trader";
+}
+
 function makeCertSeal(size) {
   const ns = "http://www.w3.org/2000/svg";
   const svg = document.createElementNS(ns, "svg");
@@ -6304,6 +6441,46 @@ function makeCertSeal(size) {
   return svg;
 }
 
+// html2canvas-pro is loaded lazily (only when someone actually opens a certificate) and cached,
+// since it's only needed for the download button, not for normal app usage.
+let _html2canvasPromise = null;
+function loadHtml2Canvas() {
+  if (!_html2canvasPromise) {
+    _html2canvasPromise = import("https://cdn.jsdelivr.net/npm/html2canvas-pro@1.5.8/+esm").then(m => m.default);
+  }
+  return _html2canvasPromise;
+}
+
+async function downloadCertAsPng(cardEl, filename, triggerBtn) {
+  const originalLabel = triggerBtn ? triggerBtn.textContent : null;
+  if (triggerBtn) { triggerBtn.disabled = true; triggerBtn.textContent = "Preparing…"; }
+  // html2canvas can't rasterize `background-clip:text` gradients — it paints the solid
+  // background box instead of clipping to the glyphs. Swap those elements to a flat fill
+  // just for the capture, then restore the live gradient once the PNG is generated.
+  const gradientEls = cardEl.querySelectorAll(".cert-title-cert, .cert-amount, .cert-ach-name");
+  const restoreFns = Array.from(gradientEls).map(elm => {
+    const prevCss = elm.style.cssText;
+    elm.style.background = "none";
+    elm.style.webkitTextFillColor = "#ff4444";
+    elm.style.color = "#ff4444";
+    return () => { elm.style.cssText = prevCss; };
+  });
+  try {
+    const html2canvas = await loadHtml2Canvas();
+    const canvas = await html2canvas(cardEl, { backgroundColor: "#060307", scale: 2, useCORS: true });
+    const link = document.createElement("a");
+    link.download = filename;
+    link.href = canvas.toDataURL("image/png");
+    link.click();
+  } catch (e) {
+    console.warn("Certificate download failed:", e);
+    toast("Couldn't generate the image — try screenshotting instead");
+  } finally {
+    restoreFns.forEach(fn => fn());
+    if (triggerBtn) { triggerBtn.disabled = false; triggerBtn.textContent = originalLabel; }
+  }
+}
+
 function openShareCard(payout) {
   const firm = getFirm(payout?.firmId);
   const firmName = firm?.name || "Prop Firm";
@@ -6311,9 +6488,7 @@ function openShareCard(payout) {
   const words = amountToWords(payout?.amount || 0);
   const certDate = fmtCertDate(payout?.date);
   const id = certId(payout);
-  const fn = state.profile.firstName || "";
-  const ln = state.profile.lastName  || "";
-  const traderName = (fn + " " + ln).trim() || "Funded Trader";
+  const traderName = certTraderName();
   const streak = withdrawalStreak();
   const total = lifetimeWithdrawals();
 
@@ -6412,6 +6587,10 @@ function openShareCard(payout) {
 
   const actions = el("div", { class: "cert-actions" },
     el("button", {
+      class: "btn primary",
+      onclick: (e) => downloadCertAsPng(card, `ledger-payout-${id}.png`, e.currentTarget)
+    }, "Download"),
+    el("button", {
       class: "btn ghost",
       onclick: () => {
         const text = `Just got paid ${amount} from ${firmName}! 💰${streak > 1 ? ` ${streak} month streak 🔥` : ""} Total: ${fmtGBP(total, { short: true })} #proptrading #funded #ledger`;
@@ -6421,7 +6600,143 @@ function openShareCard(payout) {
     el("button", { class: "btn ghost", onclick: () => overlay.remove() }, "Close")
   );
 
-  const hint = el("div", { class: "cert-hint" }, "Screenshot the card above to share");
+  const hint = el("div", { class: "cert-hint" }, "Downloads as a high-res PNG, ready to share");
+
+  const wrap = el("div", { class: "cert-overlay-inner" });
+  wrap.appendChild(card);
+  wrap.appendChild(actions);
+  wrap.appendChild(hint);
+  overlay.appendChild(wrap);
+  document.body.appendChild(overlay);
+}
+
+function achCertId(achievement) {
+  const notif = state.notifications.find(n => n.type === "achievement_unlocked" && n.payload?.achievementId === achievement.id);
+  const d = notif ? new Date(notif.createdAt) : new Date();
+  const yy = String(d.getFullYear()).slice(2);
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const dd = String(d.getDate()).padStart(2, "0");
+  return `LP-A${yy}${mm}${dd}-${achievement.id.slice(0, 4).toUpperCase()}`;
+}
+
+function openAchievementCertificate(achievement) {
+  const notif = state.notifications.find(n => n.type === "achievement_unlocked" && n.payload?.achievementId === achievement.id);
+  const certDate = fmtCertDate((notif ? notif.createdAt : new Date().toISOString()).slice(0, 10));
+  const id = achCertId(achievement);
+  const traderName = certTraderName();
+  const all = getAchievements();
+  const unlockedCount = all.filter(a => a.unlocked).length;
+
+  const overlay = document.createElement("div");
+  overlay.className = "share-overlay";
+  overlay.style.cssText = "overflow-y:auto; align-items:flex-start; padding:24px 16px 48px;";
+  overlay.addEventListener("click", e => { if (e.target === overlay) overlay.remove(); });
+
+  function corner(cls) { return el("div", { class: "cert-corner " + cls }); }
+
+  const sealWrap = el("div", {});
+  sealWrap.appendChild(makeCertSeal(64));
+
+  const footer = el("div", { class: "cert-footer" },
+    el("div", { class: "cert-footer-left" },
+      el("div", { class: "cert-sig-text" }, "Ledger"),
+      el("div", { class: "cert-sig-role" }, "TRADING ANALYTICS"),
+      el("div", { class: "cert-sig-co" }, "LEDGER PAYOUTS")
+    ),
+    sealWrap,
+    el("div", { class: "cert-footer-right" },
+      el("div", { class: "cert-id-lbl" }, "CERTIFICATE ID"),
+      el("div", { class: "cert-id-val" }, id),
+      el("div", { class: "cert-verify-lbl" }, "TRACKED BY"),
+      el("div", { class: "cert-verify-val" }, "LEDGER APP")
+    )
+  );
+
+  const card = el("div", { class: "cert-card" },
+    el("div", { class: "cert-atm" },
+      el("div", { class: "cert-atm-tl" }),
+      el("div", { class: "cert-atm-tr" }),
+      el("div", { class: "cert-atm-waves" })
+    ),
+    corner("cert-corner-tl"), corner("cert-corner-tr"),
+    corner("cert-corner-bl"), corner("cert-corner-br"),
+    el("div", { class: "cert-content" },
+      el("div", { class: "cert-logo-wrap" },
+        el("div", { class: "cert-logo-icon" }),
+        el("div", { class: "cert-brand-name" }, "LEDGER"),
+        el("div", { class: "cert-brand-sub" }, "PAYOUT TRACKER")
+      ),
+      el("div", { class: "cert-sep" },
+        el("div", { class: "cert-sep-line" }),
+        el("div", { class: "cert-sep-dot" }),
+        el("div", { class: "cert-sep-line" })
+      ),
+      el("div", { class: "cert-title-payout" }, "BADGE"),
+      el("div", { class: "cert-title-cert" }, "UNLOCKED"),
+      el("div", { class: "cert-sep" },
+        el("div", { class: "cert-sep-line" }),
+        el("div", { class: "cert-sep-dot" }),
+        el("div", { class: "cert-sep-line" })
+      ),
+      el("div", { class: "cert-certifies-label" }, "THIS CERTIFIES THAT"),
+      el("div", { class: "cert-trader-name" }, traderName),
+      el("div", { class: "cert-certifies-body" },
+        "HAS DEMONSTRATED THE DISCIPLINE, CONSISTENCY AND SKILL REQUIRED TO EARN THE FOLLOWING BADGE"
+      ),
+      el("div", { class: "cert-payout-of-row" },
+        el("div", { class: "cert-payout-of-dash" }),
+        el("div", { class: "cert-payout-of-text" }, "BADGE EARNED"),
+        el("div", { class: "cert-payout-of-dash" })
+      ),
+      el("div", { class: "cert-ach-icon-big" }, achievement.icon),
+      el("div", { class: "cert-ach-name" }, achievement.name.toUpperCase()),
+      el("div", { class: "cert-amount-words" }, achievement.desc),
+      el("div", { class: "cert-info-box" },
+        el("div", { class: "cert-info-col" },
+          el("div", { class: "cert-info-icon-ring" }, "🏆"),
+          el("div", { class: "cert-info-lbl" }, "BADGE"),
+          el("div", { class: "cert-info-val" }, achievement.name.toUpperCase().slice(0, 14))
+        ),
+        el("div", { class: "cert-info-vdiv" }),
+        el("div", { class: "cert-info-col" },
+          el("div", { class: "cert-info-icon-ring" }, "📅"),
+          el("div", { class: "cert-info-lbl" }, "DATE EARNED"),
+          el("div", { class: "cert-info-val" }, certDate)
+        ),
+        el("div", { class: "cert-info-vdiv" }),
+        el("div", { class: "cert-info-col" },
+          el("div", { class: "cert-info-icon-ring" }, "🎖️"),
+          el("div", { class: "cert-info-lbl" }, "BADGES EARNED"),
+          el("div", { class: "cert-info-val" }, `${unlockedCount}/${all.length}`)
+        )
+      ),
+      el("div", { class: "cert-congrats-text" },
+        "CONGRATULATIONS ON YOUR DEDICATION AND CONSISTENT PERFORMANCE."
+      ),
+      el("div", { class: "cert-success-line" }, "KEEP TRADING — MORE BADGES AWAIT."),
+      footer,
+      el("div", { class: "cert-legal" },
+        "Achievements are tracked and verified through Ledger based on your trading activity."
+      )
+    )
+  );
+
+  const actions = el("div", { class: "cert-actions" },
+    el("button", {
+      class: "btn primary",
+      onclick: (e) => downloadCertAsPng(card, `ledger-achievement-${achievement.id}.png`, e.currentTarget)
+    }, "Download"),
+    el("button", {
+      class: "btn ghost",
+      onclick: () => {
+        const text = `Just unlocked "${achievement.name}" on Ledger! ${achievement.icon} ${unlockedCount}/${all.length} badges earned. #proptrading #funded #ledger`;
+        navigator.clipboard?.writeText(text).then(() => toast("Caption copied!")).catch(() => toast("Copied!"));
+      }
+    }, "Copy caption"),
+    el("button", { class: "btn ghost", onclick: () => overlay.remove() }, "Close")
+  );
+
+  const hint = el("div", { class: "cert-hint" }, "Downloads as a high-res PNG, ready to share");
 
   const wrap = el("div", { class: "cert-overlay-inner" });
   wrap.appendChild(card);
@@ -6459,13 +6774,17 @@ function renderPageMilestones(app) {
   const sorted = [...unlocked, ...locked];
   const grid = el("div", { class: "achievements-grid" });
   sorted.forEach(a => {
-    const card = el("div", { class: `achievement-card ${a.unlocked ? "unlocked" : "locked"}` },
+    const card = el("div", {
+      class: `achievement-card ${a.unlocked ? "unlocked" : "locked"}`,
+      onclick: a.unlocked ? () => openAchievementCertificate(a) : undefined,
+      style: a.unlocked ? "cursor:pointer;" : ""
+    },
       el("div", { class: "achievement-card-glow", style: `background:radial-gradient(circle,${a.color},transparent)` }),
       el("div", { class: "achievement-icon" }, a.icon),
       el("div", { class: "achievement-name" }, a.name),
       el("div", { class: "achievement-desc" }, a.desc),
       el("div", { class: `achievement-status ${a.unlocked ? "unlocked" : "locked"}` },
-        a.unlocked ? "✓ Unlocked" : "Locked"
+        a.unlocked ? "✓ Unlocked — tap for certificate" : "Locked"
       )
     );
     if (a.unlocked) {
@@ -6929,9 +7248,94 @@ function renderPageDashboard(app) {
   app.appendChild(renderOvFirms());
 }
 
+function timeAgo(iso) {
+  const then = new Date(iso).getTime();
+  if (isNaN(then)) return "";
+  const diffSec = Math.max(0, Math.floor((Date.now() - then) / 1000));
+  if (diffSec < 60) return "Just now";
+  const diffMin = Math.floor(diffSec / 60);
+  if (diffMin < 60) return `${diffMin}m ago`;
+  const diffHr = Math.floor(diffMin / 60);
+  if (diffHr < 24) return `${diffHr}h ago`;
+  const diffDay = Math.floor(diffHr / 24);
+  if (diffDay < 7) return `${diffDay}d ago`;
+  return fmtCertDate(iso.slice(0, 10));
+}
+
+const NOTIF_ICONS = { payout_upcoming: "💰", achievement_unlocked: "🏆" };
+
+function handleNotificationClick(n) {
+  markNotificationRead(n.id);
+  if (n.type === "achievement_unlocked") {
+    render();
+    const achievement = ACHIEVEMENTS.find(a => a.id === n.payload?.achievementId);
+    if (achievement) openAchievementCertificate(achievement);
+    else navigateTo("milestones");
+  } else if (n.type === "payout_upcoming") {
+    navigateTo("payouts");
+  } else {
+    render();
+  }
+}
+
+function toggleNotificationPanel(anchorBtn) {
+  if (document.getElementById("notifPanel")) { closeNotificationPanel(); return; }
+  anchorBtn.classList.add("add-open");
+
+  const overlay = document.createElement("div");
+  overlay.className = "add-dropdown-overlay";
+  overlay.addEventListener("click", closeNotificationPanel);
+  document.body.appendChild(overlay);
+
+  const panel = document.createElement("div");
+  panel.className = "notif-panel";
+  panel.id = "notifPanel";
+  const rect = anchorBtn.getBoundingClientRect();
+  panel.style.top = (rect.bottom + 8) + "px";
+  panel.style.right = (window.innerWidth - rect.right) + "px";
+
+  function closeNotificationPanel() {
+    anchorBtn.classList.remove("add-open");
+    panel.remove();
+    overlay.remove();
+  }
+
+  const head = el("div", { class: "notif-panel-head" },
+    el("div", { class: "notif-panel-title" }, "Notifications"),
+    unreadNotificationCount() > 0
+      ? el("div", { class: "notif-panel-mark", onclick: () => { markAllNotificationsRead(); closeNotificationPanel(); render(); } }, "Mark all read")
+      : null
+  );
+  panel.appendChild(head);
+
+  const list = el("div", { class: "notif-panel-list" });
+  if (!state.notifications.length) {
+    list.appendChild(el("div", { class: "notif-panel-empty" }, "You're all caught up — no notifications yet."));
+  } else {
+    state.notifications.forEach(n => {
+      const item = el("button", {
+        class: `notif-item ${n.read ? "" : "unread"}`,
+        onclick: () => { closeNotificationPanel(); handleNotificationClick(n); }
+      },
+        el("div", { class: "notif-item-icon" }, NOTIF_ICONS[n.type] || "🔔"),
+        el("div", { class: "notif-item-body" },
+          el("div", { class: "notif-item-title" }, n.title),
+          n.body ? el("div", { class: "notif-item-desc" }, n.body) : null,
+          el("div", { class: "notif-item-time" }, timeAgo(n.createdAt))
+        ),
+        n.read ? null : el("div", { class: "notif-item-dot" })
+      );
+      list.appendChild(item);
+    });
+  }
+  panel.appendChild(list);
+
+  document.body.appendChild(panel);
+}
+
 function renderOvHeader() {
   const displayName = state.profile.username || state.profile.firstName || null;
-  const pendingCount = state.payouts.filter(p => p.status === "awaiting_approval").length;
+  const unreadCount = unreadNotificationCount();
 
   const now = new Date();
   const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
@@ -6964,11 +7368,11 @@ function renderOvHeader() {
 
   const bellBtn = el("button", {
     class: "ov-ctrl-btn",
-    title: pendingCount > 0 ? `${pendingCount} pending payout${pendingCount > 1 ? "s" : ""}` : "Notifications",
-    onclick: () => navigateTo("payouts"),
+    title: unreadCount > 0 ? `${unreadCount} unread notification${unreadCount > 1 ? "s" : ""}` : "Notifications",
+    onclick: (e) => { e.stopPropagation(); toggleNotificationPanel(bellBtn); },
     html: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>`
   });
-  if (pendingCount > 0) bellBtn.appendChild(el("span", { class: "ov-notif-badge" }));
+  if (unreadCount > 0) bellBtn.appendChild(el("span", { class: "ov-notif-badge" }));
 
   return el("div", { class: "ov-topbar" },
     left,
@@ -8145,10 +8549,21 @@ function openPayoutSheet(payoutId, opts = {}) {
       if (!draft.date) return toast("Pick a date");
 
       const final = { ...draft, amount };
+      const wasAwaiting = editing && editing.status === "awaiting_approval";
       if (editing) {
         state.payouts = state.payouts.map(p => p.id === editing.id ? final : p);
       } else {
         state.payouts.push(final);
+      }
+      // Notify on payouts newly entering "awaiting approval" — that's what "upcoming payout" means in this app
+      if (final.status === "awaiting_approval" && !wasAwaiting) {
+        const firmName = getFirm(final.firmId)?.name || "your firm";
+        pushNotification(
+          "payout_upcoming",
+          `Payout pending — ${firmName}`,
+          `${fmtGBP(final.amount)} is awaiting approval from ${firmName}.`,
+          { payoutId: final.id }
+        );
       }
       saveState();
       closeSheet();
