@@ -1,6 +1,9 @@
 <!doctype html>
 <html lang="en">
 <head>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
 <link rel="manifest" href="/manifest.json">
@@ -2980,129 +2983,174 @@
     from { opacity: 0; }
     to   { opacity: 1; }
   }
-  .share-card-wrap {
+  /* ============================================================
+     PAYOUT CERTIFICATE (share card)
+     ============================================================ */
+  .cert-overlay-inner {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 20px;
-    max-width: 360px;
+    gap: 18px;
     width: 100%;
+    max-width: 380px;
   }
-  .share-card {
+  .cert-card {
     width: 100%;
-    border-radius: 24px;
-    padding: 36px 28px 32px;
     position: relative;
     overflow: hidden;
-    text-align: center;
-    background: linear-gradient(135deg, #0d1018 0%, #0f1420 50%, #0a0d16 100%);
-    border: 1px solid rgba(255,255,255,0.12);
-    box-shadow: 0 40px 80px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.04) inset;
-  }
-  .share-card-aurora {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    background:
-      radial-gradient(ellipse at 20% 0%, rgba(255,51,51,0.3), transparent 55%),
-      radial-gradient(ellipse at 80% 100%, rgba(165,180,252,0.2), transparent 55%);
-  }
-  .share-card-brand {
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: rgba(255,255,255,0.35);
-    margin-bottom: 28px;
-    position: relative;
-    z-index: 1;
-  }
-  .share-card-label {
-    font-size: 12px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.15em;
-    color: rgba(255,255,255,0.45);
-    margin-bottom: 10px;
-    position: relative;
-    z-index: 1;
-  }
-  .share-card-amount {
-    font-size: clamp(40px, 14vw, 56px);
-    font-weight: 800;
-    letter-spacing: -0.04em;
-    line-height: 0.95;
-    background: linear-gradient(180deg, #ffffff 0%, #ff3333 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    position: relative;
-    z-index: 1;
-    margin-bottom: 8px;
-  }
-  .share-card-firm {
-    font-size: 15px;
-    font-weight: 600;
-    color: rgba(255,255,255,0.7);
-    position: relative;
-    z-index: 1;
-    margin-bottom: 24px;
-  }
-  .share-card-divider {
-    width: 40px;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-    margin: 0 auto 20px;
-    position: relative;
-    z-index: 1;
-  }
-  .share-card-stats {
-    display: flex;
-    justify-content: center;
-    gap: 28px;
-    position: relative;
-    z-index: 1;
-  }
-  .share-stat { text-align: center; }
-  .share-stat-value {
-    font-size: 17px;
-    font-weight: 700;
-    letter-spacing: -0.02em;
-    color: #fff;
-  }
-  .share-stat-label {
-    font-size: 9.5px;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    color: rgba(255,255,255,0.35);
-    margin-top: 2px;
-    font-weight: 600;
-  }
-  .share-card-tag {
-    margin-top: 22px;
-    font-size: 11px;
-    color: rgba(255,255,255,0.25);
-    font-weight: 600;
-    letter-spacing: 0.05em;
-    position: relative;
-    z-index: 1;
-  }
-  .share-actions {
-    display: flex;
-    gap: 10px;
-    width: 100%;
-  }
-  .share-actions .btn {
-    flex: 1;
-    padding: 14px;
-    font-size: 14px;
-    border-radius: var(--r-md);
-  }
-  .share-hint {
-    font-size: 12px;
-    color: var(--text-3);
+    border-radius: 18px;
+    background: #060307;
+    border: 1px solid rgba(180,0,0,0.32);
+    padding: 30px 22px 22px;
+    box-shadow: 0 0 60px rgba(180,0,0,0.18), 0 0 0 1px rgba(255,255,255,0.04) inset, 0 40px 80px rgba(0,0,0,0.9);
     text-align: center;
   }
+  .cert-atm { position: absolute; inset: 0; pointer-events: none; z-index: 0; }
+  .cert-atm-tl {
+    position: absolute; top: -60px; left: -60px;
+    width: 220px; height: 200px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(200,0,0,0.52) 0%, transparent 70%);
+  }
+  .cert-atm-tr {
+    position: absolute; top: -60px; right: -60px;
+    width: 180px; height: 180px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(160,0,0,0.38) 0%, transparent 70%);
+  }
+  .cert-atm-waves {
+    position: absolute; inset: 0;
+    background-image: repeating-linear-gradient(
+      -45deg, transparent, transparent 48px,
+      rgba(140,0,0,0.04) 48px, rgba(140,0,0,0.04) 49px
+    );
+  }
+  .cert-corner {
+    position: absolute; width: 18px; height: 18px; z-index: 1;
+  }
+  .cert-corner-tl { top:14px; left:14px; border-top:2px solid rgba(255,51,51,0.55); border-left:2px solid rgba(255,51,51,0.55); }
+  .cert-corner-tr { top:14px; right:14px; border-top:2px solid rgba(255,51,51,0.55); border-right:2px solid rgba(255,51,51,0.55); }
+  .cert-corner-bl { bottom:14px; left:14px; border-bottom:2px solid rgba(255,51,51,0.55); border-left:2px solid rgba(255,51,51,0.55); }
+  .cert-corner-br { bottom:14px; right:14px; border-bottom:2px solid rgba(255,51,51,0.55); border-right:2px solid rgba(255,51,51,0.55); }
+  .cert-content { position: relative; z-index: 1; }
+  .cert-logo-wrap { margin-bottom: 10px; }
+  .cert-logo-icon {
+    width: 36px; height: 36px; border-radius: 10px;
+    background: radial-gradient(circle at 30% 25%, #ff3333, #8b1010 70%);
+    box-shadow: 0 0 22px rgba(255,51,51,0.5), 0 4px 12px rgba(0,0,0,0.5);
+    margin: 0 auto 8px;
+  }
+  .cert-brand-name {
+    font-size: 12px; font-weight: 900; letter-spacing: 0.32em;
+    color: rgba(255,255,255,0.88); text-transform: uppercase; margin-bottom: 2px;
+  }
+  .cert-brand-sub {
+    font-size: 7.5px; font-weight: 600; letter-spacing: 0.28em;
+    color: rgba(255,51,51,0.65); text-transform: uppercase;
+  }
+  .cert-sep { display:flex; align-items:center; gap:10px; margin:12px 0; }
+  .cert-sep-line { flex:1; height:1px; background:linear-gradient(90deg, transparent, rgba(180,0,0,0.48), transparent); }
+  .cert-sep-dot { width:4px; height:4px; border-radius:50%; background:rgba(255,51,51,0.55); flex-shrink:0; }
+  .cert-title-payout {
+    font-size: clamp(44px, 14vw, 58px); font-weight: 900; letter-spacing: 0.14em;
+    color: #fff; line-height: 1; margin-bottom: 3px;
+    text-shadow: 0 0 50px rgba(180,0,0,0.4);
+  }
+  .cert-title-cert {
+    font-size: 13px; font-weight: 800; letter-spacing: 0.58em; text-transform: uppercase;
+    background: linear-gradient(90deg, #cc2222 0%, #ff5555 50%, #cc2222 100%);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    padding-right: 0.58em;
+  }
+  .cert-certifies-label {
+    font-size: 8px; font-weight: 600; letter-spacing: 0.22em;
+    color: rgba(255,255,255,0.35); text-transform: uppercase; margin-bottom: 8px;
+  }
+  .cert-trader-name {
+    font-family: 'Dancing Script', Georgia, cursive; font-size: 36px; font-weight: 700;
+    color: #fff; line-height: 1.15; margin-bottom: 10px;
+    text-shadow: 0 2px 16px rgba(255,255,255,0.08);
+  }
+  .cert-certifies-body {
+    font-size: 7.5px; font-weight: 500; letter-spacing: 0.14em;
+    color: rgba(255,255,255,0.3); text-transform: uppercase;
+    line-height: 1.9; max-width: 220px; margin: 0 auto;
+  }
+  .cert-payout-of-row { display:flex; align-items:center; justify-content:center; gap:10px; margin:6px 0; }
+  .cert-payout-of-dash { height:1px; width:36px; background:rgba(255,51,51,0.5); }
+  .cert-payout-of-text {
+    font-size: 8px; font-weight: 700; letter-spacing: 0.3em;
+    color: rgba(255,51,51,0.78); text-transform: uppercase;
+  }
+  .cert-amount {
+    font-size: clamp(44px, 15vw, 62px); font-weight: 900; letter-spacing: -0.02em; line-height: 0.95;
+    background: linear-gradient(180deg, #ff5555 0%, #dd1111 55%, #991111 100%);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 18px rgba(255,30,30,0.55)); margin-bottom: 5px;
+  }
+  .cert-amount-words {
+    font-size: 7.5px; font-weight: 600; letter-spacing: 0.2em;
+    color: rgba(255,255,255,0.28); text-transform: uppercase; margin-bottom: 14px;
+  }
+  .cert-info-box {
+    background: rgba(255,255,255,0.03); border: 1px solid rgba(180,0,0,0.2);
+    border-radius: 10px; padding: 14px 6px;
+    display: flex; align-items: stretch; margin-bottom: 16px;
+  }
+  .cert-info-col { flex:1; text-align:center; display:flex; flex-direction:column; align-items:center; }
+  .cert-info-vdiv { width:1px; background:rgba(255,255,255,0.06); margin:0 4px; flex-shrink:0; }
+  .cert-info-icon-ring {
+    width: 26px; height: 26px; border-radius: 50%; border: 1px solid rgba(255,51,51,0.4);
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 6px; font-size: 11px; color: rgba(255,51,51,0.78);
+  }
+  .cert-info-lbl {
+    font-size: 7px; font-weight: 600; letter-spacing: 0.14em;
+    color: rgba(255,255,255,0.28); text-transform: uppercase; margin-bottom: 3px;
+  }
+  .cert-info-val { font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.82); letter-spacing: 0.03em; }
+  .cert-congrats-text {
+    font-size: 7.5px; font-weight: 500; letter-spacing: 0.13em;
+    color: rgba(255,255,255,0.28); text-transform: uppercase; line-height: 1.85; margin-bottom: 4px;
+  }
+  .cert-success-line {
+    font-size: 7.5px; font-weight: 700; letter-spacing: 0.16em;
+    color: rgba(255,51,51,0.68); text-transform: uppercase; margin-bottom: 16px;
+  }
+  .cert-footer {
+    display: flex; align-items: center; justify-content: space-between;
+    padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.05);
+    margin-bottom: 12px; gap: 4px;
+  }
+  .cert-footer-left { flex:1; text-align:left; }
+  .cert-footer-right { flex:1; text-align:right; }
+  .cert-sig-text {
+    font-family: 'Dancing Script', Georgia, cursive; font-size: 20px;
+    color: rgba(255,255,255,0.75); line-height: 1; margin-bottom: 3px;
+  }
+  .cert-sig-role {
+    font-size: 6.5px; font-weight: 600; letter-spacing: 0.14em;
+    color: rgba(255,255,255,0.28); text-transform: uppercase;
+  }
+  .cert-sig-co {
+    font-size: 7px; font-weight: 700; letter-spacing: 0.12em;
+    color: rgba(255,51,51,0.62); text-transform: uppercase;
+  }
+  .cert-id-lbl {
+    font-size: 6.5px; font-weight: 600; letter-spacing: 0.14em;
+    color: rgba(255,255,255,0.25); text-transform: uppercase; margin-bottom: 2px;
+  }
+  .cert-id-val { font-size: 9px; font-weight: 700; color: rgba(255,255,255,0.68); letter-spacing: 0.05em; margin-bottom: 4px; }
+  .cert-verify-lbl {
+    font-size: 6.5px; font-weight: 600; letter-spacing: 0.13em;
+    color: rgba(255,255,255,0.22); text-transform: uppercase;
+  }
+  .cert-verify-val {
+    font-size: 7.5px; font-weight: 700; color: rgba(255,51,51,0.6);
+    text-transform: uppercase; letter-spacing: 0.07em;
+  }
+  .cert-legal { font-size: 6.5px; color: rgba(255,255,255,0.15); line-height: 1.6; letter-spacing: 0.01em; }
+  .cert-actions { display:flex; gap:10px; width:100%; }
+  .cert-actions .btn { flex:1; padding:14px; font-size:14px; border-radius:var(--r-md); }
+  .cert-hint { font-size:12px; color:var(--text-3); text-align:center; }
 
   /* ============================================================
      MILESTONES / TROPHY ROOM
@@ -6087,56 +6135,203 @@ function renderAchievementStrip() {
 /* ----------------------------------------------------------------
    MILESTONES / TROPHY ROOM PAGE
    ---------------------------------------------------------------- */
+/* ---- Payout certificate helpers ---- */
+function amountToWords(amount) {
+  const n = Math.round(Math.abs(amount || 0));
+  if (!n || n > 99999) return "LEDGER VERIFIED PAYOUT";
+  const ones = ["","ONE","TWO","THREE","FOUR","FIVE","SIX","SEVEN","EIGHT","NINE","TEN","ELEVEN","TWELVE","THIRTEEN","FOURTEEN","FIFTEEN","SIXTEEN","SEVENTEEN","EIGHTEEN","NINETEEN"];
+  const tens = ["","","TWENTY","THIRTY","FORTY","FIFTY","SIXTY","SEVENTY","EIGHTY","NINETY"];
+  function s100(n) { return n < 20 ? ones[n] : tens[Math.floor(n/10)] + (n%10 ? " " + ones[n%10] : ""); }
+  function s1000(n) { return n < 100 ? s100(n) : ones[Math.floor(n/100)] + " HUNDRED" + (n%100 ? " AND " + s100(n%100) : ""); }
+  let w = n >= 1000
+    ? ones[Math.floor(n/1000)] + " THOUSAND" + (n%1000 ? " " + s1000(n%1000) : "")
+    : s1000(n);
+  return w + " POUNDS";
+}
+
+function certId(payout) {
+  const d = new Date((payout?.date || "") + "T12:00:00");
+  const yy = String(d.getFullYear()).slice(2);
+  const mm = String(d.getMonth()+1).padStart(2,"0");
+  const dd = String(d.getDate()).padStart(2,"0");
+  return `LP${yy}${mm}${dd}-${Math.round(payout?.amount || 0)}`;
+}
+
+function fmtCertDate(dateStr) {
+  const months = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
+  const d = new Date((dateStr || "") + "T12:00:00");
+  return isNaN(d) ? "—" : `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+}
+
+function makeCertSeal(size) {
+  const ns = "http://www.w3.org/2000/svg";
+  const svg = document.createElementNS(ns, "svg");
+  svg.setAttribute("width", size); svg.setAttribute("height", size);
+  svg.setAttribute("viewBox", `0 0 ${size} ${size}`);
+  const cx = size/2, cy = size/2;
+  const rOuter = size/2-2, rText = size/2-7, rInner = size/2-13;
+  const uid = `sc${size}${Date.now()}`;
+
+  const defs = document.createElementNS(ns, "defs");
+  const arcPath = document.createElementNS(ns, "path");
+  arcPath.setAttribute("id", uid+"arc");
+  arcPath.setAttribute("d", `M${cx},${cy} m-${rText},0 a${rText},${rText} 0 1,1 ${rText*2},0 a${rText},${rText} 0 1,1 -${rText*2},0`);
+  defs.appendChild(arcPath);
+  const grad = document.createElementNS(ns, "radialGradient");
+  grad.setAttribute("id", uid+"g"); grad.setAttribute("cx","30%"); grad.setAttribute("cy","25%"); grad.setAttribute("r","70%");
+  const s0 = document.createElementNS(ns, "stop"); s0.setAttribute("offset","0%"); s0.setAttribute("stop-color","#ff3333");
+  const s1 = document.createElementNS(ns, "stop"); s1.setAttribute("offset","100%"); s1.setAttribute("stop-color","#8b0f0f");
+  grad.appendChild(s0); grad.appendChild(s1); defs.appendChild(grad);
+  svg.appendChild(defs);
+
+  const c1 = document.createElementNS(ns, "circle");
+  c1.setAttribute("cx",cx); c1.setAttribute("cy",cy); c1.setAttribute("r",rOuter);
+  c1.setAttribute("fill","none"); c1.setAttribute("stroke","rgba(180,0,0,0.52)"); c1.setAttribute("stroke-width","1.5");
+  svg.appendChild(c1);
+  const c2 = document.createElementNS(ns, "circle");
+  c2.setAttribute("cx",cx); c2.setAttribute("cy",cy); c2.setAttribute("r",rInner);
+  c2.setAttribute("fill","none"); c2.setAttribute("stroke","rgba(140,0,0,0.3)"); c2.setAttribute("stroke-width","1");
+  svg.appendChild(c2);
+
+  const textEl = document.createElementNS(ns, "text");
+  textEl.setAttribute("font-size","5"); textEl.setAttribute("font-weight","700");
+  textEl.setAttribute("letter-spacing","1.6"); textEl.setAttribute("fill","rgba(200,40,40,0.72)");
+  textEl.setAttribute("font-family","sans-serif");
+  const tp = document.createElementNS(ns, "textPath");
+  tp.setAttribute("href","#"+uid+"arc");
+  tp.textContent = "LEDGER PAYOUTS · VERIFIED · FUNDED TRADING ·";
+  textEl.appendChild(tp); svg.appendChild(textEl);
+
+  const iconSz = Math.round(size*0.3), ix = cx-iconSz/2, iy = cy-iconSz/2;
+  const rect = document.createElementNS(ns, "rect");
+  rect.setAttribute("x",ix); rect.setAttribute("y",iy);
+  rect.setAttribute("width",iconSz); rect.setAttribute("height",iconSz);
+  rect.setAttribute("rx",Math.round(iconSz*0.26));
+  rect.setAttribute("fill","url(#"+uid+"g)");
+  svg.appendChild(rect);
+  return svg;
+}
+
 function openShareCard(payout) {
   const firm = getFirm(payout?.firmId);
   const firmName = firm?.name || "Prop Firm";
   const amount = fmtGBP(payout?.amount || 0);
+  const words = amountToWords(payout?.amount || 0);
+  const certDate = fmtCertDate(payout?.date);
+  const id = certId(payout);
+  const fn = state.profile.firstName || "";
+  const ln = state.profile.lastName  || "";
+  const traderName = (fn + " " + ln).trim() || "Funded Trader";
   const streak = withdrawalStreak();
   const total = lifetimeWithdrawals();
 
   const overlay = document.createElement("div");
   overlay.className = "share-overlay";
+  overlay.style.cssText = "overflow-y:auto; align-items:flex-start; padding:24px 16px 48px;";
   overlay.addEventListener("click", e => { if (e.target === overlay) overlay.remove(); });
 
-  const wrap = el("div", { class: "share-card-wrap" });
+  function corner(cls) { return el("div", { class: "cert-corner " + cls }); }
 
-  const card = el("div", { class: "share-card" },
-    el("div", { class: "share-card-aurora" }),
-    el("div", { class: "share-card-brand" }, "LEDGER"),
-    el("div", { class: "share-card-label" }, "Payout received"),
-    el("div", { class: "share-card-amount num" }, amount),
-    el("div", { class: "share-card-firm" }, firmName),
-    el("div", { class: "share-card-divider" }),
-    el("div", { class: "share-card-stats" },
-      el("div", { class: "share-stat" },
-        el("div", { class: "share-stat-value num" }, fmtGBP(total, { short: total >= 1000 })),
-        el("div", { class: "share-stat-label" }, "Lifetime")
-      ),
-      el("div", { class: "share-stat" },
-        el("div", { class: "share-stat-value" }, `${streak}mo`),
-        el("div", { class: "share-stat-label" }, "Streak")
-      ),
-      el("div", { class: "share-stat" },
-        el("div", { class: "share-stat-value" }, received().length.toString()),
-        el("div", { class: "share-stat-label" }, "Payouts")
-      )
+  const sealWrap = el("div", {});
+  sealWrap.appendChild(makeCertSeal(64));
+
+  const footer = el("div", { class: "cert-footer" },
+    el("div", { class: "cert-footer-left" },
+      el("div", { class: "cert-sig-text" }, "Ledger"),
+      el("div", { class: "cert-sig-role" }, "TRADING ANALYTICS"),
+      el("div", { class: "cert-sig-co" }, "LEDGER PAYOUTS")
     ),
-    el("div", { class: "share-card-tag" }, "#proptrading #funded #ledgerpayout")
+    sealWrap,
+    el("div", { class: "cert-footer-right" },
+      el("div", { class: "cert-id-lbl" }, "CERTIFICATE ID"),
+      el("div", { class: "cert-id-val" }, id),
+      el("div", { class: "cert-verify-lbl" }, "TRACKED BY"),
+      el("div", { class: "cert-verify-val" }, "LEDGER APP")
+    )
   );
 
-  const actions = el("div", { class: "share-actions" },
+  const card = el("div", { class: "cert-card" },
+    el("div", { class: "cert-atm" },
+      el("div", { class: "cert-atm-tl" }),
+      el("div", { class: "cert-atm-tr" }),
+      el("div", { class: "cert-atm-waves" })
+    ),
+    corner("cert-corner-tl"), corner("cert-corner-tr"),
+    corner("cert-corner-bl"), corner("cert-corner-br"),
+    el("div", { class: "cert-content" },
+      el("div", { class: "cert-logo-wrap" },
+        el("div", { class: "cert-logo-icon" }),
+        el("div", { class: "cert-brand-name" }, "LEDGER"),
+        el("div", { class: "cert-brand-sub" }, "PAYOUT TRACKER")
+      ),
+      el("div", { class: "cert-sep" },
+        el("div", { class: "cert-sep-line" }),
+        el("div", { class: "cert-sep-dot" }),
+        el("div", { class: "cert-sep-line" })
+      ),
+      el("div", { class: "cert-title-payout" }, "PAYOUT"),
+      el("div", { class: "cert-title-cert" }, "CERTIFICATE"),
+      el("div", { class: "cert-sep" },
+        el("div", { class: "cert-sep-line" }),
+        el("div", { class: "cert-sep-dot" }),
+        el("div", { class: "cert-sep-line" })
+      ),
+      el("div", { class: "cert-certifies-label" }, "THIS CERTIFIES THAT"),
+      el("div", { class: "cert-trader-name" }, traderName),
+      el("div", { class: "cert-certifies-body" },
+        "HAS SUCCESSFULLY COMPLETED THE TRADING REQUIREMENTS AND IS HEREBY ENTITLED TO A"
+      ),
+      el("div", { class: "cert-payout-of-row" },
+        el("div", { class: "cert-payout-of-dash" }),
+        el("div", { class: "cert-payout-of-text" }, "PAYOUT OF"),
+        el("div", { class: "cert-payout-of-dash" })
+      ),
+      el("div", { class: "cert-amount num" }, amount),
+      el("div", { class: "cert-amount-words" }, words),
+      el("div", { class: "cert-info-box" },
+        el("div", { class: "cert-info-col" },
+          el("div", { class: "cert-info-icon-ring" }, "£"),
+          el("div", { class: "cert-info-lbl" }, "PAYOUT AMOUNT"),
+          el("div", { class: "cert-info-val" }, amount)
+        ),
+        el("div", { class: "cert-info-vdiv" }),
+        el("div", { class: "cert-info-col" },
+          el("div", { class: "cert-info-icon-ring" }, "📅"),
+          el("div", { class: "cert-info-lbl" }, "PAYOUT DATE"),
+          el("div", { class: "cert-info-val" }, certDate)
+        ),
+        el("div", { class: "cert-info-vdiv" }),
+        el("div", { class: "cert-info-col" },
+          el("div", { class: "cert-info-icon-ring" }, "📈"),
+          el("div", { class: "cert-info-lbl" }, "PROP FIRM"),
+          el("div", { class: "cert-info-val" }, firmName.toUpperCase().slice(0,12))
+        )
+      ),
+      el("div", { class: "cert-congrats-text" },
+        "CONGRATULATIONS ON YOUR DISCIPLINE, CONSISTENCY AND EXCELLENT PERFORMANCE."
+      ),
+      el("div", { class: "cert-success-line" }, "WE WISH YOU CONTINUED SUCCESS."),
+      footer,
+      el("div", { class: "cert-legal" },
+        "Payouts are tracked and verified through Ledger. Past performance does not guarantee future results."
+      )
+    )
+  );
+
+  const actions = el("div", { class: "cert-actions" },
     el("button", {
       class: "btn ghost",
       onclick: () => {
-        const text = `Just got paid ${amount} from ${firmName}! 💰 ${streak > 1 ? `${streak} month streak 🔥 ` : ""}Total: ${fmtGBP(total, { short: true })} #proptrading #funded`;
+        const text = `Just got paid ${amount} from ${firmName}! 💰${streak > 1 ? ` ${streak} month streak 🔥` : ""} Total: ${fmtGBP(total, { short: true })} #proptrading #funded #ledger`;
         navigator.clipboard?.writeText(text).then(() => toast("Caption copied!")).catch(() => toast("Copied!"));
       }
     }, "Copy caption"),
     el("button", { class: "btn ghost", onclick: () => overlay.remove() }, "Close")
   );
 
-  const hint = el("div", { class: "share-hint" }, "Screenshot the card above to share");
+  const hint = el("div", { class: "cert-hint" }, "Screenshot the card above to share");
 
+  const wrap = el("div", { class: "cert-overlay-inner" });
   wrap.appendChild(card);
   wrap.appendChild(actions);
   wrap.appendChild(hint);
