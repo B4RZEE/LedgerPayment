@@ -10,7 +10,7 @@ interface LedgerActions {
   /** Back to DEFAULT_STATE — used on logout. */
   reset: () => void;
 
-  setUserId: (userId: string | null) => void;
+  setUser: (userId: string | null, email: string | null) => void;
 
   setProfile: (patch: Partial<Omit<Profile, "goals" | "unlockedAchievementIds">>) => void;
   setGoals: (patch: Partial<Profile["goals"]>) => void;
@@ -40,9 +40,10 @@ interface LedgerActions {
 }
 
 export type LedgerStore = LedgerState & {
-  /** Supabase auth user id, set once after login — not part of DEFAULT_STATE since it's
-   *  session metadata, not ledger data (never persisted to localStorage/Supabase as a field). */
+  /** Supabase auth user id + email, set once after login — not part of DEFAULT_STATE since
+   *  it's session metadata, not ledger data (never persisted to localStorage/Supabase as a field). */
   userId: string | null;
+  email: string | null;
   actions: LedgerActions;
 };
 
@@ -50,6 +51,7 @@ export const useLedgerStore = create<LedgerStore>()(
   immer((set) => ({
     ...DEFAULT_STATE,
     userId: null,
+    email: null,
 
     actions: {
       hydrate: (state) =>
@@ -62,9 +64,10 @@ export const useLedgerStore = create<LedgerStore>()(
           Object.assign(draft, DEFAULT_STATE);
         }),
 
-      setUserId: (userId) =>
+      setUser: (userId, email) =>
         set((draft) => {
           draft.userId = userId;
+          draft.email = email;
         }),
 
       setProfile: (patch) =>
@@ -182,6 +185,6 @@ export const useLedgerStore = create<LedgerStore>()(
 /** Selector helper: pulls only the domain state, dropping userId/actions — useful anywhere
  *  a plain LedgerState is needed (selectors, achievement checks, sync). */
 export function getLedgerState(store: LedgerStore): LedgerState {
-  const { userId: _userId, actions: _actions, ...state } = store;
+  const { userId: _userId, email: _email, actions: _actions, ...state } = store;
   return state;
 }

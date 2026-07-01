@@ -118,6 +118,26 @@ export function isSameDay(a: string, b: string): boolean {
   return a === b;
 }
 
+export function fmtCertDate(dateStr: string): string {
+  const months = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+  const d = new Date((dateStr || "") + "T12:00:00");
+  return isNaN(d.getTime()) ? "—" : `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+}
+
+export function timeAgo(iso: string): string {
+  const then = new Date(iso).getTime();
+  if (isNaN(then)) return "";
+  const diffSec = Math.max(0, Math.floor((Date.now() - then) / 1000));
+  if (diffSec < 60) return "Just now";
+  const diffMin = Math.floor(diffSec / 60);
+  if (diffMin < 60) return `${diffMin}m ago`;
+  const diffHr = Math.floor(diffMin / 60);
+  if (diffHr < 24) return `${diffHr}h ago`;
+  const diffDay = Math.floor(diffHr / 24);
+  if (diffDay < 7) return `${diffDay}d ago`;
+  return fmtCertDate(iso.slice(0, 10));
+}
+
 export function isInRange(date: string, start: string, end: string): boolean {
   return date >= start && date <= end;
 }

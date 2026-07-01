@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import AppShell from "@/components/dashboard/layout/AppShell";
 import "../../dashboard.css";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
@@ -15,7 +16,9 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     redirect("/app/login");
   }
 
-  // Phase 2 placeholder shell — Sidebar/TopBar/BottomNav/SheetHost/PinLockOverlay
-  // land in Phase 4.
-  return <div className="min-h-svh" style={{ background: "var(--bg-0)", color: "var(--text-0)" }}>{children}</div>;
+  return (
+    <AppShell userId={user.id} email={user.email ?? null}>
+      {children}
+    </AppShell>
+  );
 }
