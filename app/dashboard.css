@@ -1,3 +1,151 @@
-/* Dashboard-only styles — imported by app/app/(app)/layout.tsx only, not the root layout.
-   Holds what's too bespoke for Tailwind utilities: keyframe animations, certificate styling,
-   gradient-text effects, chart-adjacent CSS, and light-theme overrides. */
+/* Dashboard-only styles — imported by the (app) and (auth) layouts only, not the root
+   layout, so marketing-site visitors don't pay for it. Holds what's too bespoke/stateful
+   for Tailwind utilities: pseudo-class-heavy pieces, keyframe animations, certificate
+   styling, gradient-text effects, and light-theme overrides. Ported from public/app.html. */
+
+/* ── Auth screens ──────────────────────────────────────────────── */
+.auth-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 250;
+  background: var(--bg-0);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  padding-top: calc(24px + env(safe-area-inset-top));
+  padding-bottom: calc(24px + env(safe-area-inset-bottom));
+  overflow-y: auto;
+}
+.auth-card {
+  width: 100%;
+  max-width: 400px;
+  margin: auto;
+}
+@media (min-width: 640px) {
+  .auth-screen {
+    background: rgba(7, 8, 12, 0.72);
+  }
+  .auth-card {
+    max-width: 460px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border);
+    border-radius: var(--r-xl);
+    padding: 44px 44px 40px;
+    backdrop-filter: blur(28px) saturate(150%);
+    -webkit-backdrop-filter: blur(28px) saturate(150%);
+    box-shadow:
+      0 0 0 1px rgba(255, 255, 255, 0.06) inset,
+      0 32px 80px rgba(0, 0, 0, 0.55),
+      0 0 120px rgba(224, 28, 28, 0.06);
+    position: relative;
+  }
+  .auth-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.14), transparent);
+    border-radius: var(--r-xl) var(--r-xl) 0 0;
+    pointer-events: none;
+  }
+}
+[data-theme="light"] .auth-screen { background: rgba(241, 245, 249, 0.85); }
+[data-theme="light"] .auth-card { background: rgba(255, 255, 255, 0.7); border-color: rgba(0, 0, 0, 0.08); }
+
+.auth-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 36px;
+}
+.auth-brand-mark {
+  width: 36px;
+  height: 36px;
+  border-radius: 11px;
+  background: radial-gradient(circle at 30% 25%, var(--jade-1), var(--jade-3) 65%), var(--jade-2);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1) inset, 0 8px 20px var(--jade-glow);
+}
+.auth-brand-name { font-size: 22px; font-weight: 800; letter-spacing: -0.03em; color: var(--text-0); }
+
+.auth-title { font-size: 24px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 6px; text-align: center; }
+.auth-sub { font-size: 14px; color: var(--text-2); text-align: center; margin-bottom: 28px; }
+
+.auth-field { margin-bottom: 14px; }
+.auth-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-3);
+  font-weight: 600;
+  margin-bottom: 7px;
+  display: block;
+}
+.auth-input {
+  width: 100%;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  padding: 13px 16px;
+  font-size: 15px;
+  color: var(--text-0);
+  transition: border-color 0.15s var(--ease), box-shadow 0.15s var(--ease);
+  outline: none;
+}
+.auth-input:focus { border-color: var(--jade-2); box-shadow: 0 0 0 3px var(--jade-glow); }
+.auth-input::placeholder { color: var(--text-4); }
+.auth-input.error { border-color: var(--rose-2, var(--rose-1)); }
+[data-theme="light"] .auth-input { background: #f8fafc; border-color: rgba(0, 0, 0, 0.12); }
+
+.auth-error {
+  font-size: 13px;
+  color: var(--rose-1);
+  margin-top: -4px;
+  margin-bottom: 14px;
+  min-height: 16px;
+}
+.auth-success {
+  font-size: 13px;
+  color: var(--jade-1);
+  margin-top: -4px;
+  margin-bottom: 14px;
+}
+
+.auth-submit {
+  width: 100%;
+  padding: 14px;
+  border-radius: var(--r-sm);
+  background: linear-gradient(135deg, var(--jade-1), var(--jade-2));
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  margin-top: 6px;
+  transition: filter 0.15s var(--ease), transform 0.1s var(--ease);
+  box-shadow: 0 8px 24px var(--jade-glow);
+}
+.auth-submit:hover { filter: brightness(1.06); }
+.auth-submit:active { transform: scale(0.98); }
+.auth-submit:disabled { opacity: 0.6; cursor: not-allowed; filter: none; }
+
+.auth-switch {
+  text-align: center;
+  margin-top: 22px;
+  font-size: 13px;
+  color: var(--text-3);
+}
+.auth-switch a { color: var(--jade-1); font-weight: 600; cursor: pointer; text-decoration: none; }
+.auth-switch a:hover { text-decoration: underline; }
+
+.auth-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-3);
+  font-size: 13px;
+  cursor: pointer;
+  margin-bottom: 20px;
+}
+.auth-back:hover { color: var(--text-1); }
