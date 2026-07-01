@@ -1694,6 +1694,191 @@
     text-align: right;
   }
 
+  /* ---- Firm Comparison Card ---- */
+  .fc-top-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 4px 10px;
+    border-radius: 20px;
+    background: rgba(59,130,246,0.12);
+    color: #3b82f6;
+    margin-bottom: 14px;
+  }
+  .fc-rows { display: flex; flex-direction: column; gap: 0; }
+  .fc-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--hairline);
+    position: relative;
+  }
+  .fc-row:last-child { border-bottom: none; }
+  .fc-rank {
+    font-size: 16px;
+    width: 24px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+  .fc-avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .fc-info { flex: 1; min-width: 0; }
+  .fc-name {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-0);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 8px;
+  }
+  .fc-bars { display: flex; flex-direction: column; gap: 5px; }
+  .fc-bar-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 10px;
+    color: var(--text-3);
+  }
+  .fc-bar-label { width: 72px; flex-shrink: 0; font-weight: 600; }
+  .fc-bar-track {
+    flex: 1;
+    height: 5px;
+    border-radius: 99px;
+    background: rgba(255,255,255,0.06);
+    overflow: hidden;
+  }
+  .fc-bar-fill {
+    height: 100%;
+    border-radius: 99px;
+    width: 0;
+    transition: width 0.9s cubic-bezier(0.16,1,0.3,1);
+  }
+  .fc-bar-val { font-size: 10px; font-weight: 700; color: var(--text-2); min-width: 44px; text-align: right; }
+  .fc-total {
+    font-size: 15px;
+    font-weight: 800;
+    color: #3b82f6;
+    flex-shrink: 0;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.03em;
+    min-width: 68px;
+    text-align: right;
+  }
+  .fc-score-pill {
+    position: absolute;
+    top: 10px;
+    right: 16px;
+    font-size: 9px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 20px;
+    background: rgba(59,130,246,0.1);
+    color: #3b82f6;
+  }
+
+  /* ---- Per-firm curve cards ---- */
+  .firm-curves-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 12px;
+  }
+  .firm-curve-card {
+    background: var(--glass);
+    border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+    overflow: hidden;
+    position: relative;
+  }
+  .firm-curve-card::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+    pointer-events: none;
+  }
+  .fcc-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 16px 8px;
+  }
+  .fcc-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .fcc-name {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-0);
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .fcc-total {
+    font-size: 14px;
+    font-weight: 800;
+    color: #3b82f6;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.03em;
+    flex-shrink: 0;
+  }
+  .fcc-total.zero { color: var(--text-4); }
+  .fcc-chart { position: relative; padding: 0; }
+  .fcc-svg { display: block; width: 100%; overflow: visible; }
+  .fcc-no-data {
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    color: var(--text-4);
+  }
+  .fcc-pills {
+    display: flex;
+    gap: 6px;
+    padding: 10px 14px 14px;
+    flex-wrap: wrap;
+  }
+  .fcc-pill {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 20px;
+    background: var(--glass-strong);
+    border: 1px solid var(--border);
+    color: var(--text-2);
+  }
+  .fcc-pill.blue { background: rgba(59,130,246,0.1); border-color: rgba(59,130,246,0.2); color: #3b82f6; }
+  .fcc-pill.red  { background: rgba(255,51,51,0.1);  border-color: rgba(255,51,51,0.2);  color: var(--jade-1); }
+  .fcc-pill.amb  { background: rgba(245,158,11,0.1); border-color: rgba(245,158,11,0.2); color: var(--amber-1); }
+
   /* ---- Projected income card ---- */
   .projected-card {
     padding: 18px 20px;
@@ -6921,8 +7106,237 @@ function renderPageCalendar(app) {
   app.appendChild(renderCalendar());
 }
 
+/* ----------------------------------------------------------------
+   FIRM EARNINGS CURVES — per-firm and comparison
+   ---------------------------------------------------------------- */
+function firmCurveSeries(firmId) {
+  const pts = payoutsForFirm(firmId)
+    .filter(p => p.status === "received")
+    .slice()
+    .sort((a, b) => a.date.localeCompare(b.date));
+  if (!pts.length) return [];
+  let cum = 0;
+  const out = [{ date: pts[0].date, value: 0, synth: true }];
+  pts.forEach(p => { cum += Number(p.amount); out.push({ date: p.date, value: cum }); });
+  return out;
+}
+
+function buildMiniCurve(points, W, H, color, fId) {
+  const ns = "http://www.w3.org/2000/svg";
+  const svg = document.createElementNS(ns, "svg");
+  svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+  svg.setAttribute("preserveAspectRatio", "none");
+  svg.setAttribute("width", "100%");
+  svg.setAttribute("height", H);
+  svg.classList.add("fcc-svg");
+
+  if (points.length < 2) {
+    const msg = document.createElementNS(ns, "text");
+    msg.setAttribute("x", W / 2); msg.setAttribute("y", H / 2);
+    msg.setAttribute("text-anchor", "middle");
+    msg.setAttribute("dominant-baseline", "middle");
+    msg.setAttribute("fill", "rgba(255,255,255,0.2)");
+    msg.setAttribute("font-size", "10");
+    msg.textContent = "No data";
+    svg.appendChild(msg);
+    return svg;
+  }
+
+  const padL = 0, padT = 8, padR = 0, padB = 6;
+  const { d, dFill } = buildPNLPath(points, W, H, padL, padT, padR, padB);
+
+  const defs = document.createElementNS(ns, "defs");
+
+  const grad = document.createElementNS(ns, "linearGradient");
+  grad.setAttribute("id", `fg-${fId}`);
+  grad.setAttribute("x1","0"); grad.setAttribute("y1","0");
+  grad.setAttribute("x2","0"); grad.setAttribute("y2","1");
+  const s0 = document.createElementNS(ns, "stop");
+  s0.setAttribute("offset","0%");
+  s0.setAttribute("stop-color", color);
+  s0.setAttribute("stop-opacity", "0.22");
+  const s1 = document.createElementNS(ns, "stop");
+  s1.setAttribute("offset","100%");
+  s1.setAttribute("stop-color","rgba(0,0,0,0)");
+  grad.appendChild(s0); grad.appendChild(s1);
+  defs.appendChild(grad);
+  svg.appendChild(defs);
+
+  const fill = document.createElementNS(ns, "path");
+  fill.setAttribute("d", dFill);
+  fill.setAttribute("fill", `url(#fg-${fId})`);
+  svg.appendChild(fill);
+
+  const line = document.createElementNS(ns, "path");
+  line.setAttribute("d", d);
+  line.setAttribute("fill", "none");
+  line.setAttribute("stroke-width", "1.8");
+  line.setAttribute("stroke-linecap", "round");
+  line.setAttribute("stroke-linejoin", "round");
+  line.style.stroke = color;
+  line.style.filter = `drop-shadow(0 0 3px ${color})`;
+  line.setAttribute("data-mini-curve", "1");
+  svg.appendChild(line);
+
+  // End dot
+  const { xs, ys } = buildPNLPath(points, W, H, padL, padT, padR, padB);
+  const ex = xs[xs.length - 1];
+  const ey = ys[ys.length - 1];
+  const dot = document.createElementNS(ns, "circle");
+  dot.setAttribute("cx", ex.toFixed(1));
+  dot.setAttribute("cy", ey.toFixed(1));
+  dot.setAttribute("r", "3");
+  dot.setAttribute("fill", "#fff");
+  dot.style.filter = `drop-shadow(0 0 4px ${color})`;
+  svg.appendChild(dot);
+
+  return svg;
+}
+
+
+function renderFirmCurves() {
+  if (!state.firms.length) return el("div", {});
+
+  const COLORS = ["#3b82f6","#a78bfa","#f59e0b","#34d399","#f472b6","#60a5fa","#fb923c"];
+  const grid = el("div", { class: "firm-curves-grid" });
+
+  state.firms.forEach((firm, fi) => {
+    const color = COLORS[fi % COLORS.length];
+    const pts   = firmCurveSeries(firm.id);
+    const firmPays = payoutsForFirm(firm.id);
+    const rcv = firmPays.filter(p => p.status === "received");
+    const den = firmPays.filter(p => p.status === "denied");
+    const total = rcv.reduce((s, p) => s + Number(p.amount), 0);
+    const avg   = rcv.length ? total / rcv.length : 0;
+    const successRate = (rcv.length + den.length) > 0
+      ? Math.round(rcv.length / (rcv.length + den.length) * 100)
+      : null;
+
+    const card = el("div", { class: "firm-curve-card" });
+
+    const hdr = el("div", { class: "fcc-header" },
+      el("div", { class: "fcc-avatar", style: `background:${firmAvatar(firm)};` }, firmInitials(firm.name)),
+      el("div", { class: "fcc-name" }, firm.name),
+      el("div", { class: "fcc-total" + (total === 0 ? " zero" : "") },
+        total > 0 ? fmtGBP(total, { short: total >= 10000 }) : "—"
+      )
+    );
+    card.appendChild(hdr);
+
+    const chartWrap = el("div", { class: "fcc-chart" });
+    if (pts.length >= 2) {
+      chartWrap.appendChild(buildMiniCurve(pts, 300, 90, color, firm.id.replace(/[^a-z0-9]/gi, "")));
+    } else {
+      chartWrap.appendChild(el("div", { class: "fcc-no-data" }, "No received payouts yet"));
+    }
+    card.appendChild(chartWrap);
+
+    const pills = el("div", { class: "fcc-pills" });
+    pills.appendChild(el("span", { class: "fcc-pill blue" }, `${rcv.length} paid`));
+    if (avg > 0) pills.appendChild(el("span", { class: "fcc-pill" }, `avg ${fmtGBP(avg, { short: avg >= 1000 })}`));
+    if (successRate !== null) {
+      const cls = successRate >= 70 ? "blue" : successRate >= 40 ? "amb" : "red";
+      pills.appendChild(el("span", { class: `fcc-pill ${cls}` }, `${successRate}% success`));
+    }
+    if (den.length > 0) pills.appendChild(el("span", { class: "fcc-pill red" }, `${den.length} denied`));
+    card.appendChild(pills);
+
+    grid.appendChild(card);
+  });
+
+  return el("section", { class: "section" },
+    el("div", { class: "card" },
+      el("div", { class: "card-header" },
+        el("div", { class: "card-title" }, "Earnings Curve · Per Firm"),
+        el("div", { class: "section-meta" }, `${state.firms.length} firm${state.firms.length !== 1 ? "s" : ""}`)
+      ),
+      el("div", { style: "padding: 4px 16px 16px;" }, grid)
+    )
+  );
+}
+
+function renderFirmComparison() {
+  const board = firmLeaderboard().filter(e => e.count > 0);
+  if (board.length < 2) return el("div", {});
+
+  const maxTotal  = Math.max(1, ...board.map(e => e.total));
+  const maxCount  = Math.max(1, ...board.map(e => e.count));
+  const maxAvg    = Math.max(1, ...board.map(e => e.count ? e.total / e.count : 0));
+
+  // Composite score: 50% total, 30% count, 20% success rate
+  const scored = board.map(e => {
+    const avg = e.count ? e.total / e.count : 0;
+    const sr  = e.denialRate !== null ? (100 - e.denialRate) / 100 : 0.5;
+    const score = (e.total / maxTotal) * 0.5
+                + (e.count / maxCount) * 0.3
+                + sr * 0.2;
+    return { ...e, score: Math.round(score * 100), avg };
+  }).sort((a, b) => b.score - a.score);
+
+  const top = scored[0];
+  const COLORS = ["#3b82f6","#a78bfa","#f59e0b","#34d399","#f472b6","#60a5fa","#fb923c"];
+  const colorFor = (firm) => COLORS[state.firms.findIndex(f => f.id === firm.id) % COLORS.length];
+
+  const rows = scored.map((e, i) => {
+    const color = colorFor(e.firm);
+    const avg   = e.avg;
+    const sr    = e.denialRate !== null ? 100 - e.denialRate : null;
+
+    const barDefs = [
+      { label: "Total earned", pct: e.total / maxTotal, val: fmtGBP(e.total, { short: e.total >= 1000 }), color },
+      { label: "Payout count", pct: e.count / maxCount, val: `${e.count}`, color },
+      { label: "Avg payout",   pct: avg / maxAvg,       val: fmtGBP(avg, { short: avg >= 1000 }),         color },
+      { label: "Success rate", pct: sr !== null ? sr / 100 : 0, val: sr !== null ? sr + "%" : "—",       color: sr !== null && sr >= 70 ? "#3b82f6" : sr !== null && sr >= 40 ? "#f59e0b" : "#ff3333" },
+    ];
+
+    const row = el("div", { class: "fc-row" },
+      el("div", { class: "fc-rank" }, i < 3 ? ["🥇","🥈","🥉"][i] : `${i+1}`),
+      el("div", { class: "fc-avatar", style: `background:${firmAvatar(e.firm)};` }, firmInitials(e.firm.name)),
+      el("div", { class: "fc-info" },
+        el("div", { class: "fc-name" }, e.firm.name),
+        el("div", { class: "fc-bars" },
+          ...barDefs.map(b =>
+            el("div", { class: "fc-bar-row" },
+              el("div", { class: "fc-bar-label" }, b.label),
+              el("div", { class: "fc-bar-track" },
+                el("div", {
+                  class: "fc-bar-fill",
+                  "data-fc-pct": (b.pct * 100).toFixed(1),
+                  style: `background:${b.color};`
+                })
+              ),
+              el("div", { class: "fc-bar-val" }, b.val)
+            )
+          )
+        )
+      )
+    );
+    if (i === 0) {
+      const pill = el("div", { class: "fc-score-pill" }, `Score ${e.score}`);
+      row.appendChild(pill);
+    }
+    return row;
+  });
+
+  const badge = el("div", { class: "fc-top-badge" },
+    "🏆 Top performer: " + top.firm.name
+  );
+
+  return el("section", { class: "section" },
+    el("div", { class: "card" },
+      el("div", { class: "card-header" },
+        el("div", { class: "card-title" }, "Firm Comparison")
+      ),
+      el("div", { style: "padding: 0 16px 12px 16px;" }, badge),
+      el("div", { class: "fc-rows" }, ...rows)
+    )
+  );
+}
+
 function renderPageStats(app) {
   app.appendChild(renderStats());
+  app.appendChild(renderFirmComparison());
+  app.appendChild(renderFirmCurves());
   app.appendChild(renderLeaderboard());
 }
 
@@ -7142,6 +7556,20 @@ function render() {
       document.querySelectorAll("circle[data-pie-target]").forEach(c => {
         c.style.transition = "stroke-dasharray 0.8s cubic-bezier(0.16,1,0.3,1)";
         c.setAttribute("stroke-dasharray", c.getAttribute("data-pie-target"));
+      });
+      // Firm comparison bar fills
+      document.querySelectorAll(".fc-bar-fill[data-fc-pct]").forEach(f => {
+        f.style.width = f.getAttribute("data-fc-pct") + "%";
+      });
+      // Mini firm curve lines — animate stroke-dashoffset draw
+      document.querySelectorAll("path[data-mini-curve='1']").forEach(line => {
+        const len = line.getTotalLength ? line.getTotalLength() : 500;
+        line.style.strokeDasharray = len;
+        line.style.strokeDashoffset = len;
+        requestAnimationFrame(() => {
+          line.style.transition = "stroke-dashoffset 1s cubic-bezier(0.16,1,0.3,1)";
+          line.style.strokeDashoffset = "0";
+        });
       });
     });
   });
