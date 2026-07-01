@@ -3787,6 +3787,10 @@ const PRO_PAGES    = new Set(["stats", "analytics", "calendar"]);
 const FREE_FIRMS   = 3;
 const FREE_PAYOUTS = 50;
 
+// TESTING_MODE: set to false before production/beta release to re-enable tier gates
+const TESTING_MODE = true;
+function isFree() { return !TESTING_MODE && isFree(); }
+
 // Each user gets their own localStorage namespace scoped by Supabase user ID.
 function scopedKey(base) {
   return _currentUser ? `${base}::${_currentUser.id}` : base;
@@ -4582,7 +4586,7 @@ function svgIcon(name) {
    NAVIGATION DRAWER
    ================================================================ */
 function navigateTo(pageId) {
-  if (_tier === "free" && PRO_PAGES.has(pageId)) {
+  if (isFree() && PRO_PAGES.has(pageId)) {
     closeNavDrawer();
     const names = { stats: "Statistics", analytics: "Analytics", calendar: "Calendar & Journal" };
     showUpgradePrompt(names[pageId] || pageId);
@@ -4630,7 +4634,7 @@ function renderSidebar() {
       lastSection = page.section;
     }
 
-    const isLocked = _tier === "free" && PRO_PAGES.has(page.id);
+    const isLocked = isFree() && PRO_PAGES.has(page.id);
     const item = document.createElement("button");
     item.className = "nav-item sidebar-nav-item" + (currentPage === page.id ? " active" : "");
     item.dataset.page = page.id;
@@ -4730,7 +4734,7 @@ function openNavDrawer() {
       lastSection = page.section;
     }
 
-    const isLocked = _tier === "free" && PRO_PAGES.has(page.id);
+    const isLocked = isFree() && PRO_PAGES.has(page.id);
     const item = document.createElement("button");
     item.className = "nav-item" + (currentPage === page.id ? " active" : "");
     item.innerHTML = `${svgIcon(page.icon).outerHTML || ""}<span>${page.label}</span>${isLocked ? '<span style="margin-left:auto;font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px;background:var(--jade-glow);color:var(--jade-1);border:1px solid rgba(255,51,51,0.2);">Pro</span>' : ''}`;
@@ -4838,6 +4842,11 @@ function renderTop() {
         icon: "coin", bg: "rgba(59,130,246,0.1)", color: "#3b82f6",
         label: "Add a payout", desc: "Log a received or pending payout",
         action: () => openPayoutSheet()
+      },
+      {
+        icon: "target", bg: "rgba(245,158,11,0.1)", color: "#f59e0b",
+        label: "Add an expense", desc: "Log a fee, purchase or cost",
+        action: () => openSpendingSheet()
       },
     ].forEach(({ icon, bg, color, label, desc, action }) => {
       const item = document.createElement("button");
@@ -7072,13 +7081,13 @@ function renderPageSettings(app) {
           el("div", { style: "font-size:13px;color:var(--text-2);" }, "Current plan"),
           el("div", { style: "font-size:20px;font-weight:700;color:" + tierColor + ";margin-top:3px;" }, tierLabel)
         ),
-        _tier === "free" ? el("a", {
+        isFree() ? el("a", {
           href: "/#pricing",
           class: "btn primary",
           style: "text-decoration:none;font-size:13px;padding:8px 16px;"
         }, "Upgrade →") : el("div", { style: "font-size:12px;color:var(--text-3);" }, "Active")
       ),
-      _tier === "free" ? el("div", { style: "font-size:12px;color:var(--text-3);line-height:1.5;border-top:1px solid var(--hairline);padding-top:12px;" },
+      isFree() ? el("div", { style: "font-size:12px;color:var(--text-3);line-height:1.5;border-top:1px solid var(--hairline);padding-top:12px;" },
         "Free plan: up to " + FREE_FIRMS + " firms, " + FREE_PAYOUTS + " payouts. Upgrade to Pro for unlimited access."
       ) : null
     )
@@ -7205,7 +7214,7 @@ function sheetHead(title, onClose) {
    ---------------------------------------------------------------- */
 function openPayoutSheet(payoutId, opts = {}) {
   const editing = payoutId ? state.payouts.find(p => p.id === payoutId) : null;
-  if (!editing && _tier === "free" && state.payouts.length >= FREE_PAYOUTS) {
+  if (!editing && isFree() && state.payouts.length >= FREE_PAYOUTS) {
     showUpgradePrompt("More than " + FREE_PAYOUTS + " payouts");
     return;
   }
@@ -7427,7 +7436,7 @@ function openPayoutSheet(payoutId, opts = {}) {
    ---------------------------------------------------------------- */
 function openFirmSheet(firmId) {
   const editing = firmId ? getFirm(firmId) : null;
-  if (!editing && _tier === "free" && state.firms.length >= FREE_FIRMS) {
+  if (!editing && isFree() && state.firms.length >= FREE_FIRMS) {
     showUpgradePrompt("More than " + FREE_FIRMS + " firms");
     return;
   }
