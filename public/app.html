@@ -6116,8 +6116,11 @@ function renderPageSettings(app) {
 
   // Username save helper (async uniqueness check)
   let _usernameSaveEl = null;
+  let _usernameErrEl  = null;
   async function saveUsername(val) {
     const usernameInput = _usernameSaveEl;
+    const usernameErr   = _usernameErrEl;
+    if (usernameErr) usernameErr.textContent = "";
     const normalized = val.toLowerCase().replace(/[^a-z0-9_]/g, "");
     if (normalized !== val) {
       if (usernameInput) usernameInput.value = normalized;
@@ -6135,11 +6138,7 @@ function renderPageSettings(app) {
         .neq("id", _currentUser.id)
         .limit(1);
       if (data && data.length > 0) {
-        if (usernameInput) {
-          usernameInput.setCustomValidity("Username already taken");
-          usernameInput.reportValidity();
-          usernameInput.setCustomValidity("");
-        }
+        if (usernameErr) usernameErr.textContent = `"${normalized}" is already taken — try another.`;
         toast(`"${normalized}" is already taken — try another`);
         return;
       }
@@ -6152,9 +6151,14 @@ function renderPageSettings(app) {
   const usernameInput = el("input", {
     class: "input", type: "text", placeholder: "e.g. traderJoe (optional)",
     value: state.profile.username || "",
-    oninput: (e) => { e.target.value = e.target.value.replace(/[^a-zA-Z0-9_]/g, ""); }
+    oninput: (e) => {
+      e.target.value = e.target.value.replace(/[^a-zA-Z0-9_]/g, "");
+      if (_usernameErrEl) _usernameErrEl.textContent = "";
+    }
   });
+  const usernameErrEl = el("div", { style: "font-size:12px;color:#f87171;margin-top:4px;min-height:16px;" });
   _usernameSaveEl = usernameInput;
+  _usernameErrEl  = usernameErrEl;
   usernameInput.addEventListener("blur", () => saveUsername(usernameInput.value.trim()));
 
   function readOnlyField(label, value) {
@@ -6178,7 +6182,8 @@ function renderPageSettings(app) {
         el("div", { style: "font-size:11px;color:var(--text-3);margin-bottom:6px;" },
           "Letters, numbers, underscores only. This is how you'll be greeted."
         ),
-        usernameInput
+        usernameInput,
+        usernameErrEl
       )
     )
   ));
@@ -7408,14 +7413,28 @@ function buildRegisterForm() {
     if (pw.length < 6)        { errEl.textContent = "Password must be at least 6 characters."; return; }
     if (pw !== pw2)           { errEl.textContent = "Passwords don't match."; return; }
     submit.disabled = true; submit.textContent = "Creating account…";
+    errEl.style.color = "#f87171";
     const { data, error } = await supabase.auth.signUp({
       email,
       password: pw,
       options: { data: { first_name: firstName, last_name: lastName } }
     });
     if (error) {
-      errEl.textContent = error.message;
+      let msg = error.message;
+      const lower = msg.toLowerCase();
+      if (lower.includes("already registered") || lower.includes("already exists") ||
+          lower.includes("user already") || lower.includes("email address is already")) {
+        msg = "An account with this email address already exists. Try logging in instead.";
+      }
+      errEl.textContent = msg;
       submit.disabled = false; submit.textContent = "Sign Up";
+      return;
+    }
+    // Email confirmation required — session is null until user clicks the link
+    if (data?.user && !data?.session) {
+      errEl.style.color = "#4ade80";
+      errEl.textContent = "Account created! Check your inbox and click the confirmation link, then log in.";
+      submit.textContent = "Check your inbox";
       return;
     }
     // Persist first/last name to profiles immediately (session is live after signUp)
