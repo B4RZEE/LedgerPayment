@@ -4,7 +4,7 @@
    `state` in the original; they now take `state` as an explicit first
    argument instead — same logic, more testable, no hidden globals.
    ================================================================ */
-import type { Account, Firm, LedgerState, Payout, SpendingCategory } from "@/lib/store/types";
+import type { Account, Firm, JournalEntry, LedgerState, Payout, SpendingCategory } from "@/lib/store/types";
 import { daysBetween, fmtGBP, localISO, localMonthISO, monthKey, parseISO, startOfWeekISO, endOfWeekISO, todayISO } from "@/lib/format";
 import { SPENDING_CATEGORIES } from "@/lib/domain/meta";
 
@@ -356,6 +356,41 @@ export function filteredPayouts(state: LedgerState, query: string, filter: Payou
 export interface PayoutCountdown {
   cdClass: "later" | "received" | "denied" | "overdue" | "soon" | "this-week";
   cdText: string;
+}
+
+/* ----------------------------------------------------------------
+   CALENDAR PAGE
+   ---------------------------------------------------------------- */
+export function journalForDate(state: LedgerState, iso: string): JournalEntry | null {
+  return state.journal.find((j) => j.date === iso) || null;
+}
+
+export interface CalendarCell {
+  date: Date;
+  otherMonth: boolean;
+}
+
+// Always 42 cells (6 full weeks), Monday-first week, negative-date trick for
+// previous-month padding — matches the original exactly rather than a "clean"
+// reimplementation, so cell counts/positions can't drift from parity checks.
+export function buildMonthGrid(year: number, month: number): CalendarCell[] {
+  const first = new Date(year, month - 1, 1);
+  const last = new Date(year, month, 0);
+  const startWeekday = (first.getDay() + 6) % 7; // Mon=0
+
+  const cells: CalendarCell[] = [];
+  for (let i = startWeekday - 1; i >= 0; i--) {
+    cells.push({ date: new Date(year, month - 1, -i), otherMonth: true });
+  }
+  for (let d = 1; d <= last.getDate(); d++) {
+    cells.push({ date: new Date(year, month - 1, d), otherMonth: false });
+  }
+  while (cells.length < 42) {
+    const d = new Date(cells[cells.length - 1].date);
+    d.setDate(d.getDate() + 1);
+    cells.push({ date: d, otherMonth: true });
+  }
+  return cells;
 }
 
 /* ----------------------------------------------------------------

@@ -849,3 +849,52 @@
 .fcc-pill.blue { background: rgba(59,130,246,0.1); border-color: rgba(59,130,246,0.2); color: #3b82f6; }
 .fcc-pill.red { background: rgba(255,51,51,0.1); border-color: rgba(255,51,51,0.2); color: var(--jade-1); }
 .fcc-pill.amb { background: rgba(245,158,11,0.1); border-color: rgba(245,158,11,0.2); color: var(--amber-1); }
+
+/* ============================================================
+   PHASE 8 — CALENDAR PAGE
+   ============================================================ */
+.cal-month { font-weight: 700; font-size: 16px; letter-spacing: -0.01em; }
+.cal-nav { display: flex; gap: 6px; }
+.cal-nav-btn { width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; border-radius: 8px; background: rgba(255,255,255,0.04); border: 1px solid var(--hairline); color: var(--text-1); transition: all .15s var(--ease); }
+.cal-nav-btn:hover { background: rgba(255,255,255,0.08); }
+.cal-nav-btn svg { width: 14px; height: 14px; }
+
+.cal-weekdays { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-bottom: 4px; }
+.cal-weekdays span { text-align: center; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-4); padding: 4px 0; }
+.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+.cal-day { min-height: 54px; border-radius: 8px; background: rgba(255,255,255,0.015); border: 1px solid transparent; padding: 5px 4px 4px; position: relative; display: flex; flex-direction: column; cursor: pointer; transition: background .15s var(--ease), border-color .15s var(--ease); }
+@media (min-width: 560px) { .cal-day { min-height: 68px; padding: 6px 6px 5px; } }
+@media (min-width: 880px) { .cal-day { min-height: 80px; } }
+.cal-day:hover { background: rgba(255,255,255,0.05); }
+.cal-day.other-month { opacity: 0.35; cursor: default; }
+.cal-day.other-month:hover { background: rgba(255,255,255,0.015); }
+.cal-day.today { background: rgba(165,180,252,0.08); border-color: var(--lav-3); }
+.cal-day.has-received { background: rgba(224,28,28,0.06); }
+.cal-day.has-received:hover { background: rgba(224,28,28,0.1); }
+.cal-day.has-pending { background: rgba(245,158,11,0.05); }
+.cal-day.has-pending:hover { background: rgba(245,158,11,0.09); }
+.cal-day-num { font-size: 10.5px; font-weight: 600; color: var(--text-3); line-height: 1; align-self: flex-start; }
+.cal-day.today .cal-day-num { color: var(--lav-1); font-weight: 700; }
+.cal-day.other-month .cal-day-num { color: var(--text-4); }
+.cal-day-amount { flex: 1; display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: 11px; font-weight: 700; letter-spacing: -0.03em; line-height: 1; color: var(--text-1); padding: 2px 0; }
+@media (min-width: 560px) { .cal-day-amount { font-size: 13px; } }
+@media (min-width: 880px) { .cal-day-amount { font-size: 14px; } }
+.cal-day-amount.received { color: #3b82f6; }
+.cal-day-amount.pending { color: var(--amber-1); }
+.cal-day-amount.denied { color: var(--rose-1); opacity: 0.7; text-decoration: line-through; }
+.cal-dots { display: flex; gap: 2px; justify-content: center; min-height: 4px; }
+.cal-dot { width: 4px; height: 4px; border-radius: 50%; }
+.cal-dot.received { background: #3b82f6; }
+.cal-dot.awaiting_approval { background: var(--amber-1); }
+.cal-dot.denied { background: var(--rose-1); }
+.cal-legend { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--hairline); font-size: 11px; color: var(--text-3); }
+.cal-legend-item { display: inline-flex; align-items: center; gap: 5px; }
+.cal-legend-dot { width: 6px; height: 6px; border-radius: 50%; }
+
+/* Journal in day sheet */
+.journal-wrap { margin-top: 18px; }
+.journal-label { font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-3); font-weight: 600; margin-bottom: 8px; }
+.journal-textarea { width: 100%; min-height: 90px; background: var(--bg-2); border: 1px solid var(--hairline); border-radius: 10px; padding: 12px 14px; color: var(--text-0); font-size: 14px; font-family: var(--font-sans); resize: vertical; transition: border-color .15s var(--ease); box-sizing: border-box; }
+.journal-textarea:focus { outline: none; border-color: var(--jade-2); }
+.journal-textarea::placeholder { color: var(--text-4); }
+.journal-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--lav-1); display: inline-block; vertical-align: middle; margin-left: 4px; }
