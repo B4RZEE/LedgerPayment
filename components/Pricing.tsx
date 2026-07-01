@@ -109,7 +109,7 @@ export default function Pricing() {
             className="text-[11px] font-bold px-2 py-0.5 rounded-full border"
             style={{
               background: "var(--jade-glow)",
-              borderColor: "rgba(52,211,153,0.25)",
+              borderColor: "rgba(255,51,51,0.25)",
               color: "var(--jade-1)",
             }}
           >
@@ -219,10 +219,10 @@ function PriceCard({
       style={
         popular
           ? {
-              background: "rgba(16,185,129,0.04)",
-              border: "1px solid rgba(52,211,153,0.35)",
+              background: "rgba(255,51,51,0.04)",
+              border: "1px solid rgba(255,51,51,0.35)",
               boxShadow:
-                "0 0 0 1px rgba(52,211,153,0.1), 0 24px 64px rgba(0,0,0,0.4), 0 0 60px rgba(16,185,129,0.08)",
+                "0 0 0 1px rgba(255,51,51,0.1), 0 24px 64px rgba(0,0,0,0.4), 0 0 60px rgba(255,51,51,0.08)",
             }
           : { background: "var(--glass)", border: "1px solid var(--border)" }
       }
@@ -233,7 +233,7 @@ function PriceCard({
         style={{
           height: 1,
           background: popular
-            ? "linear-gradient(90deg, transparent, rgba(52,211,153,0.3), transparent)"
+            ? "linear-gradient(90deg, transparent, rgba(255,51,51,0.3), transparent)"
             : "linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent)",
         }}
       />
@@ -243,7 +243,7 @@ function PriceCard({
           className="absolute top-5 right-5 text-[11px] font-bold px-2.5 py-1 rounded-full"
           style={{
             background: "linear-gradient(135deg, var(--jade-1), var(--jade-2))",
-            color: "#052e1d",
+            color: "#fff",
           }}
         >
           Most Popular
@@ -304,7 +304,7 @@ function PriceCard({
         href="/app"
         className={`block w-full text-center py-3.5 rounded-full text-[15px] font-bold ${
           ctaStyle === "jade"
-            ? "btn-jade-solid"
+            ? "btn-red-solid"
             : ctaStyle === "lav"
             ? "btn-lav-solid"
             : "btn-outline"

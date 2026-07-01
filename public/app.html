@@ -19,9 +19,9 @@
      ============================================================ */
   :root {
     /* Surface */
-    --bg-0: #07080c;
-    --bg-1: #0a0c12;
-    --bg-2: #0d1018;
+    --bg-0: #0a0a0b;
+    --bg-1: #0f0e11;
+    --bg-2: #141318;
 
     /* Glass */
     --glass: rgba(255,255,255,0.025);
@@ -37,11 +37,11 @@
     --text-3: #8e8e99;
     --text-4: #6b6b78;
 
-    /* Brand — jade (money/growth) */
-    --jade-1: #34d399;
-    --jade-2: #10b981;
-    --jade-3: #059669;
-    --jade-glow: rgba(16,185,129,0.18);
+    /* Brand — neon red */
+    --jade-1: #ff3333;
+    --jade-2: #e01c1c;
+    --jade-3: #b51414;
+    --jade-glow: rgba(255,51,51,0.15);
 
     /* Secondary — lavender (highlight) */
     --lav-1: #c7d2fe;
@@ -123,34 +123,12 @@
     overflow: hidden;
     pointer-events: none;
   }
+  /* Solid background — no gradient orbs */
   .atmosphere::before,
   .atmosphere::after {
     content: "";
     position: absolute;
-    border-radius: 50%;
-    filter: blur(120px);
-    opacity: 0.55;
-    will-change: transform, opacity;
-  }
-  .atmosphere::before {
-    top: -20%;
-    left: -10%;
-    width: 60vw;
-    height: 60vw;
-    max-width: 900px;
-    max-height: 900px;
-    background: radial-gradient(circle at 30% 30%, var(--jade-1), transparent 60%);
-    animation: drift1 22s ease-in-out infinite alternate;
-  }
-  .atmosphere::after {
-    top: -10%;
-    right: -15%;
-    width: 55vw;
-    height: 55vw;
-    max-width: 800px;
-    max-height: 800px;
-    background: radial-gradient(circle at 70% 30%, var(--lav-3), transparent 60%);
-    animation: drift2 28s ease-in-out infinite alternate;
+    opacity: 0;
   }
   /* Vignette layer */
   .vignette {
@@ -828,12 +806,12 @@
   }
   .bc-col:hover .bc-bar { filter: brightness(1.18); transform: translateY(-2px); }
   .bc-bar.current {
-    box-shadow: 0 -4px 18px rgba(52,211,153,0.35), inset 0 0 0 1px rgba(255,255,255,0.08);
+    box-shadow: 0 -4px 18px rgba(255,51,51,0.35), inset 0 0 0 1px rgba(255,255,255,0.08);
     animation: barPulse 2.4s ease-in-out infinite;
   }
   @keyframes barPulse {
-    0%, 100% { box-shadow: 0 -4px 14px rgba(52,211,153,0.25), inset 0 0 0 1px rgba(255,255,255,0.08); }
-    50%      { box-shadow: 0 -4px 22px rgba(52,211,153,0.55), inset 0 0 0 1px rgba(255,255,255,0.12); }
+    0%, 100% { box-shadow: 0 -4px 14px rgba(255,51,51,0.25), inset 0 0 0 1px rgba(255,255,255,0.08); }
+    50%      { box-shadow: 0 -4px 22px rgba(255,51,51,0.55), inset 0 0 0 1px rgba(255,255,255,0.12); }
   }
   .bc-bar.empty {
     min-height: 6px;
@@ -1124,8 +1102,8 @@
     background: rgba(165,180,252,0.08);
     border-color: var(--lav-3);
   }
-  .cal-day.has-received { background: rgba(16,185,129,0.06); }
-  .cal-day.has-received:hover { background: rgba(16,185,129,0.1); }
+  .cal-day.has-received { background: rgba(224,28,28,0.06); }
+  .cal-day.has-received:hover { background: rgba(224,28,28,0.1); }
   .cal-day.has-pending  { background: rgba(245,158,11,0.05); }
   .cal-day.has-pending:hover  { background: rgba(245,158,11,0.09); }
   .cal-day.has-being_paid { background: rgba(14,165,233,0.05); }
@@ -1608,7 +1586,7 @@
     padding: 3px 8px;
     border-radius: 20px;
   }
-  .velocity-badge.up   { background: rgba(52,211,153,0.12); color: var(--jade-1); }
+  .velocity-badge.up   { background: rgba(255,51,51,0.12); color: var(--jade-1); }
   .velocity-badge.down { background: rgba(251,113,133,0.12); color: var(--rose-1); }
   .velocity-badge.flat { background: rgba(148,163,184,0.1);  color: var(--text-3); }
 
@@ -1643,7 +1621,7 @@
     border-radius: 6px;
     flex-shrink: 0;
   }
-  .lb-denial.low  { background: rgba(52,211,153,0.1); color: var(--jade-1); }
+  .lb-denial.low  { background: rgba(255,51,51,0.1); color: var(--jade-1); }
   .lb-denial.mid  { background: rgba(251,191,36,0.1); color: var(--amber-1); }
   .lb-denial.high { background: rgba(251,113,133,0.1); color: var(--rose-1); }
   .lb-total {
@@ -1659,8 +1637,8 @@
   /* ---- Projected income card ---- */
   .projected-card {
     padding: 18px 20px;
-    background: linear-gradient(135deg, rgba(52,211,153,0.06) 0%, rgba(139,92,246,0.06) 100%);
-    border: 1px solid rgba(52,211,153,0.15);
+    background: linear-gradient(135deg, rgba(255,51,51,0.06) 0%, rgba(139,92,246,0.06) 100%);
+    border: 1px solid rgba(255,51,51,0.15);
     border-radius: 14px;
     display: flex;
     align-items: center;
@@ -1785,7 +1763,7 @@
     --sh-1: 0 1px 0 rgba(255,255,255,0.9) inset, 0 4px 12px rgba(0,0,0,0.08);
     --sh-2: 0 1px 0 rgba(255,255,255,0.9) inset, 0 8px 24px rgba(0,0,0,0.12);
     --sh-pop: 0 12px 40px rgba(0,0,0,0.2);
-    --jade-glow: rgba(16,185,129,0.15);
+    --jade-glow: rgba(224,28,28,0.15);
     --lav-glow: rgba(139,92,246,0.12);
     --amber-glow: rgba(245,158,11,0.15);
     --rose-glow: rgba(244,63,94,0.12);
@@ -1802,7 +1780,7 @@
   [data-theme="light"] .hero-eyebrow { color: rgba(15,23,42,0.55); }
   [data-theme="light"] .hero-stat { background: rgba(0,0,0,0.05); }
   [data-theme="light"] .hero-stat-label { color: rgba(15,23,42,0.5); }
-  [data-theme="light"] .delta.pos { background: rgba(16,185,129,0.12); }
+  [data-theme="light"] .delta.pos { background: rgba(224,28,28,0.12); }
   [data-theme="light"] .delta.neg { background: rgba(244,63,94,0.12); }
 
   /* Cards */
@@ -1868,7 +1846,7 @@
   [data-theme="light"] .account-chip.add { border-color: rgba(0,0,0,0.15); color: #64748b; }
 
   /* Projected income card */
-  [data-theme="light"] .projected-card { background: linear-gradient(135deg, rgba(52,211,153,0.08) 0%, rgba(139,92,246,0.08) 100%); border-color: rgba(52,211,153,0.2); }
+  [data-theme="light"] .projected-card { background: linear-gradient(135deg, rgba(255,51,51,0.08) 0%, rgba(139,92,246,0.08) 100%); border-color: rgba(255,51,51,0.2); }
   [data-theme="light"] .projected-label { color: #64748b; }
   [data-theme="light"] .projected-sub { color: #64748b; }
   [data-theme="light"] .projected-avg-label { color: #64748b; }
@@ -1887,7 +1865,7 @@
 
   /* Calendar */
   [data-theme="light"] .cal-day { color: #334155; }
-  [data-theme="light"] .cal-day.today { background: rgba(16,185,129,0.1); }
+  [data-theme="light"] .cal-day.today { background: rgba(224,28,28,0.1); }
   [data-theme="light"] .cal-day-num { color: #0f172a; }
   [data-theme="light"] .cal-day.other-month .cal-day-num { color: #94a3b8; }
   [data-theme="light"] .cal-dow { color: #64748b; }
@@ -1913,27 +1891,26 @@
   [data-theme="light"] .menu-btn { background: rgba(0,0,0,0.05); border-color: rgba(0,0,0,0.1); }
   [data-theme="light"] .menu-btn:hover { background: rgba(0,0,0,0.09); }
   [data-theme="light"] .menu-btn span { background: #334155; }
-  [data-theme="light"] .theme-btn { background: rgba(0,0,0,0.06); }
-  [data-theme="light"] .theme-btn:hover { background: rgba(0,0,0,0.1); }
-
   /* Toast */
   [data-theme="light"] .toast { background: #0f172a; color: #f8fafc; }
 
   /* ---- Theme toggle button ---- */
   .theme-btn {
-    width: 36px; height: 36px;
-    border-radius: 10px;
-    background: rgba(255,255,255,0.07);
+    width: 40px; height: 40px;
+    border-radius: 12px;
+    background: var(--glass);
+    border: 1px solid var(--border);
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-size: 17px;
-    transition: background .15s var(--ease), transform .2s var(--ease-spring);
+    color: var(--text-1);
+    transition: background .15s var(--ease), border-color .15s var(--ease);
     flex-shrink: 0;
   }
-  .theme-btn:hover { background: rgba(255,255,255,0.12); transform: rotate(20deg); }
-  [data-theme="light"] .theme-btn { background: rgba(0,0,0,0.06); }
-  [data-theme="light"] .theme-btn:hover { background: rgba(0,0,0,0.1); }
+  .theme-btn svg { width: 18px; height: 18px; }
+  .theme-btn:hover { background: var(--glass-strong); border-color: var(--border-strong); }
+  [data-theme="light"] .theme-btn { background: rgba(0,0,0,0.05); border-color: rgba(0,0,0,0.1); }
+  [data-theme="light"] .theme-btn:hover { background: rgba(0,0,0,0.09); }
 
   /* ============================================================
      NAV DRAWER + ROUTER
@@ -2090,6 +2067,130 @@
     to   { opacity: 1; transform: translateY(0); }
   }
   .page-enter { animation: pageFadeIn .25s var(--ease) forwards; }
+
+  /* ============================================================
+     SIDEBAR (static left nav — desktop only)
+     ============================================================ */
+  .sidebar {
+    position: fixed;
+    top: 0; left: 0; bottom: 0;
+    width: 224px;
+    background: var(--bg-1);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    z-index: 30;
+    overflow-y: auto;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  @media (max-width: 767px) { .sidebar { display: none; } }
+
+  .sidebar-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 20px 16px 16px;
+    border-bottom: 1px solid var(--hairline);
+    flex-shrink: 0;
+  }
+  .sidebar-mark {
+    width: 28px; height: 28px;
+    border-radius: 8px;
+    background: radial-gradient(circle at 30% 25%, var(--jade-1), var(--jade-3) 65%);
+    box-shadow: 0 4px 12px var(--jade-glow);
+    flex-shrink: 0;
+  }
+  .sidebar-name {
+    font-weight: 700;
+    font-size: 16px;
+    letter-spacing: -0.01em;
+    color: var(--text-0);
+  }
+
+  .sidebar-nav {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .sidebar-footer {
+    border-top: 1px solid var(--hairline);
+    padding: 10px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .sidebar-user {
+    font-size: 11px;
+    color: var(--text-4);
+    padding: 4px 12px 8px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* Reuse existing .nav-section-label and .nav-item styles */
+
+  /* ============================================================
+     BOTTOM NAV (mobile only)
+     ============================================================ */
+  .bottom-nav {
+    display: none;
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: var(--bg-1);
+    border-top: 1px solid var(--border);
+    z-index: 50;
+    padding-bottom: env(safe-area-inset-bottom);
+    backdrop-filter: blur(20px) saturate(140%);
+    -webkit-backdrop-filter: blur(20px) saturate(140%);
+  }
+  @media (max-width: 767px) { .bottom-nav { display: flex; } }
+
+  .bottom-nav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    padding: 10px 4px;
+    border: none;
+    background: none;
+    color: var(--text-3);
+    font-size: 10px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: color .15s var(--ease);
+    letter-spacing: 0.01em;
+  }
+  .bottom-nav-item.active { color: var(--jade-1); }
+  .bottom-nav-item svg { width: 20px; height: 20px; }
+  [data-theme="light"] .bottom-nav { background: #fff; }
+  [data-theme="light"] .bottom-nav-item { color: #94a3b8; }
+  [data-theme="light"] .bottom-nav-item.active { color: var(--jade-1); }
+
+  /* ============================================================
+     LAYOUT ADJUSTMENT FOR SIDEBAR
+     ============================================================ */
+  .app {
+    /* Override previous centering — sidebar takes the left */
+  }
+  @media (min-width: 768px) {
+    .app {
+      margin-left: 224px;
+      max-width: none;
+      padding: 24px 32px 80px;
+    }
+  }
+  @media (max-width: 767px) {
+    .app {
+      /* Add bottom padding for bottom-nav */
+      padding-bottom: calc(70px + env(safe-area-inset-bottom));
+    }
+  }
 
 
   .search-bar-inner {
@@ -2303,7 +2404,7 @@
       box-shadow:
         0 0 0 1px rgba(255,255,255,0.06) inset,
         0 32px 80px rgba(0,0,0,0.55),
-        0 0 120px rgba(16,185,129,0.06);
+        0 0 120px rgba(224,28,28,0.06);
       position: relative;
     }
     .auth-card::before {
@@ -2379,7 +2480,7 @@
     padding: 14px;
     border-radius: var(--r-sm);
     background: linear-gradient(135deg, var(--jade-1), var(--jade-2));
-    color: #052e1d;
+    color: #fff;
     font-size: 15px;
     font-weight: 700;
     margin-top: 6px;
@@ -2462,7 +2563,7 @@
     top: 0; left: 0; right: 0; height: 1px;
     background: linear-gradient(90deg, transparent, var(--accent, rgba(255,255,255,0.12)), transparent);
   }
-  .roi-stat.jade { --accent: rgba(52,211,153,0.4); }
+  .roi-stat.jade { --accent: rgba(255,51,51,0.4); }
   .roi-stat.lav  { --accent: rgba(165,180,252,0.4); }
   .roi-stat.amber { --accent: rgba(251,191,36,0.4); }
   .roi-icon {
@@ -2658,7 +2759,7 @@
     inset: 0;
     pointer-events: none;
     background:
-      radial-gradient(ellipse at 20% 0%, rgba(52,211,153,0.3), transparent 55%),
+      radial-gradient(ellipse at 20% 0%, rgba(255,51,51,0.3), transparent 55%),
       radial-gradient(ellipse at 80% 100%, rgba(165,180,252,0.2), transparent 55%);
   }
   .share-card-brand {
@@ -2686,7 +2787,7 @@
     font-weight: 800;
     letter-spacing: -0.04em;
     line-height: 0.95;
-    background: linear-gradient(180deg, #ffffff 0%, #34d399 100%);
+    background: linear-gradient(180deg, #ffffff 0%, #ff3333 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -2778,13 +2879,13 @@
     border-radius: var(--r-full);
     background: var(--jade-glow);
     color: var(--jade-1);
-    border: 1px solid rgba(52,211,153,0.2);
+    border: 1px solid rgba(255,51,51,0.2);
   }
   .trophy-room-banner {
     padding: 28px 24px;
     border-radius: var(--r-lg);
-    background: linear-gradient(135deg, rgba(52,211,153,0.08) 0%, rgba(165,180,252,0.06) 100%);
-    border: 1px solid rgba(52,211,153,0.15);
+    background: linear-gradient(135deg, rgba(255,51,51,0.08) 0%, rgba(165,180,252,0.06) 100%);
+    border: 1px solid rgba(255,51,51,0.15);
     text-align: center;
     margin-bottom: 20px;
     position: relative;
@@ -2797,7 +2898,7 @@
     transform: translateX(-50%);
     width: 200px; height: 200px;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(52,211,153,0.15), transparent 70%);
+    background: radial-gradient(circle, rgba(255,51,51,0.15), transparent 70%);
     pointer-events: none;
   }
   .trophy-room-icon { font-size: 40px; margin-bottom: 10px; }
@@ -2880,14 +2981,20 @@
 <!-- Auth screen — login / register / forgot password. Shown when no valid session exists. -->
 <div class="auth-screen" id="authScreen" style="display:none;"></div>
 
-<!-- Nav drawer -->
+<!-- Nav drawer (retained for legacy/mobile fallback) -->
 <div class="nav-overlay" id="navOverlay"></div>
 <div class="nav-drawer" id="navDrawer"></div>
+
+<!-- Static sidebar (desktop) -->
+<aside class="sidebar" id="sidebar"></aside>
 
 <!-- PIN lock screen — hidden by default, shown when PIN is set -->
 <div class="pin-screen" id="pinScreen" style="display:none;"></div>
 
 <div class="app" id="app"></div>
+
+<!-- Bottom nav (mobile) -->
+<nav class="bottom-nav" id="bottomNav"></nav>
 
 <div class="scrim" id="scrim"></div>
 <div class="sheet" id="sheet" role="dialog" aria-modal="true">
@@ -3311,7 +3418,7 @@ const HEALTH_STATUSES = [
 
 const SPENDING_CATEGORIES = [
   { id: "account_purchase", label: "Account Purchase", icon: "🎯", color: "#a78bfa" },
-  { id: "cash_deposit",     label: "Cash Deposit",     icon: "💵", color: "#34d399" },
+  { id: "cash_deposit",     label: "Cash Deposit",     icon: "💵", color: "#ff3333" },
   { id: "subscription",     label: "Subscription",     icon: "🔄", color: "#fbbf24" },
   { id: "other",            label: "Other",            icon: "📦", color: "#94a3b8" }
 ];
@@ -3351,7 +3458,7 @@ function firmInitials(name) {
   return (parts[0][0] + parts[1][0]).toUpperCase();
 }
 const AVATAR_GRADIENTS = [
-  "linear-gradient(135deg, #10b981, #06b6d4)",
+  "linear-gradient(135deg, #e01c1c, #06b6d4)",
   "linear-gradient(135deg, #6366f1, #a855f7)",
   "linear-gradient(135deg, #f59e0b, #ef4444)",
   "linear-gradient(135deg, #ec4899, #8b5cf6)",
@@ -3632,9 +3739,9 @@ function feeROI() {
 
 /* ---- Achievement system ---- */
 const ACHIEVEMENTS = [
-  { id: "first_firm",       name: "Getting Started",  desc: "Add your first firm",                           icon: "🚀", color: "#34d399", check: () => state.firms.length >= 1 },
+  { id: "first_firm",       name: "Getting Started",  desc: "Add your first firm",                           icon: "🚀", color: "#ff3333", check: () => state.firms.length >= 1 },
   { id: "first_withdrawal", name: "First Win",         desc: "Receive your first payout",                    icon: "🏆", color: "#f59e0b", check: () => received().length >= 1 },
-  { id: "five_payouts",     name: "Momentum",          desc: "Receive 5 payouts",                            icon: "📈", color: "#10b981", check: () => received().length >= 5 },
+  { id: "five_payouts",     name: "Momentum",          desc: "Receive 5 payouts",                            icon: "📈", color: "#e01c1c", check: () => received().length >= 5 },
   { id: "twenty_payouts",   name: "Power Trader",      desc: "Receive 20 payouts",                           icon: "⚡", color: "#c7d2fe", check: () => received().length >= 20 },
   { id: "big_score",        name: "Big Score",         desc: "Single payout of £1,000+",                    icon: "💰", color: "#f59e0b", check: () => received().some(p => Number(p.amount) >= 1000) },
   { id: "high_roller",      name: "High Roller",       desc: "Single payout of £5,000+",                    icon: "💎", color: "#6366f1", check: () => received().some(p => Number(p.amount) >= 5000) },
@@ -3642,11 +3749,11 @@ const ACHIEVEMENTS = [
   { id: "streak_2",         name: "Consistent",        desc: "Payouts in 2 consecutive months",              icon: "🔥", color: "#f97316", check: () => withdrawalStreak() >= 2 },
   { id: "streak_3",         name: "On Fire",           desc: "Payouts in 3 consecutive months",              icon: "🌶️", color: "#ef4444", check: () => withdrawalStreak() >= 3 },
   { id: "streak_6",         name: "Unstoppable",       desc: "Payouts in 6 consecutive months",              icon: "🌟", color: "#fbbf24", check: () => withdrawalStreak() >= 6 },
-  { id: "ten_k",            name: "Five Figures",      desc: "Lifetime withdrawals hit £10,000",             icon: "💸", color: "#10b981", check: () => lifetimeWithdrawals() >= 10000 },
+  { id: "ten_k",            name: "Five Figures",      desc: "Lifetime withdrawals hit £10,000",             icon: "💸", color: "#e01c1c", check: () => lifetimeWithdrawals() >= 10000 },
   { id: "fifty_k",          name: "Elite Trader",      desc: "Lifetime withdrawals hit £50,000",             icon: "👑", color: "#a78bfa", check: () => lifetimeWithdrawals() >= 50000 },
-  { id: "profitable",       name: "In Profit",         desc: "Withdrawals exceed your challenge fees",       icon: "✅", color: "#34d399", check: () => challengeFees() > 0 && netProfit() > 0 },
+  { id: "profitable",       name: "In Profit",         desc: "Withdrawals exceed your challenge fees",       icon: "✅", color: "#ff3333", check: () => challengeFees() > 0 && netProfit() > 0 },
   { id: "multi_firm",       name: "Multi-Firm",        desc: "Receive payouts from 3+ different firms",      icon: "🏢", color: "#0ea5e9", check: () => new Set(received().map(p => p.firmId).filter(Boolean)).size >= 3 },
-  { id: "sharp_eye",        name: "Sharp Eye",         desc: "80%+ challenge pass rate (min 3 attempts)",   icon: "🎯", color: "#34d399", check: () => { const pr = accountPassRate(); return pr && pr.total >= 3 && pr.rate >= 80; } },
+  { id: "sharp_eye",        name: "Sharp Eye",         desc: "80%+ challenge pass rate (min 3 attempts)",   icon: "🎯", color: "#ff3333", check: () => { const pr = accountPassRate(); return pr && pr.total >= 3 && pr.rate >= 80; } },
   { id: "journal_7",        name: "Journaling",        desc: "Write 7+ journal entries",                    icon: "📓", color: "#94a3b8", check: () => state.journal.length >= 7 },
 ];
 
@@ -3734,8 +3841,106 @@ function navigateTo(pageId) {
   }
   currentPage = pageId;
   closeNavDrawer();
+  // Update sidebar active state without full re-render
+  document.querySelectorAll(".sidebar-nav-item").forEach(item => {
+    item.classList.toggle("active", item.dataset.page === pageId);
+  });
+  // Update bottom nav active state
+  document.querySelectorAll(".bottom-nav-item").forEach(item => {
+    item.classList.toggle("active", item.dataset.page === pageId);
+  });
   render();
   window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+/* ----------------------------------------------------------------
+   SIDEBAR (desktop static nav)
+   ---------------------------------------------------------------- */
+function renderSidebar() {
+  const sidebar = document.getElementById("sidebar");
+  if (!sidebar) return;
+  sidebar.innerHTML = "";
+
+  // Brand
+  const brand = document.createElement("div");
+  brand.className = "sidebar-brand";
+  brand.innerHTML = `<div class="sidebar-mark"></div><div class="sidebar-name">Ledger</div>`;
+  sidebar.appendChild(brand);
+
+  // Nav list
+  const nav = document.createElement("div");
+  nav.className = "sidebar-nav";
+
+  let lastSection = "";
+  PAGES.forEach(page => {
+    if (page.section !== lastSection) {
+      const lbl = document.createElement("div");
+      lbl.className = "nav-section-label";
+      lbl.textContent = page.section === "account" ? "Account" : "Navigation";
+      nav.appendChild(lbl);
+      lastSection = page.section;
+    }
+
+    const isLocked = _tier === "free" && PRO_PAGES.has(page.id);
+    const item = document.createElement("button");
+    item.className = "nav-item sidebar-nav-item" + (currentPage === page.id ? " active" : "");
+    item.dataset.page = page.id;
+    item.innerHTML = `${svgIcon(page.icon).outerHTML || ""}<span>${page.label}</span>${isLocked ? `<span style="margin-left:auto;font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px;background:var(--jade-glow);color:var(--jade-1);">Pro</span>` : ""}`;
+    item.addEventListener("click", () => navigateTo(page.id));
+    nav.appendChild(item);
+  });
+
+  sidebar.appendChild(nav);
+
+  // Footer with user + logout
+  const footer = document.createElement("div");
+  footer.className = "sidebar-footer";
+
+  const session = getSession();
+  if (session) {
+    const userInfo = document.createElement("div");
+    userInfo.className = "sidebar-user";
+    userInfo.textContent = session.email;
+    footer.appendChild(userInfo);
+  }
+
+  const logoutBtn = document.createElement("button");
+  logoutBtn.className = "nav-item";
+  logoutBtn.style.color = "var(--rose-1)";
+  logoutBtn.innerHTML = `${svgIcon("logout").outerHTML || ""}<span>Log Out</span>`;
+  logoutBtn.addEventListener("click", () => logout());
+  footer.appendChild(logoutBtn);
+
+  sidebar.appendChild(footer);
+}
+
+/* ----------------------------------------------------------------
+   BOTTOM NAV (mobile)
+   ---------------------------------------------------------------- */
+function renderBottomNav() {
+  const nav = document.getElementById("bottomNav");
+  if (!nav) return;
+  nav.innerHTML = "";
+
+  const mobilePages = [
+    { id: "dashboard",  label: "Home",     icon: "home" },
+    { id: "payouts",    label: "Payouts",  icon: "money" },
+    { id: "firms",      label: "Firms",    icon: "building" },
+    { id: "analytics",  label: "Stats",    icon: "chart" },
+    { id: "settings",   label: "Settings", icon: "settings" },
+  ];
+
+  mobilePages.forEach(page => {
+    const item = document.createElement("button");
+    item.className = "bottom-nav-item" + (currentPage === page.id ? " active" : "");
+    item.dataset.page = page.id;
+    item.appendChild(svgIcon(page.icon));
+    const label = document.createElement("span");
+    label.textContent = page.label;
+    item.appendChild(label);
+    item.addEventListener("click", () => navigateTo(page.id));
+    nav.appendChild(item);
+  });
 }
 
 function openNavDrawer() {
@@ -3779,7 +3984,7 @@ function openNavDrawer() {
     const isLocked = _tier === "free" && PRO_PAGES.has(page.id);
     const item = document.createElement("button");
     item.className = "nav-item" + (currentPage === page.id ? " active" : "");
-    item.innerHTML = `${svgIcon(page.icon).outerHTML || ""}<span>${page.label}</span>${isLocked ? '<span style="margin-left:auto;font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px;background:var(--jade-glow);color:var(--jade-1);border:1px solid rgba(52,211,153,0.2);">Pro</span>' : ''}`;
+    item.innerHTML = `${svgIcon(page.icon).outerHTML || ""}<span>${page.label}</span>${isLocked ? '<span style="margin-left:auto;font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px;background:var(--jade-glow);color:var(--jade-1);border:1px solid rgba(255,51,51,0.2);">Pro</span>' : ''}`;
     item.addEventListener("click", () => navigateTo(page.id));
     list.appendChild(item);
   });
@@ -3826,30 +4031,25 @@ function closeNavDrawer() {
 }
 
 /* ----------------------------------------------------------------
-   TOP BAR (updated with hamburger + page title)
+   TOP BAR
    ---------------------------------------------------------------- */
 function renderTop() {
   const isDark = getTheme() === "dark";
   const page = PAGES.find(p => p.id === currentPage);
   const pageLabel = page ? page.label : "Ledger";
 
-  // Hamburger button (three-line menu)
-  const menuBtn = document.createElement("button");
-  menuBtn.className = "menu-btn";
-  menuBtn.title = "Menu";
-  menuBtn.innerHTML = `<span></span><span></span><span></span>`;
-  menuBtn.addEventListener("click", openNavDrawer);
+  // Theme toggle — SVG sun/moon icon, same size as other icon-btns
+  const sunSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>`;
+  const moonSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`;
 
-  // Theme toggle — fix: don't re-render on click, just swap class so no jitter
   const themeBtn = document.createElement("button");
   themeBtn.className = "theme-btn";
   themeBtn.title = isDark ? "Switch to light mode" : "Switch to dark mode";
-  themeBtn.textContent = isDark ? "☀️" : "🌙";
+  themeBtn.innerHTML = isDark ? sunSvg : moonSvg;
   themeBtn.addEventListener("click", () => {
     const next = getTheme() === "dark" ? "light" : "dark";
     applyTheme(next);
-    // Update just the icon and title without triggering a full rerender (prevents jitter)
-    themeBtn.textContent = next === "dark" ? "☀️" : "🌙";
+    themeBtn.innerHTML = next === "dark" ? sunSvg : moonSvg;
     themeBtn.title = next === "dark" ? "Switch to light mode" : "Switch to dark mode";
   });
 
@@ -3863,14 +4063,27 @@ function renderTop() {
   actions.className = "top-actions";
   actions.appendChild(themeBtn);
   actions.appendChild(addBtn);
-  actions.appendChild(menuBtn);
+
+  // On mobile only: show hamburger to open nav drawer
+  const isMobile = window.innerWidth < 768;
+  if (isMobile) {
+    const menuBtn = document.createElement("button");
+    menuBtn.className = "menu-btn";
+    menuBtn.title = "Menu";
+    menuBtn.innerHTML = `<span></span><span></span><span></span>`;
+    menuBtn.addEventListener("click", openNavDrawer);
+    actions.appendChild(menuBtn);
+  }
 
   const header = document.createElement("header");
   header.className = "top";
 
   const brandDiv = document.createElement("div");
   brandDiv.className = "brand";
-  brandDiv.innerHTML = `<div class="brand-mark"></div>`;
+  // On desktop the sidebar has the brand — only show page title
+  if (isMobile) {
+    brandDiv.innerHTML = `<div class="brand-mark"></div>`;
+  }
 
   const titleDiv = document.createElement("div");
   titleDiv.className = "page-title";
@@ -5286,6 +5499,9 @@ function render() {
   const app = document.getElementById("app");
   app.innerHTML = "";
   app.appendChild(renderTop());
+  // Sidebar and bottom nav are rendered once; subsequent renders just update active classes
+  if (!document.getElementById("sidebar")?.hasChildNodes()) renderSidebar();
+  if (!document.getElementById("bottomNav")?.hasChildNodes()) renderBottomNav();
 
   // Add page-enter animation wrapper
   const content = document.createElement("div");
@@ -6539,6 +6755,8 @@ async function onAuthSuccess() {
   _curKey = getCurKey();
   loadState();
   applyTheme(getTheme());
+  renderSidebar();
+  renderBottomNav();
   render();
   const greeting = state.profile.username || state.profile.firstName;
   toast(`Welcome${greeting ? ", " + greeting : ""}!`);
@@ -6553,6 +6771,8 @@ function logout() {
       await supabase.auth.signOut();
       _currentUser = null;
       document.getElementById("app").innerHTML = "";
+      document.getElementById("sidebar").innerHTML = "";
+      document.getElementById("bottomNav").innerHTML = "";
       authView = "login";
       showAuthScreen();
     }}]
@@ -6860,6 +7080,8 @@ supabase.auth.onAuthStateChange((event, session) => {
   if (event === "SIGNED_OUT" || event === "TOKEN_REFRESHED" && !session) {
     _currentUser = null;
     document.getElementById("app").innerHTML = "";
+    document.getElementById("sidebar").innerHTML = "";
+    document.getElementById("bottomNav").innerHTML = "";
     authView = "login";
     showAuthScreen();
   }

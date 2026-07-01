@@ -45,7 +45,7 @@ export default function PhoneMockup() {
           borderRadius: 36,
           border: "1px solid rgba(255,255,255,0.1)",
           boxShadow:
-            "0 0 0 1px rgba(255,255,255,0.05) inset, 0 40px 100px rgba(0,0,0,0.7), 0 0 80px rgba(52,211,153,0.12), 0 0 160px rgba(129,140,248,0.08)",
+            "0 0 0 1px rgba(255,255,255,0.05) inset, 0 40px 100px rgba(0,0,0,0.7), 0 0 80px rgba(255,51,51,0.1), 0 0 160px rgba(129,140,248,0.08)",
           overflow: "hidden",
           animation: "float-phone 6s ease-in-out infinite",
         }}
@@ -226,7 +226,7 @@ export default function PhoneMockup() {
                       ? "linear-gradient(180deg, var(--jade-1), var(--jade-3))"
                       : "linear-gradient(180deg, var(--jade-1), var(--jade-3))",
                     opacity: bar.current ? 1 : 0.7,
-                    boxShadow: bar.current ? "0 -3px 8px rgba(52,211,153,0.4)" : undefined,
+                    boxShadow: bar.current ? "0 -3px 8px rgba(255,51,51,0.4)" : undefined,
                   }}
                 />
               ))}

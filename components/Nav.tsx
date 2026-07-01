@@ -19,12 +19,18 @@ export default function Nav() {
     };
   }, [menuOpen]);
 
+  const navLinks = [
+    { href: "#features", label: "Features" },
+    { href: "#pricing", label: "Pricing" },
+    { href: "/about", label: "About" },
+  ];
+
   return (
     <>
       <header
         className="fixed top-0 left-0 right-0 z-50 h-16 flex items-center px-6 transition-all duration-300"
         style={{
-          background: scrolled ? "rgba(7,8,12,0.85)" : "rgba(7,8,12,0.6)",
+          background: scrolled ? "rgba(10,10,11,0.9)" : "rgba(10,10,11,0.6)",
           backdropFilter: "blur(20px) saturate(140%)",
           WebkitBackdropFilter: "blur(20px) saturate(140%)",
           borderBottom: `1px solid ${scrolled ? "rgba(255,255,255,0.07)" : "transparent"}`,
@@ -52,12 +58,11 @@ export default function Nav() {
 
           {/* Desktop links */}
           <nav className="hidden md:flex items-center gap-8">
-            <a href="#features" className="nav-link text-sm font-medium">
-              Features
-            </a>
-            <a href="#pricing" className="nav-link text-sm font-medium">
-              Pricing
-            </a>
+            {navLinks.map(({ href, label }) => (
+              <a key={href} href={href} className="nav-link text-sm font-medium">
+                {label}
+              </a>
+            ))}
           </nav>
 
           {/* Desktop CTAs */}
@@ -65,7 +70,7 @@ export default function Nav() {
             <a href="/app" className="btn-nav-ghost px-4 py-2 rounded-full text-sm font-medium">
               Log in
             </a>
-            <a href="/app" className="btn-nav-jade px-4 py-2 rounded-full text-sm font-semibold">
+            <a href="/app" className="btn-nav-red px-4 py-2 rounded-full text-sm font-semibold">
               Start free
             </a>
           </div>
@@ -77,7 +82,7 @@ export default function Nav() {
               className="px-3.5 py-1.5 rounded-full text-[13px] font-semibold"
               style={{
                 background: "linear-gradient(135deg, var(--jade-1), var(--jade-2))",
-                color: "#052e1d",
+                color: "#fff",
               }}
             >
               Start free
@@ -119,7 +124,7 @@ export default function Nav() {
       {menuOpen && (
         <div
           className="fixed inset-0 z-40 md:hidden"
-          style={{ background: "rgba(7,8,12,0.6)", backdropFilter: "blur(4px)" }}
+          style={{ background: "rgba(10,10,11,0.7)", backdropFilter: "blur(4px)" }}
           onClick={() => setMenuOpen(false)}
         />
       )}
@@ -152,10 +157,7 @@ export default function Nav() {
         </button>
 
         <div className="flex flex-col gap-1">
-          {[
-            { href: "#features", label: "Features" },
-            { href: "#pricing", label: "Pricing" },
-          ].map(({ href, label }) => (
+          {navLinks.map(({ href, label }) => (
             <a
               key={href}
               href={href}

@@ -44,7 +44,7 @@ const features = [
 ];
 
 const accentMap = {
-  jade: { iconBg: "var(--jade-glow)", tagBg: "rgba(52,211,153,0.06)", tagBorder: "rgba(52,211,153,0.15)" },
+  jade: { iconBg: "var(--jade-glow)", tagBg: "rgba(255,51,51,0.06)", tagBorder: "rgba(255,51,51,0.15)" },
   lav: { iconBg: "var(--lav-glow)", tagBg: "rgba(165,180,252,0.06)", tagBorder: "rgba(165,180,252,0.15)" },
   amber: { iconBg: "var(--amber-glow)", tagBg: "rgba(245,158,11,0.06)", tagBorder: "rgba(245,158,11,0.15)" },
 };

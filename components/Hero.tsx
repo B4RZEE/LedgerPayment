@@ -12,7 +12,7 @@ export default function Hero() {
               className="inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-widest border mb-6"
               style={{
                 background: "var(--jade-glow)",
-                borderColor: "rgba(52,211,153,0.25)",
+                borderColor: "rgba(255,51,51,0.25)",
                 color: "var(--jade-1)",
               }}
             >
