@@ -3103,8 +3103,8 @@
     line-height: 1;
     margin-bottom: 4px;
   }
-  .ov-hero-amount.pos { color: var(--jade-1); }
-  .ov-hero-amount.neg { color: var(--rose-1); }
+  .ov-hero-amount.pos { color: #3b82f6; }
+  .ov-hero-amount.neg { color: var(--jade-1); }
   .ov-hero-amount.neutral { color: var(--text-0); }
   .ov-hero-meta {
     font-size: 12px;
@@ -3121,8 +3121,8 @@
     border-radius: 99px;
     margin-left: 8px;
   }
-  .ov-hero-delta.pos { background: rgba(255,51,51,0.12); color: var(--jade-1); }
-  .ov-hero-delta.neg { background: rgba(244,63,94,0.12); color: var(--rose-1); }
+  .ov-hero-delta.pos { background: rgba(59,130,246,0.12); color: #3b82f6; }
+  .ov-hero-delta.neg { background: rgba(255,51,51,0.12); color: var(--jade-1); }
   .ov-hero-delta.flat { background: rgba(255,255,255,0.05); color: var(--text-3); }
 
   /* Right stats strip inside hero */
@@ -3157,10 +3157,43 @@
     color: var(--text-0);
   }
 
-  /* Chart embed inside hero */
-  .ov-chart-wrap {
-    padding: 0 20px 20px;
+  /* Month earnings rings (replaces bar chart inside hero) */
+  .month-rings {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    padding: 8px 20px 20px;
+    gap: 4px;
   }
+  .month-ring-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    min-width: 0;
+    transition: opacity .15s;
+  }
+  .month-ring-item:hover { opacity: 0.8; }
+  .mr-val {
+    font-size: 9px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: var(--text-3);
+    letter-spacing: -0.01em;
+    min-height: 12px;
+    text-align: center;
+  }
+  .month-ring-item.current .mr-val { color: #3b82f6; font-size: 10px; }
+  .mr-svg { display: block; overflow: visible; }
+  .mr-label {
+    font-size: 9px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-4);
+  }
+  .month-ring-item.current .mr-label { color: var(--text-0); font-weight: 700; }
 
   /* Recent payouts panel */
   .ov-recent {
@@ -3352,14 +3385,14 @@
 
   .ov-firm-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 10px;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 12px;
   }
   .ov-firm-card {
     background: var(--glass);
     border: 1px solid var(--border);
     border-radius: var(--r-md);
-    padding: 16px;
+    padding: 20px;
     cursor: pointer;
     transition: border-color .15s, transform .15s;
     position: relative;
@@ -3374,8 +3407,16 @@
     pointer-events: none;
   }
   .ov-firm-card:hover { border-color: var(--border-strong); transform: translateY(-1px); }
+  /* Firm card header row */
+  .ov-firm-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .ov-firm-info { flex: 1; min-width: 0; }
   .ov-firm-avatar {
-    width: 36px; height: 36px;
+    width: 38px; height: 38px;
     border-radius: 10px;
     display: flex;
     align-items: center;
@@ -3383,11 +3424,11 @@
     font-size: 11px;
     font-weight: 800;
     color: #fff;
-    margin-bottom: 12px;
+    flex-shrink: 0;
     letter-spacing: 0;
   }
   .ov-firm-name {
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 700;
     color: var(--text-0);
     margin-bottom: 2px;
@@ -3398,10 +3439,47 @@
   .ov-firm-accts {
     font-size: 11px;
     color: var(--text-3);
-    margin-bottom: 12px;
+  }
+  /* Donut chart area */
+  .ov-firm-donut-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    margin: 4px 0 14px;
+  }
+  .ov-firm-legend {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .ov-firm-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-3);
+  }
+  .ov-firm-legend-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .ov-firm-divider {
+    height: 1px;
+    background: var(--hairline);
+    margin: 10px 0;
+  }
+  .ov-firm-bottom {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 8px;
   }
   .ov-firm-total {
-    font-size: 18px;
+    font-size: 20px;
     font-weight: 800;
     letter-spacing: -0.03em;
     color: var(--text-0);
@@ -3416,7 +3494,7 @@
     display: flex;
     gap: 5px;
     flex-wrap: wrap;
-    margin-top: 10px;
+    justify-content: flex-end;
   }
   .ov-firm-chip {
     font-size: 9px;
@@ -5912,13 +5990,149 @@ function renderOvHero() {
   top.appendChild(stats);
 
   heroCard.appendChild(top);
-
-  // Bar chart
-  const chartWrap = el("div", { class: "ov-chart-wrap" });
-  chartWrap.appendChild(renderChart());
-  heroCard.appendChild(chartWrap);
+  heroCard.appendChild(renderMonthRings());
 
   return heroCard;
+}
+
+function renderMonthRings() {
+  const data = monthlyEarningsSeries(6);
+  const maxVal = Math.max(1, ...data.map(d => d.total));
+  const currentIdx = data.length - 1;
+  const velocity = payoutVelocity();
+  const velClass = velocity > 0 ? "up" : velocity < 0 ? "down" : "flat";
+  const velText  = velocity > 0 ? `↑ ${velocity}%` : velocity < 0 ? `↓ ${Math.abs(velocity)}%` : "→ steady";
+  const totalEarned = data.reduce((s, d) => s + d.total, 0);
+
+  const header = el("div", {
+    style: "display:flex;align-items:center;justify-content:space-between;padding:14px 20px 0;"
+  },
+    el("div", {
+      style: "font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:var(--text-3);"
+    }, "Monthly Earnings"),
+    el("div", { style: "display:flex;align-items:center;gap:8px;" },
+      el("span", { class: `velocity-badge ${velClass}` }, velText),
+      el("div", { class: "section-meta" }, fmtGBP(totalEarned, { short: true }))
+    )
+  );
+
+  const ringsRow = el("div", { class: "month-rings" });
+  const R = 20, CX = 26, CY = 26, SZ = 52;
+  const CIRC = +(2 * Math.PI * R).toFixed(2);
+
+  data.forEach((d, i) => {
+    const isCurrent = i === currentIdx;
+    const pct = d.total > 0 ? Math.min(1, d.total / maxVal) : 0;
+    const dashLen = +(pct * CIRC).toFixed(2);
+
+    const ns = "http://www.w3.org/2000/svg";
+    const svg = document.createElementNS(ns, "svg");
+    svg.setAttribute("viewBox", `0 0 ${SZ} ${SZ}`);
+    svg.setAttribute("width", SZ); svg.setAttribute("height", SZ);
+    svg.classList.add("mr-svg");
+
+    const track = document.createElementNS(ns, "circle");
+    track.setAttribute("cx", CX); track.setAttribute("cy", CY); track.setAttribute("r", R);
+    track.setAttribute("fill", "none");
+    track.setAttribute("stroke", "rgba(255,255,255,0.07)");
+    track.setAttribute("stroke-width", isCurrent ? "4.5" : "4");
+    svg.appendChild(track);
+
+    if (pct > 0) {
+      const arc = document.createElementNS(ns, "circle");
+      arc.setAttribute("cx", CX); arc.setAttribute("cy", CY); arc.setAttribute("r", R);
+      arc.setAttribute("fill", "none");
+      arc.setAttribute("stroke-width", isCurrent ? "4.5" : "4");
+      arc.setAttribute("stroke-linecap", "round");
+      arc.setAttribute("stroke-dasharray", `${CIRC}`);
+      arc.setAttribute("stroke-dashoffset", `${CIRC}`);
+      arc.setAttribute("transform", `rotate(-90 ${CX} ${CY})`);
+      arc.setAttribute("data-ring-final", `${CIRC - dashLen}`);
+      arc.style.stroke = isCurrent ? "#3b82f6" : "rgba(59,130,246,0.45)";
+      if (isCurrent) arc.style.filter = "drop-shadow(0 0 4px #3b82f6)";
+      svg.appendChild(arc);
+    }
+
+    const valText = d.total > 0 ? compactGBP(d.total) : "";
+    ringsRow.appendChild(
+      el("div", { class: "month-ring-item" + (isCurrent ? " current" : "") },
+        el("div", { class: "mr-val" }, valText),
+        svg,
+        el("div", { class: "mr-label" }, d.label)
+      )
+    );
+  });
+
+  const wrap = el("div", {});
+  wrap.appendChild(header);
+  wrap.appendChild(ringsRow);
+  return wrap;
+}
+
+function buildFirmPieDonut(rCount, aCount, dCount) {
+  const total = rCount + aCount + dCount;
+  const SZ = 90, R = 32, CX = 45, CY = 45;
+  const CIRC = +(2 * Math.PI * R).toFixed(2);
+  const ns = "http://www.w3.org/2000/svg";
+
+  const svg = document.createElementNS(ns, "svg");
+  svg.setAttribute("viewBox", `0 0 ${SZ} ${SZ}`);
+  svg.setAttribute("width", SZ); svg.setAttribute("height", SZ);
+
+  const track = document.createElementNS(ns, "circle");
+  track.setAttribute("cx", CX); track.setAttribute("cy", CY); track.setAttribute("r", R);
+  track.setAttribute("fill", "none");
+  track.setAttribute("stroke", "rgba(255,255,255,0.06)");
+  track.setAttribute("stroke-width", "9");
+  svg.appendChild(track);
+
+  if (total > 0) {
+    const segs = [
+      { count: rCount, color: "#3b82f6" },
+      { count: aCount, color: "#f59e0b" },
+      { count: dCount, color: "#ff3333" },
+    ];
+    let cumLen = 0;
+    segs.forEach(seg => {
+      if (!seg.count) return;
+      const len = +(seg.count / total * CIRC).toFixed(2);
+      const arc = document.createElementNS(ns, "circle");
+      arc.setAttribute("cx", CX); arc.setAttribute("cy", CY); arc.setAttribute("r", R);
+      arc.setAttribute("fill", "none");
+      arc.style.stroke = seg.color;
+      arc.setAttribute("stroke-width", "9");
+      arc.setAttribute("stroke-linecap", "butt");
+      arc.setAttribute("stroke-dasharray", `0 ${CIRC}`);
+      arc.setAttribute("stroke-dashoffset", `${-cumLen}`);
+      arc.setAttribute("transform", `rotate(-90 ${CX} ${CY})`);
+      arc.setAttribute("data-pie-target", `${len} ${CIRC}`);
+      svg.appendChild(arc);
+      cumLen += len;
+    });
+  }
+
+  const countTxt = document.createElementNS(ns, "text");
+  countTxt.setAttribute("x", CX); countTxt.setAttribute("y", CY - 3);
+  countTxt.setAttribute("text-anchor", "middle");
+  countTxt.setAttribute("dominant-baseline", "middle");
+  countTxt.style.fill = "rgba(255,255,255,0.9)";
+  countTxt.setAttribute("font-size", "16");
+  countTxt.setAttribute("font-weight", "800");
+  countTxt.setAttribute("font-family", "inherit");
+  countTxt.textContent = total.toString();
+  svg.appendChild(countTxt);
+
+  const subTxt = document.createElementNS(ns, "text");
+  subTxt.setAttribute("x", CX); subTxt.setAttribute("y", CY + 12);
+  subTxt.setAttribute("text-anchor", "middle");
+  subTxt.style.fill = "rgba(255,255,255,0.3)";
+  subTxt.setAttribute("font-size", "7");
+  subTxt.setAttribute("font-weight", "600");
+  subTxt.setAttribute("letter-spacing", "0.1em");
+  subTxt.textContent = "PAYOUTS";
+  svg.appendChild(subTxt);
+
+  return svg;
 }
 
 function renderOvRecentPanel() {
@@ -6033,8 +6247,12 @@ function renderOvFirms() {
   const grid = el("div", { class: "ov-firm-grid" });
 
   state.firms.forEach(firm => {
-    const firmPayouts = received().filter(p => p.firmId === firm.id);
-    const firmTotal = firmPayouts.reduce((s, p) => s + Number(p.amount || 0), 0);
+    const allFirmPayouts = state.payouts.filter(p => p.firmId === firm.id);
+    const rCount = allFirmPayouts.filter(p => p.status === "received").length;
+    const aCount = allFirmPayouts.filter(p => p.status === "awaiting_approval").length;
+    const dCount = allFirmPayouts.filter(p => p.status === "denied").length;
+    const firmTotal = allFirmPayouts.filter(p => p.status === "received")
+      .reduce((s, p) => s + Number(p.amount || 0), 0);
     const firmAccounts = state.accounts.filter(a => a.firmId === firm.id);
     const funded = firmAccounts.filter(a => a.health === "funded");
     const evals  = firmAccounts.filter(a => a.health === "eval");
@@ -6042,28 +6260,53 @@ function renderOvFirms() {
     const active = firmAccounts.filter(a => a.health === "active");
 
     const chips = el("div", { class: "ov-firm-status-chips" });
-    if (funded.length)  chips.appendChild(el("span", { class: "ov-firm-chip funded" }, `${funded.length} Funded`));
-    if (active.length)  chips.appendChild(el("span", { class: "ov-firm-chip active" }, `${active.length} Active`));
-    if (evals.length)   chips.appendChild(el("span", { class: "ov-firm-chip eval" },   `${evals.length} Eval`));
-    if (blown.length)   chips.appendChild(el("span", { class: "ov-firm-chip blown" },  `${blown.length} Blown`));
+    if (funded.length) chips.appendChild(el("span", { class: "ov-firm-chip funded" }, `${funded.length} Funded`));
+    if (active.length) chips.appendChild(el("span", { class: "ov-firm-chip active" }, `${active.length} Active`));
+    if (evals.length)  chips.appendChild(el("span", { class: "ov-firm-chip eval" },   `${evals.length} Eval`));
+    if (blown.length)  chips.appendChild(el("span", { class: "ov-firm-chip blown" },  `${blown.length} Blown`));
+
+    const legend = el("div", { class: "ov-firm-legend" });
+    [
+      { color: "#3b82f6", label: "Received", count: rCount },
+      { color: "#f59e0b", label: "Awaiting", count: aCount },
+      { color: "#ff3333", label: "Denied",   count: dCount },
+    ].forEach(({ color, label, count }) => {
+      legend.appendChild(
+        el("div", { class: "ov-firm-legend-item" },
+          el("div", { class: "ov-firm-legend-dot", style: `background:${color}` }),
+          `${count} ${label}`
+        )
+      );
+    });
 
     const card = el("div", { class: "ov-firm-card", onclick: () => navigateTo("firms") },
-      el("div", { class: "ov-firm-avatar", style: `background:${firmAvatar(firm)};` },
-        firmInitials(firm.name)
+      el("div", { class: "ov-firm-header" },
+        el("div", { class: "ov-firm-avatar", style: `background:${firmAvatar(firm)};` },
+          firmInitials(firm.name)
+        ),
+        el("div", { class: "ov-firm-info" },
+          el("div", { class: "ov-firm-name" }, firm.name),
+          el("div", { class: "ov-firm-accts" },
+            `${firmAccounts.length} account${firmAccounts.length !== 1 ? "s" : ""}`
+          )
+        )
       ),
-      el("div", { class: "ov-firm-name" }, firm.name),
-      el("div", { class: "ov-firm-accts" },
-        `${firmAccounts.length} account${firmAccounts.length !== 1 ? "s" : ""}`
+      el("div", { class: "ov-firm-donut-wrap" },
+        buildFirmPieDonut(rCount, aCount, dCount),
+        legend
       ),
-      el("div", { class: "ov-firm-total" },
-        firmTotal > 0 ? fmtGBP(firmTotal, { short: firmTotal >= 10000 }) : "—"
-      ),
-      el("div", { class: "ov-firm-payout-meta" },
-        firmPayouts.length > 0
-          ? `${firmPayouts.length} payout${firmPayouts.length !== 1 ? "s" : ""} received`
-          : "No payouts yet"
-      ),
-      chips
+      el("div", { class: "ov-firm-divider" }),
+      el("div", { class: "ov-firm-bottom" },
+        el("div", {},
+          el("div", { class: "ov-firm-total" },
+            firmTotal > 0 ? fmtGBP(firmTotal, { short: firmTotal >= 10000 }) : "—"
+          ),
+          el("div", { class: "ov-firm-payout-meta" },
+            rCount > 0 ? `${rCount} payout${rCount !== 1 ? "s" : ""} received` : "No payouts yet"
+          )
+        ),
+        chips
+      )
     );
 
     grid.appendChild(card);
@@ -6304,6 +6547,17 @@ function render() {
     });
     document.querySelectorAll(".bc-bar[data-target-height]").forEach(b => {
       b.style.height = b.getAttribute("data-target-height") + "%";
+    });
+    // SVG ring + donut animations need double rAF to ensure initial state is painted first
+    requestAnimationFrame(() => {
+      document.querySelectorAll("circle[data-ring-final]").forEach(c => {
+        c.style.transition = "stroke-dashoffset 0.9s cubic-bezier(0.16,1,0.3,1)";
+        c.setAttribute("stroke-dashoffset", c.getAttribute("data-ring-final"));
+      });
+      document.querySelectorAll("circle[data-pie-target]").forEach(c => {
+        c.style.transition = "stroke-dasharray 0.8s cubic-bezier(0.16,1,0.3,1)";
+        c.setAttribute("stroke-dasharray", c.getAttribute("data-pie-target"));
+      });
     });
   });
 }
