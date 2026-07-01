@@ -321,3 +321,50 @@ export function feeROI(state: LedgerState): number | null {
   if (!fees) return null;
   return ((lifetimeWithdrawals(state) - fees) / fees) * 100;
 }
+
+/* ----------------------------------------------------------------
+   PAYOUTS PAGE — search/filter/countdown
+   ---------------------------------------------------------------- */
+export type PayoutSearchFilter = "all" | "received" | "pending" | "denied";
+
+export function matchesPayoutSearch(state: LedgerState, p: Payout, query: string): boolean {
+  if (!query) return true;
+  const q = query.toLowerCase();
+  const firm = getFirm(state, p.firmId);
+  const acct = getAccount(state, p.accountId);
+  return (
+    (firm?.name || "").toLowerCase().includes(q) ||
+    (acct?.label || "").toLowerCase().includes(q) ||
+    String(p.amount).includes(q) ||
+    (p.notes || "").toLowerCase().includes(q) ||
+    p.date.includes(q) ||
+    (p.status || "").includes(q)
+  );
+}
+
+export function filteredPayouts(state: LedgerState, query: string, filter: PayoutSearchFilter): Payout[] {
+  return state.payouts
+    .filter((p) => {
+      if (filter === "received" && p.status !== "received") return false;
+      if (filter === "pending" && p.status !== "awaiting_approval") return false;
+      if (filter === "denied" && p.status !== "denied") return false;
+      return matchesPayoutSearch(state, p, query);
+    })
+    .sort((a, b) => b.date.localeCompare(a.date));
+}
+
+export interface PayoutCountdown {
+  cdClass: "later" | "received" | "denied" | "overdue" | "soon" | "this-week";
+  cdText: string;
+}
+
+export function payoutCountdown(p: Payout): PayoutCountdown {
+  const days = daysBetween(today(), p.date);
+  if (p.status === "received") return { cdClass: "received", cdText: "Paid" };
+  if (p.status === "denied") return { cdClass: "denied", cdText: "Denied" };
+  if (days < 0) return { cdClass: "overdue", cdText: "Overdue" };
+  if (days === 0) return { cdClass: "soon", cdText: "Today" };
+  if (days <= 3) return { cdClass: "soon", cdText: `${days} ${days === 1 ? "day" : "days"}` };
+  if (days <= 7) return { cdClass: "this-week", cdText: `${days} days` };
+  return { cdClass: "later", cdText: `${days}d` };
+}

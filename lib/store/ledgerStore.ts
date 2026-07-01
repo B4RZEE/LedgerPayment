@@ -86,9 +86,19 @@ export const useLedgerStore = create<LedgerStore>()(
           else draft.firms[i] = firm;
         }),
       deleteFirm: (id) => {
+        let doomedPayoutIds: string[] = [];
         set((draft) => {
+          doomedPayoutIds = draft.payouts.filter((p) => p.firmId === id).map((p) => p.id);
           draft.firms = draft.firms.filter((f) => f.id !== id);
+          draft.accounts = draft.accounts.filter((a) => a.firmId !== id);
+          draft.payouts = draft.payouts.filter((p) => p.firmId !== id);
+          draft.spending.forEach((s) => {
+            if (s.firmId === id) s.firmId = "";
+          });
         });
+        // Payouts schema is ON DELETE SET NULL, not cascade — delete them explicitly.
+        // Accounts cascade-delete server-side once the firm row is gone.
+        doomedPayoutIds.forEach((pid) => void dbDelete("payouts", pid));
         void dbDelete("firms", id);
       },
 
@@ -101,6 +111,12 @@ export const useLedgerStore = create<LedgerStore>()(
       deleteAccount: (id) => {
         set((draft) => {
           draft.accounts = draft.accounts.filter((a) => a.id !== id);
+          draft.payouts.forEach((p) => {
+            if (p.accountId === id) p.accountId = "";
+          });
+          draft.spending.forEach((s) => {
+            if (s.accountId === id) s.accountId = "";
+          });
         });
         void dbDelete("accounts", id);
       },

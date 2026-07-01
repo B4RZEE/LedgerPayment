@@ -1,7 +1,9 @@
+import FirmListCard from "@/components/dashboard/firms-page/FirmListCard";
+
 export default function FirmsPage() {
   return (
-    <div className="p-8" style={{ color: "var(--text-2)" }}>
-      Firms &amp; Accounts — built in Phase 6.
+    <div className="page-enter">
+      <FirmListCard />
     </div>
   );
 }

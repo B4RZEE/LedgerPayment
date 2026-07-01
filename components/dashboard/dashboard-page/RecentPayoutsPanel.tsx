@@ -5,6 +5,7 @@ import { useLedgerStore, getLedgerState } from "@/lib/store/ledgerStore";
 import { getFirm, recentSettled } from "@/lib/domain/selectors";
 import { firmAvatar, firmInitials } from "@/lib/domain/avatar";
 import { fmtDateShort, fmtGBP } from "@/lib/format";
+import { openPayoutSheet } from "@/components/dashboard/sheets/PayoutSheet";
 
 export default function RecentPayoutsPanel() {
   const router = useRouter();
@@ -31,8 +32,7 @@ export default function RecentPayoutsPanel() {
           const amtClass = isReceived ? "received" : isDenied ? "denied" : "awaiting";
           const pillLabel = isReceived ? "Paid" : isDenied ? "Denied" : "Pending";
           return (
-            // TODO(Phase 6): open PayoutSheet(p.id) instead of navigating to the list.
-            <div key={p.id} className="ov-pay-row" onClick={() => router.push("/app/payouts")}>
+            <div key={p.id} className="ov-pay-row" onClick={() => openPayoutSheet(p.id)}>
               <div className="ov-pay-avatar" style={{ background: firmAvatar(firm) }}>
                 {firmInitials(firm?.name)}
               </div>

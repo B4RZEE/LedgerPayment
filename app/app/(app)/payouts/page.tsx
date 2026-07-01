@@ -1,7 +1,11 @@
+import UpcomingPayoutsCard from "@/components/dashboard/payouts-page/UpcomingPayoutsCard";
+import RecentPayoutsCard from "@/components/dashboard/payouts-page/RecentPayoutsCard";
+
 export default function PayoutsPage() {
   return (
-    <div className="p-8" style={{ color: "var(--text-2)" }}>
-      Payouts — built in Phase 6.
+    <div className="page-enter">
+      <UpcomingPayoutsCard />
+      <RecentPayoutsCard />
     </div>
   );
 }
