@@ -3355,6 +3355,111 @@
   .ov-pay-status-pill.denied   { background: rgba(255,51,51,0.12);  color: var(--jade-1); }
   .ov-pay-status-pill.awaiting { background: rgba(245,158,11,0.12); color: var(--amber-1); }
 
+  /* ---- Net PNL Curve Chart ---- */
+  .ov-pnl-card {
+    background: var(--glass);
+    border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+    overflow: hidden;
+    margin: 0 0 14px;
+    position: relative;
+  }
+  .ov-pnl-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 50% 0%, rgba(59,130,246,0.06), transparent 60%);
+    pointer-events: none;
+  }
+  .ov-pnl-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 18px 20px 4px;
+    gap: 12px;
+  }
+  .ov-pnl-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text-3);
+    margin-bottom: 4px;
+  }
+  .ov-pnl-value {
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    font-variant-numeric: tabular-nums;
+  }
+  .ov-pnl-value.pos { color: #3b82f6; }
+  .ov-pnl-value.neg { color: var(--jade-1); }
+  .ov-pnl-value.neutral { color: var(--text-0); }
+  .ov-pnl-subdesc {
+    font-size: 11px;
+    color: var(--text-4);
+    margin-top: 3px;
+  }
+  .ov-pnl-tabs {
+    display: flex;
+    gap: 2px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 3px;
+    flex-shrink: 0;
+    align-self: flex-start;
+    margin-top: 2px;
+  }
+  .ov-pnl-tab {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 16px;
+    border: none;
+    background: transparent;
+    color: var(--text-3);
+    cursor: pointer;
+    transition: all .15s;
+  }
+  .ov-pnl-tab.active {
+    background: var(--glass-strong);
+    border: 1px solid var(--border-strong);
+    color: var(--text-0);
+  }
+  .ov-pnl-chart-wrap {
+    position: relative;
+    padding: 4px 0 0;
+    cursor: crosshair;
+  }
+  .ov-pnl-svg { display: block; width: 100%; overflow: visible; }
+  .ov-pnl-tooltip {
+    position: absolute;
+    top: 8px;
+    pointer-events: none;
+    background: var(--bg-1);
+    border: 1px solid var(--border-strong);
+    border-radius: 10px;
+    padding: 8px 12px;
+    font-size: 12px;
+    z-index: 10;
+    opacity: 0;
+    transition: opacity .1s;
+    white-space: nowrap;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+  }
+  .ov-pnl-tooltip.visible { opacity: 1; }
+  .ov-pnl-tip-date { font-size: 10px; color: var(--text-3); margin-bottom: 3px; font-weight: 600; }
+  .ov-pnl-tip-val { font-size: 14px; font-weight: 800; letter-spacing: -0.03em; }
+  .ov-pnl-tip-val.pos { color: #3b82f6; }
+  .ov-pnl-tip-val.neg { color: var(--jade-1); }
+  .ov-pnl-empty {
+    padding: 40px 20px;
+    text-align: center;
+    color: var(--text-4);
+    font-size: 13px;
+  }
+
   /* Goals 2-col grid */
   .ov-goals-grid {
     display: grid;
@@ -6003,11 +6108,336 @@ function renderPassRateSection() {
 }
 
 /* ----------------------------------------------------------------
+   PNL CURVE — data + render
+   ---------------------------------------------------------------- */
+function pnlCurveSeries(rangeKey) {
+  const events = [];
+  received().forEach(p => events.push({ date: p.date, delta: +Number(p.amount) }));
+  state.spending.forEach(s => events.push({ date: s.date, delta: -Number(s.amount) }));
+  events.sort((a, b) => a.date.localeCompare(b.date));
+  if (!events.length) return [];
+
+  const todayStr = todayISO();
+  let startStr = null;
+  if (rangeKey === "7D") {
+    const d = parseISO(todayStr); d.setDate(d.getDate() - 7); startStr = localISO(d);
+  } else if (rangeKey === "30D") {
+    const d = parseISO(todayStr); d.setDate(d.getDate() - 30); startStr = localISO(d);
+  } else if (rangeKey === "3M") {
+    const d = parseISO(todayStr); d.setMonth(d.getMonth() - 3); startStr = localISO(d);
+  } else if (rangeKey === "1Y") {
+    const d = parseISO(todayStr); d.setFullYear(d.getFullYear() - 1); startStr = localISO(d);
+  }
+
+  let baseValue = 0;
+  if (startStr) {
+    events.forEach(e => { if (e.date < startStr) baseValue += e.delta; });
+    const filtered = [{ date: startStr, value: baseValue, synth: true }];
+    events.forEach(e => {
+      if (e.date >= startStr) {
+        baseValue += e.delta;
+        filtered.push({ date: e.date, value: baseValue });
+      }
+    });
+    return filtered;
+  }
+
+  let cum = 0;
+  const all = [];
+  events.forEach(e => { cum += e.delta; all.push({ date: e.date, value: cum }); });
+  return [{ date: events[0].date, value: 0, synth: true }, ...all];
+}
+
+function buildPNLPath(points, W, H, padL, padT, padR, padB) {
+  if (points.length < 2) return { d: "", dFill: "", xs: [], ys: [] };
+  const chartW = W - padL - padR;
+  const chartH = H - padT - padB;
+  const minV = Math.min(0, ...points.map(p => p.value));
+  const maxV = Math.max(0, ...points.map(p => p.value));
+  const range = maxV - minV || 1;
+  const toX = (i) => padL + (i / (points.length - 1)) * chartW;
+  const toY = (v) => padT + chartH - ((v - minV) / range) * chartH;
+  const xs = points.map((_, i) => toX(i));
+  const ys = points.map(p => toY(p.value));
+
+  // Smooth cubic bezier path
+  let d = `M ${xs[0].toFixed(1)} ${ys[0].toFixed(1)}`;
+  for (let i = 1; i < xs.length; i++) {
+    const cpx = (xs[i - 1] + xs[i]) / 2;
+    d += ` C ${cpx.toFixed(1)} ${ys[i-1].toFixed(1)}, ${cpx.toFixed(1)} ${ys[i].toFixed(1)}, ${xs[i].toFixed(1)} ${ys[i].toFixed(1)}`;
+  }
+  const baseY = toY(0).toFixed(1);
+  const dFill = d + ` L ${xs[xs.length-1].toFixed(1)} ${baseY} L ${xs[0].toFixed(1)} ${baseY} Z`;
+  return { d, dFill, xs, ys, minV, maxV, toY };
+}
+
+function renderOvPNLChart() {
+  const net = netProfit();
+  const netClass = net > 0 ? "pos" : net < 0 ? "neg" : "neutral";
+  const netSign = net >= 0 ? "+" : "−";
+  const lineColor = net >= 0 ? "#3b82f6" : "#ff3333";
+  const glowColor = net >= 0 ? "rgba(59,130,246,0.5)" : "rgba(255,51,51,0.5)";
+  const gradStop  = net >= 0 ? "rgba(59,130,246,0.18)" : "rgba(255,51,51,0.18)";
+
+  const card = el("div", { class: "ov-pnl-card" });
+
+  // Top row: value + range tabs
+  const top = el("div", { class: "ov-pnl-top" });
+  const left = el("div", {});
+  left.appendChild(el("div", { class: "ov-pnl-label" }, "Net P&L Curve"));
+  left.appendChild(el("div", { class: `ov-pnl-value ${netClass}` },
+    lifetimeWithdrawals() === 0 && lifetimeSpend() === 0 ? "—" : netSign + fmtGBP(Math.abs(net), { short: false })
+  ));
+  left.appendChild(el("div", { class: "ov-pnl-subdesc" }, "Payouts in minus costs out, over time"));
+
+  const RANGES = ["7D", "30D", "3M", "1Y", "ALL"];
+  let activeRange = "ALL";
+  const tabEls = {};
+  const tabs = el("div", { class: "ov-pnl-tabs" });
+  RANGES.forEach(r => {
+    const t = el("button", { class: "ov-pnl-tab" + (r === activeRange ? " active" : "") }, r);
+    tabEls[r] = t;
+    t.addEventListener("click", () => {
+      if (activeRange === r) return;
+      tabEls[activeRange].classList.remove("active");
+      activeRange = r;
+      t.classList.add("active");
+      rebuildChart();
+    });
+    tabs.appendChild(t);
+  });
+
+  top.appendChild(left);
+  top.appendChild(tabs);
+  card.appendChild(top);
+
+  // Chart area
+  const chartWrap = el("div", { class: "ov-pnl-chart-wrap" });
+  card.appendChild(chartWrap);
+
+  const tooltip = el("div", { class: "ov-pnl-tooltip" });
+  const tipDate = el("div", { class: "ov-pnl-tip-date" });
+  const tipVal  = el("div", { class: "ov-pnl-tip-val" });
+  tooltip.appendChild(tipDate);
+  tooltip.appendChild(tipVal);
+  chartWrap.appendChild(tooltip);
+
+  const ns = "http://www.w3.org/2000/svg";
+  let svgEl = null;
+
+  function rebuildChart() {
+    if (svgEl) svgEl.remove();
+    svgEl = null;
+
+    const points = pnlCurveSeries(activeRange);
+    if (points.length < 2) {
+      const empty = el("div", { class: "ov-pnl-empty" }, "Not enough data for this range — add payouts to see your curve");
+      chartWrap.appendChild(empty);
+      return;
+    }
+
+    const W = chartWrap.clientWidth || 360;
+    const H = 160;
+    const padL = 8, padT = 14, padR = 8, padB = 28;
+
+    const { d, dFill, xs, ys, minV, maxV, toY } = buildPNLPath(points, W, H, padL, padT, padR, padB);
+
+    const svg = document.createElementNS(ns, "svg");
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+    svg.setAttribute("width", W);
+    svg.setAttribute("height", H);
+    svg.classList.add("ov-pnl-svg");
+
+    const defs = document.createElementNS(ns, "defs");
+
+    // Gradient fill
+    const grad = document.createElementNS(ns, "linearGradient");
+    grad.setAttribute("id", "pnlFillGrad");
+    grad.setAttribute("x1", "0"); grad.setAttribute("y1", "0");
+    grad.setAttribute("x2", "0"); grad.setAttribute("y2", "1");
+    const s0 = document.createElementNS(ns, "stop");
+    s0.setAttribute("offset", "0%"); s0.setAttribute("stop-color", gradStop);
+    const s1 = document.createElementNS(ns, "stop");
+    s1.setAttribute("offset", "100%"); s1.setAttribute("stop-color", "rgba(0,0,0,0)");
+    grad.appendChild(s0); grad.appendChild(s1);
+
+    // Glow filter
+    const filter = document.createElementNS(ns, "filter");
+    filter.setAttribute("id", "pnlGlow");
+    filter.setAttribute("x", "-20%"); filter.setAttribute("y", "-20%");
+    filter.setAttribute("width", "140%"); filter.setAttribute("height", "140%");
+    const blur = document.createElementNS(ns, "feGaussianBlur");
+    blur.setAttribute("stdDeviation", "3"); blur.setAttribute("result", "glow");
+    const merge = document.createElementNS(ns, "feMerge");
+    const mn1 = document.createElementNS(ns, "feMergeNode"); mn1.setAttribute("in", "glow");
+    const mn2 = document.createElementNS(ns, "feMergeNode"); mn2.setAttribute("in", "SourceGraphic");
+    merge.appendChild(mn1); merge.appendChild(mn2);
+    filter.appendChild(blur); filter.appendChild(merge);
+
+    defs.appendChild(grad); defs.appendChild(filter);
+    svg.appendChild(defs);
+
+    // Breakeven line at y=0
+    if (minV < 0 && maxV > 0) {
+      const bY = toY(0).toFixed(1);
+      const bl = document.createElementNS(ns, "line");
+      bl.setAttribute("x1", padL); bl.setAttribute("x2", W - padR);
+      bl.setAttribute("y1", bY); bl.setAttribute("y2", bY);
+      bl.setAttribute("stroke", "rgba(255,255,255,0.15)");
+      bl.setAttribute("stroke-width", "1");
+      bl.setAttribute("stroke-dasharray", "4 4");
+      svg.appendChild(bl);
+      const beLabel = document.createElementNS(ns, "text");
+      beLabel.setAttribute("x", W - padR - 2);
+      beLabel.setAttribute("y", +bY - 3);
+      beLabel.setAttribute("text-anchor", "end");
+      beLabel.setAttribute("fill", "rgba(255,255,255,0.3)");
+      beLabel.setAttribute("font-size", "9");
+      beLabel.textContent = "Breakeven";
+      svg.appendChild(beLabel);
+    }
+
+    // X-axis date labels (first, mid, last)
+    const labelIdxs = [0, Math.floor((points.length - 1) / 2), points.length - 1];
+    labelIdxs.forEach(idx => {
+      if (!points[idx] || points[idx].synth) return;
+      const lbl = document.createElementNS(ns, "text");
+      lbl.setAttribute("x", xs[idx].toFixed(1));
+      lbl.setAttribute("y", H - 6);
+      lbl.setAttribute("text-anchor", idx === 0 ? "start" : idx === points.length - 1 ? "end" : "middle");
+      lbl.setAttribute("fill", "rgba(255,255,255,0.25)");
+      lbl.setAttribute("font-size", "9");
+      lbl.textContent = fmtDateShort(points[idx].date);
+      svg.appendChild(lbl);
+    });
+
+    // Filled area
+    const fillPath = document.createElementNS(ns, "path");
+    fillPath.setAttribute("d", dFill);
+    fillPath.setAttribute("fill", "url(#pnlFillGrad)");
+    svg.appendChild(fillPath);
+
+    // Line (initially length=0 for animation)
+    const linePath = document.createElementNS(ns, "path");
+    linePath.setAttribute("d", d);
+    linePath.setAttribute("fill", "none");
+    linePath.setAttribute("stroke-width", "2");
+    linePath.setAttribute("stroke-linecap", "round");
+    linePath.setAttribute("stroke-linejoin", "round");
+    linePath.style.stroke = lineColor;
+    linePath.style.filter = `drop-shadow(0 0 4px ${glowColor})`;
+    svg.appendChild(linePath);
+
+    // Measure path length for animation
+    requestAnimationFrame(() => {
+      const len = linePath.getTotalLength ? linePath.getTotalLength() : 9999;
+      linePath.style.strokeDasharray = len;
+      linePath.style.strokeDashoffset = len;
+      requestAnimationFrame(() => {
+        linePath.style.transition = "stroke-dashoffset 1.2s cubic-bezier(0.16,1,0.3,1)";
+        linePath.style.strokeDashoffset = "0";
+      });
+    });
+
+    // Glowing dot at end
+    const endX = xs[xs.length - 1];
+    const endY = ys[ys.length - 1];
+
+    const pulseOuter = document.createElementNS(ns, "circle");
+    pulseOuter.setAttribute("cx", endX.toFixed(1));
+    pulseOuter.setAttribute("cy", endY.toFixed(1));
+    pulseOuter.setAttribute("r", "6");
+    pulseOuter.style.fill = lineColor;
+    pulseOuter.style.opacity = "0.25";
+    pulseOuter.innerHTML = `<animate attributeName="r" values="5;9;5" dur="2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.3;0;0.3" dur="2s" repeatCount="indefinite"/>`;
+    svg.appendChild(pulseOuter);
+
+    const dot = document.createElementNS(ns, "circle");
+    dot.setAttribute("cx", endX.toFixed(1));
+    dot.setAttribute("cy", endY.toFixed(1));
+    dot.setAttribute("r", "3.5");
+    dot.setAttribute("fill", "#fff");
+    dot.style.filter = `drop-shadow(0 0 5px ${lineColor})`;
+    svg.appendChild(dot);
+
+    // Crosshair overlay
+    const crossH = document.createElementNS(ns, "line");
+    crossH.setAttribute("y1", padT); crossH.setAttribute("y2", H - padB);
+    crossH.setAttribute("stroke", "rgba(255,255,255,0.2)");
+    crossH.setAttribute("stroke-width", "1");
+    crossH.setAttribute("stroke-dasharray", "3 3");
+    crossH.style.display = "none";
+    svg.appendChild(crossH);
+
+    const hoverDot = document.createElementNS(ns, "circle");
+    hoverDot.setAttribute("r", "4");
+    hoverDot.setAttribute("fill", "#fff");
+    hoverDot.style.stroke = lineColor;
+    hoverDot.setAttribute("stroke-width", "2");
+    hoverDot.style.display = "none";
+    svg.appendChild(hoverDot);
+
+    // Mouse interaction
+    const chartW = W - padL - padR;
+    svg.addEventListener("mousemove", (e) => {
+      const rect = svg.getBoundingClientRect();
+      const mx = e.clientX - rect.left;
+      const pct = Math.max(0, Math.min(1, (mx - padL) / chartW));
+      const idx = Math.round(pct * (points.length - 1));
+      const pt = points[idx];
+      if (!pt) return;
+
+      const px = xs[idx];
+      const py = ys[idx];
+
+      crossH.setAttribute("x1", px.toFixed(1));
+      crossH.setAttribute("x2", px.toFixed(1));
+      crossH.style.display = "";
+      hoverDot.setAttribute("cx", px.toFixed(1));
+      hoverDot.setAttribute("cy", py.toFixed(1));
+      hoverDot.style.display = "";
+
+      const v = pt.value;
+      tipDate.textContent = pt.synth ? "Start of range" : fmtDateShort(pt.date);
+      tipVal.textContent = (v >= 0 ? "+" : "−") + fmtGBP(Math.abs(v));
+      tipVal.className = "ov-pnl-tip-val " + (v > 0 ? "pos" : v < 0 ? "neg" : "");
+
+      // Position tooltip: flip if too close to right edge
+      const tipW = 130;
+      const svgW = rect.width;
+      const tipLeft = px / W * svgW;
+      if (tipLeft + tipW + 16 > svgW) {
+        tooltip.style.left = "";
+        tooltip.style.right = (svgW - tipLeft + 8) + "px";
+      } else {
+        tooltip.style.right = "";
+        tooltip.style.left = (tipLeft + 12) + "px";
+      }
+      tooltip.classList.add("visible");
+    });
+
+    svg.addEventListener("mouseleave", () => {
+      crossH.style.display = "none";
+      hoverDot.style.display = "none";
+      tooltip.classList.remove("visible");
+    });
+
+    svgEl = svg;
+    chartWrap.appendChild(svg);
+  }
+
+  rebuildChart();
+  return card;
+}
+
+/* ----------------------------------------------------------------
    OVERVIEW DASHBOARD — redesigned
    ---------------------------------------------------------------- */
 function renderPageDashboard(app) {
   app.appendChild(renderOvHeader());
   app.appendChild(renderOvKPI());
+  app.appendChild(renderOvPNLChart());
 
   const mainGrid = el("div", { class: "ov-main" });
   mainGrid.appendChild(renderOvHero());
