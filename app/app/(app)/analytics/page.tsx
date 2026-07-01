@@ -1,7 +1,17 @@
+import ChallengeAnalyticsCard from "@/components/dashboard/analytics-page/ChallengeAnalyticsCard";
+import AnalyticsBarChart from "@/components/dashboard/charts/AnalyticsBarChart";
+import ExpectedIncomeCard from "@/components/dashboard/analytics-page/ExpectedIncomeCard";
+import TradingCostsCard from "@/components/dashboard/analytics-page/TradingCostsCard";
+
 export default function AnalyticsPage() {
   return (
-    <div className="p-8" style={{ color: "var(--text-2)" }}>
-      Analytics — built in Phase 7.
+    <div className="page-enter">
+      <section className="section">
+        <ChallengeAnalyticsCard />
+      </section>
+      <AnalyticsBarChart />
+      <ExpectedIncomeCard />
+      <TradingCostsCard />
     </div>
   );
 }

@@ -5,7 +5,7 @@
    argument instead — same logic, more testable, no hidden globals.
    ================================================================ */
 import type { Account, Firm, LedgerState, Payout, SpendingCategory } from "@/lib/store/types";
-import { daysBetween, localISO, localMonthISO, monthKey, parseISO, startOfWeekISO, endOfWeekISO, todayISO } from "@/lib/format";
+import { daysBetween, fmtGBP, localISO, localMonthISO, monthKey, parseISO, startOfWeekISO, endOfWeekISO, todayISO } from "@/lib/format";
 import { SPENDING_CATEGORIES } from "@/lib/domain/meta";
 
 const today = () => todayISO();
@@ -356,6 +356,82 @@ export function filteredPayouts(state: LedgerState, query: string, filter: Payou
 export interface PayoutCountdown {
   cdClass: "later" | "received" | "denied" | "overdue" | "soon" | "this-week";
   cdText: string;
+}
+
+/* ----------------------------------------------------------------
+   STATS PAGE — per-firm curve + composite comparison score
+   ---------------------------------------------------------------- */
+export interface FirmCurvePoint {
+  date: string;
+  value: number;
+  synth?: boolean;
+}
+
+export function firmCurveSeries(state: LedgerState, firmId: string): FirmCurvePoint[] {
+  const pts = payoutsForFirm(state, firmId)
+    .filter((p) => p.status === "received")
+    .slice()
+    .sort((a, b) => a.date.localeCompare(b.date));
+  if (!pts.length) return [];
+  let cum = 0;
+  const out: FirmCurvePoint[] = [{ date: pts[0].date, value: 0, synth: true }];
+  pts.forEach((p) => {
+    cum += Number(p.amount);
+    out.push({ date: p.date, value: cum });
+  });
+  return out;
+}
+
+export const FIRM_COMPARISON_COLORS = ["#3b82f6", "#a78bfa", "#f59e0b", "#34d399", "#f472b6", "#60a5fa", "#fb923c"];
+
+export function firmColor(state: LedgerState, firmId: string): string {
+  const i = state.firms.findIndex((f) => f.id === firmId);
+  return FIRM_COMPARISON_COLORS[i % FIRM_COMPARISON_COLORS.length];
+}
+
+export interface FirmComparisonBar {
+  label: string;
+  pct: number;
+  val: string;
+  color: string;
+}
+
+export interface FirmComparisonRow extends FirmLeaderboardEntry {
+  score: number;
+  avg: number;
+  bars: FirmComparisonBar[];
+}
+
+// Composite score: 50% total earned, 30% payout count, 20% success rate (denial-rate inverted).
+export function firmComparisonRows(state: LedgerState): FirmComparisonRow[] {
+  const board = firmLeaderboard(state).filter((e) => e.count > 0);
+  if (board.length < 2) return [];
+
+  const maxTotal = Math.max(1, ...board.map((e) => e.total));
+  const maxCount = Math.max(1, ...board.map((e) => e.count));
+  const maxAvg = Math.max(1, ...board.map((e) => (e.count ? e.total / e.count : 0)));
+
+  return board
+    .map((e) => {
+      const avg = e.count ? e.total / e.count : 0;
+      const sr = e.denialRate !== null ? (100 - e.denialRate) / 100 : 0.5;
+      const score = Math.round((e.total / maxTotal) * 0.5 * 100 + (e.count / maxCount) * 0.3 * 100 + sr * 0.2 * 100);
+      const successPct = e.denialRate !== null ? 100 - e.denialRate : null;
+      const color = firmColor(state, e.firm.id);
+      const bars: FirmComparisonBar[] = [
+        { label: "Total earned", pct: e.total / maxTotal, val: fmtGBP(e.total, { short: e.total >= 1000 }), color },
+        { label: "Payout count", pct: e.count / maxCount, val: `${e.count}`, color },
+        { label: "Avg payout", pct: avg / maxAvg, val: fmtGBP(avg, { short: avg >= 1000 }), color },
+        {
+          label: "Success rate",
+          pct: successPct !== null ? successPct / 100 : 0,
+          val: successPct !== null ? successPct + "%" : "—",
+          color: successPct !== null && successPct >= 70 ? "#3b82f6" : successPct !== null && successPct >= 40 ? "#f59e0b" : "#ff3333",
+        },
+      ];
+      return { ...e, score, avg, bars };
+    })
+    .sort((a, b) => b.score - a.score);
 }
 
 export function payoutCountdown(p: Payout): PayoutCountdown {
