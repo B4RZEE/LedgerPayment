@@ -437,3 +437,184 @@
   .desktop-only { display: none !important; }
 }
 .auth-back:hover { color: var(--text-1); }
+
+/* ── Dashboard overview page ──────────────────────────────────── */
+.ov-topbar { display: flex; align-items: flex-start; justify-content: space-between; padding: 4px 0 20px; gap: 12px; }
+.ov-page-eyebrow { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: var(--jade-1); margin-bottom: 5px; }
+.ov-title { font-size: 26px; font-weight: 800; letter-spacing: -0.03em; color: var(--text-0); margin-bottom: 3px; line-height: 1.1; }
+.ov-title-name { color: var(--jade-1); }
+.ov-subtitle { font-size: 13px; color: var(--text-3); }
+.ov-topbar-controls { display: flex; align-items: center; gap: 8px; flex-shrink: 0; padding-top: 2px; }
+.ov-date-pill {
+  display: flex; align-items: center; gap: 6px; padding: 7px 12px; border-radius: 99px; border: 1px solid var(--border);
+  background: var(--glass); font-size: 12px; font-weight: 600; color: var(--text-2); cursor: default; white-space: nowrap; letter-spacing: -0.01em;
+}
+.ov-date-pill svg { flex-shrink: 0; opacity: 0.5; }
+@media (max-width: 640px) { .ov-date-pill { display: none; } }
+
+.velocity-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 700; padding: 3px 8px; border-radius: 20px; }
+.velocity-badge.up { background: rgba(59,130,246,0.12); color: #3b82f6; }
+.velocity-badge.down { background: rgba(251,113,133,0.12); color: var(--rose-1); }
+.velocity-badge.flat { background: rgba(148,163,184,0.1); color: var(--text-3); }
+
+/* KPI strip */
+.kpi-strip { display: grid; grid-template-columns: repeat(8, 1fr); background: var(--bg-1); border: 1px solid var(--border); border-radius: var(--r-md); overflow: hidden; margin-bottom: 16px; }
+@media (max-width: 900px) { .kpi-strip { grid-template-columns: repeat(4, 1fr); } }
+@media (max-width: 540px) { .kpi-strip { grid-template-columns: repeat(2, 1fr); } }
+.kpi-item { padding: 14px; border-right: 1px solid var(--border); display: flex; flex-direction: column; gap: 5px; min-width: 0; position: relative; }
+.kpi-icon {
+  position: absolute; top: 12px; right: 12px; width: 32px; height: 32px; border-radius: 8px; background: rgba(255,51,51,0.07);
+  border: 1px solid rgba(255,51,51,0.1); display: flex; align-items: center; justify-content: center; color: var(--jade-2); flex-shrink: 0;
+}
+.kpi-icon svg, .kpi-icon span { width: 15px; height: 15px; display: flex; }
+.kpi-icon span { align-items: center; justify-content: center; }
+.kpi-label { padding-right: 40px; font-size: 10px; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.1em; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.kpi-item:last-child { border-right: none; }
+@media (max-width: 900px) {
+  .kpi-item:nth-child(4n) { border-right: none; }
+  .kpi-item:nth-child(n+5) { border-top: 1px solid var(--border); }
+}
+@media (max-width: 540px) {
+  .kpi-item:nth-child(2n) { border-right: none; }
+  .kpi-item:nth-child(n+3) { border-top: 1px solid var(--border); }
+}
+.kpi-value { font-size: 17px; font-weight: 700; letter-spacing: -0.03em; color: var(--text-0); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-variant-numeric: tabular-nums; }
+.kpi-value.pos { color: var(--jade-1); }
+.kpi-value.neg { color: var(--rose-1); }
+.kpi-value.lav { color: var(--lav-2); }
+.kpi-sub { font-size: 11px; color: var(--text-4); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+[data-theme="light"] .kpi-item { background: #fff; }
+[data-theme="light"] .kpi-strip { background: #fff; }
+
+/* Main 2-col grid: hero chart | recent payouts */
+.ov-main { display: grid; grid-template-columns: 1fr 320px; gap: 14px; margin-bottom: 14px; align-items: start; }
+@media (max-width: 960px) { .ov-main { grid-template-columns: 1fr; } }
+
+.ov-hero { background: var(--glass); border: 1px solid var(--border); border-radius: var(--r-lg); overflow: hidden; position: relative; }
+.ov-hero::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent); pointer-events: none; }
+.ov-hero-top { padding: 20px 20px 14px; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.ov-hero-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-3); margin-bottom: 6px; }
+.ov-hero-amount { font-size: clamp(28px, 4vw, 40px); font-weight: 800; letter-spacing: -0.04em; font-variant-numeric: tabular-nums; line-height: 1; margin-bottom: 4px; }
+.ov-hero-amount.pos { color: var(--jade-1); }
+.ov-hero-amount.neg { color: var(--jade-1); }
+.ov-hero-amount.neutral { color: var(--text-0); }
+.ov-hero-meta { font-size: 12px; color: var(--text-3); margin-top: 3px; }
+.ov-hero-delta { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 99px; margin-left: 8px; }
+.ov-hero-delta.pos { background: rgba(59,130,246,0.12); color: #3b82f6; }
+.ov-hero-delta.neg { background: rgba(255,51,51,0.12); color: var(--jade-1); }
+.ov-hero-delta.flat { background: rgba(255,255,255,0.05); color: var(--text-3); }
+.ov-hero-stats { display: flex; gap: 20px; flex-wrap: wrap; }
+.ov-hero-stat { display: flex; flex-direction: column; gap: 3px; min-width: 64px; }
+.ov-hero-stat-icon { font-size: 12px; margin-bottom: 1px; color: var(--text-3); }
+.ov-hero-stat-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-3); }
+.ov-hero-stat-value { font-size: 15px; font-weight: 700; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; color: var(--text-0); }
+
+/* Monthly earnings bar chart */
+.month-bars { display: flex; align-items: flex-end; justify-content: space-around; padding: 4px 20px 20px; gap: 6px; min-height: 88px; }
+.month-bar-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 0; transition: opacity .15s; }
+.month-bar-item:hover { opacity: 0.75; }
+.mb-val { font-size: 9px; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--text-4); letter-spacing: -0.01em; min-height: 12px; text-align: center; white-space: nowrap; }
+.month-bar-item.current .mb-val { color: var(--jade-1); font-size: 10px; }
+.mb-track { width: 100%; height: 56px; display: flex; align-items: flex-end; position: relative; }
+.mb-bar { width: 100%; background: rgba(255,51,51,0.22); border-radius: 4px 4px 0 0; min-height: 3px; height: 0; transition: height .9s cubic-bezier(0.16,1,0.3,1); }
+.month-bar-item.current .mb-bar { background: var(--jade-1); box-shadow: 0 0 10px rgba(255,51,51,0.35); }
+.mb-label { font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-4); text-align: center; }
+.month-bar-item.current .mb-label { color: var(--text-1); font-weight: 700; }
+
+/* Recent payouts panel */
+.ov-recent { background: var(--bg-1); border: 1px solid var(--border); border-radius: var(--r-lg); overflow: hidden; position: relative; }
+.ov-recent::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent); pointer-events: none; }
+.ov-recent-head { display: flex; align-items: center; justify-content: space-between; padding: 16px 16px 10px; border-bottom: 1px solid var(--hairline); }
+.ov-recent-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-3); }
+.ov-recent-link { font-size: 12px; color: var(--jade-1); font-weight: 600; cursor: pointer; background: none; border: none; padding: 0; }
+.ov-recent-link:hover { opacity: 0.8; }
+.ov-pay-row { display: flex; align-items: center; gap: 10px; padding: 11px 14px; border-bottom: 1px solid var(--hairline); cursor: pointer; transition: background .15s; }
+.ov-pay-row:last-child { border-bottom: none; }
+.ov-pay-row:hover { background: rgba(255,255,255,0.03); }
+.ov-pay-avatar { width: 28px; height: 28px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700; color: #fff; flex-shrink: 0; }
+.ov-pay-body { flex: 1; min-width: 0; }
+.ov-pay-firm { font-size: 12px; font-weight: 600; color: var(--text-0); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ov-pay-date { font-size: 11px; color: var(--text-3); }
+.ov-pay-amount { font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; flex-shrink: 0; color: var(--text-0); display: flex; flex-direction: column; align-items: flex-end; gap: 3px; }
+.ov-pay-amount.received { color: #3b82f6; }
+.ov-pay-amount.denied { color: var(--jade-1); }
+.ov-pay-amount.awaiting { color: var(--amber-1); }
+.ov-pay-status-pill { font-size: 9px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; padding: 2px 6px; border-radius: 20px; }
+.ov-pay-status-pill.received { background: rgba(59,130,246,0.12); color: #3b82f6; }
+.ov-pay-status-pill.denied { background: rgba(255,51,51,0.12); color: var(--jade-1); }
+.ov-pay-status-pill.awaiting { background: rgba(245,158,11,0.12); color: var(--amber-1); }
+
+/* Net P&L curve chart */
+.ov-pnl-card { background: var(--bg-1); border: 1px solid var(--border); border-radius: var(--r-lg); overflow: hidden; margin: 0 0 14px; position: relative; }
+.ov-pnl-top { display: flex; align-items: flex-start; justify-content: space-between; padding: 18px 20px 4px; gap: 12px; }
+.ov-pnl-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-3); margin-bottom: 4px; }
+.ov-pnl-value { font-size: 22px; font-weight: 800; letter-spacing: -0.04em; font-variant-numeric: tabular-nums; }
+.ov-pnl-value.pos { color: var(--jade-1); }
+.ov-pnl-value.neg { color: var(--jade-1); }
+.ov-pnl-value.neutral { color: var(--text-0); }
+.ov-pnl-subdesc { font-size: 11px; color: var(--text-4); margin-top: 3px; }
+.ov-pnl-tabs { display: flex; gap: 2px; background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 20px; padding: 3px; flex-shrink: 0; align-self: flex-start; margin-top: 2px; }
+.ov-pnl-tab { font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 16px; border: none; background: transparent; color: var(--text-3); cursor: pointer; transition: all .15s; }
+.ov-pnl-tab.active { background: var(--glass-strong); border: 1px solid var(--border-strong); color: var(--text-0); }
+.ov-pnl-chart-wrap { position: relative; padding: 4px 0 0; cursor: crosshair; }
+.ov-pnl-svg { display: block; width: 100%; overflow: visible; }
+.ov-pnl-tooltip {
+  position: absolute; top: 8px; pointer-events: none; background: var(--bg-1); border: 1px solid var(--border-strong); border-radius: 10px;
+  padding: 8px 12px; font-size: 12px; z-index: 10; opacity: 0; transition: opacity .1s; white-space: nowrap; box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+}
+.ov-pnl-tooltip.visible { opacity: 1; }
+.ov-pnl-tip-date { font-size: 10px; color: var(--text-3); margin-bottom: 3px; font-weight: 600; }
+.ov-pnl-tip-val { font-size: 14px; font-weight: 800; letter-spacing: -0.03em; }
+.ov-pnl-tip-val.pos { color: var(--jade-1); }
+.ov-pnl-tip-val.neg { color: var(--jade-1); }
+.ov-pnl-empty { padding: 40px 20px; text-align: center; color: var(--text-4); font-size: 13px; }
+
+/* Income goals */
+.ov-goals-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 14px; }
+@media (max-width: 900px) { .ov-goals-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 480px) { .ov-goals-grid { grid-template-columns: 1fr; } }
+.ov-goal-card { background: var(--bg-1); border: 1px solid var(--border); border-radius: var(--r-md); padding: 16px; position: relative; overflow: hidden; }
+.ov-goal-card::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent); pointer-events: none; }
+.ov-goal-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.ov-goal-name { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-3); }
+.ov-goal-pct { font-size: 13px; font-weight: 800; letter-spacing: -0.02em; color: var(--jade-1); }
+.ov-goal-pct.done { color: var(--lav-2); }
+.ov-goal-amounts { display: flex; align-items: baseline; gap: 4px; margin-bottom: 10px; }
+.ov-goal-current { font-size: 20px; font-weight: 800; letter-spacing: -0.03em; color: var(--text-0); font-variant-numeric: tabular-nums; }
+.ov-goal-of { font-size: 12px; color: var(--text-3); }
+.ov-goal-bar-track { height: 4px; background: rgba(255,255,255,0.05); border-radius: 99px; overflow: hidden; }
+.ov-goal-bar-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--jade-2), var(--jade-1)); width: 0%; transition: width .9s cubic-bezier(0.16,1,.3,1); }
+.ov-goal-bar-fill.done { background: linear-gradient(90deg, var(--jade-1), var(--lav-2)); }
+[data-theme="light"] .ov-goal-bar-track { background: rgba(0,0,0,0.08); }
+
+/* Firm mini-cards grid */
+.ov-firms-section { margin-bottom: 14px; }
+.ov-section-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.ov-section-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-3); }
+.ov-section-link { font-size: 12px; color: var(--jade-1); font-weight: 600; cursor: pointer; background: none; border: none; padding: 0; }
+.ov-section-link:hover { opacity: 0.8; }
+.ov-firm-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }
+.ov-firm-card { background: var(--bg-1); border: 1px solid var(--border); border-radius: var(--r-md); padding: 20px; cursor: pointer; transition: border-color .15s, transform .15s; position: relative; overflow: hidden; }
+.ov-firm-card::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent); pointer-events: none; }
+.ov-firm-card:hover { border-color: var(--border-strong); transform: translateY(-1px); }
+.ov-firm-header { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+.ov-firm-info { flex: 1; min-width: 0; }
+.ov-firm-avatar { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; color: #fff; flex-shrink: 0; }
+.ov-firm-name { font-size: 14px; font-weight: 700; color: var(--text-0); margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ov-firm-accts { font-size: 11px; color: var(--text-3); }
+.ov-firm-donut-wrap { display: flex; flex-direction: column; align-items: center; gap: 10px; margin: 4px 0 14px; }
+.ov-firm-legend { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+.ov-firm-legend-item { display: flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 600; color: var(--text-3); }
+.ov-firm-legend-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.ov-firm-divider { height: 1px; background: var(--hairline); margin: 10px 0; }
+.ov-firm-bottom { display: flex; align-items: flex-end; justify-content: space-between; gap: 8px; }
+.ov-firm-total { font-size: 20px; font-weight: 800; letter-spacing: -0.03em; color: var(--text-0); font-variant-numeric: tabular-nums; margin-bottom: 2px; }
+.ov-firm-payout-meta { font-size: 11px; color: var(--text-3); }
+.ov-firm-status-chips { display: flex; gap: 5px; flex-wrap: wrap; justify-content: flex-end; }
+.ov-firm-chip { font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 99px; text-transform: uppercase; letter-spacing: 0.08em; }
+.ov-firm-chip.funded { background: rgba(255,51,51,0.12); color: var(--jade-1); border: 1px solid rgba(255,51,51,0.2); }
+.ov-firm-chip.eval { background: rgba(245,158,11,0.1); color: var(--amber-1); border: 1px solid rgba(245,158,11,0.2); }
+.ov-firm-chip.blown { background: rgba(244,63,94,0.1); color: var(--rose-1); border: 1px solid rgba(244,63,94,0.2); }
+.ov-firm-chip.active { background: rgba(165,180,252,0.1); color: var(--lav-2); border: 1px solid rgba(165,180,252,0.2); }
+.ov-empty-firms { text-align: center; padding: 32px 16px; color: var(--text-3); font-size: 13px; background: var(--glass); border: 1px solid var(--border); border-radius: var(--r-md); }
+.section-meta { font-size: 12px; color: var(--text-3); }
