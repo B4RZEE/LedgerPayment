@@ -2970,6 +2970,494 @@
   .pass-rate-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-3); margin-bottom: 4px; }
   .pass-rate-detail { font-size: 13px; color: var(--text-1); }
 
+  /* ============================================================
+     OVERVIEW DASHBOARD
+     ============================================================ */
+
+  /* Page header */
+  .ov-header {
+    padding: 4px 0 20px;
+  }
+  .ov-title {
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    color: var(--text-0);
+    margin-bottom: 2px;
+  }
+  .ov-subtitle {
+    font-size: 13px;
+    color: var(--text-3);
+  }
+
+  /* KPI strip */
+  .kpi-strip {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    background: var(--glass);
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+  @media (max-width: 900px) { .kpi-strip { grid-template-columns: repeat(4, 1fr); } }
+  @media (max-width: 540px) { .kpi-strip { grid-template-columns: repeat(2, 1fr); } }
+
+  .kpi-item {
+    padding: 14px 16px;
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    min-width: 0;
+  }
+  .kpi-item:last-child { border-right: none; }
+  @media (max-width: 900px) {
+    .kpi-item:nth-child(4n) { border-right: none; }
+    .kpi-item:nth-child(n+5) { border-top: 1px solid var(--border); }
+  }
+  @media (max-width: 540px) {
+    .kpi-item:nth-child(2n) { border-right: none; }
+    .kpi-item:nth-child(n+3) { border-top: 1px solid var(--border); }
+  }
+  .kpi-label {
+    font-size: 10px;
+    color: var(--text-3);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .kpi-value {
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    color: var(--text-0);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-variant-numeric: tabular-nums;
+  }
+  .kpi-value.pos { color: var(--jade-1); }
+  .kpi-value.neg { color: var(--rose-1); }
+  .kpi-value.lav { color: var(--lav-2); }
+  .kpi-sub {
+    font-size: 11px;
+    color: var(--text-4);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  [data-theme="light"] .kpi-item { background: #fff; }
+  [data-theme="light"] .kpi-strip { background: #fff; }
+
+  /* Main 2-col grid: hero chart | recent payouts */
+  .ov-main {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 14px;
+    margin-bottom: 14px;
+    align-items: start;
+  }
+  @media (max-width: 960px) { .ov-main { grid-template-columns: 1fr; } }
+
+  /* Hero chart card */
+  .ov-hero {
+    background: var(--glass);
+    border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+    overflow: hidden;
+    position: relative;
+  }
+  .ov-hero::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+    pointer-events: none;
+  }
+  .ov-hero-top {
+    padding: 20px 20px 14px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .ov-hero-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text-3);
+    margin-bottom: 6px;
+  }
+  .ov-hero-amount {
+    font-size: clamp(28px, 4vw, 40px);
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .ov-hero-amount.pos { color: var(--jade-1); }
+  .ov-hero-amount.neg { color: var(--rose-1); }
+  .ov-hero-amount.neutral { color: var(--text-0); }
+  .ov-hero-meta {
+    font-size: 12px;
+    color: var(--text-3);
+    margin-top: 3px;
+  }
+  .ov-hero-delta {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 99px;
+    margin-left: 8px;
+  }
+  .ov-hero-delta.pos { background: rgba(255,51,51,0.12); color: var(--jade-1); }
+  .ov-hero-delta.neg { background: rgba(244,63,94,0.12); color: var(--rose-1); }
+  .ov-hero-delta.flat { background: rgba(255,255,255,0.05); color: var(--text-3); }
+
+  /* Right stats strip inside hero */
+  .ov-hero-stats {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  .ov-hero-stat {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 64px;
+  }
+  .ov-hero-stat-icon {
+    font-size: 12px;
+    margin-bottom: 1px;
+    color: var(--text-3);
+  }
+  .ov-hero-stat-label {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-3);
+  }
+  .ov-hero-stat-value {
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+    color: var(--text-0);
+  }
+
+  /* Chart embed inside hero */
+  .ov-chart-wrap {
+    padding: 0 20px 20px;
+  }
+
+  /* Recent payouts panel */
+  .ov-recent {
+    background: var(--glass);
+    border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+    overflow: hidden;
+    position: relative;
+  }
+  .ov-recent::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+    pointer-events: none;
+  }
+  .ov-recent-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 16px 10px;
+    border-bottom: 1px solid var(--hairline);
+  }
+  .ov-recent-title {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text-3);
+  }
+  .ov-recent-link {
+    font-size: 12px;
+    color: var(--jade-1);
+    font-weight: 600;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .ov-recent-link:hover { opacity: 0.8; }
+  .ov-pay-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 14px;
+    border-bottom: 1px solid var(--hairline);
+    cursor: pointer;
+    transition: background .15s;
+  }
+  .ov-pay-row:last-child { border-bottom: none; }
+  .ov-pay-row:hover { background: rgba(255,255,255,0.03); }
+  .ov-pay-avatar {
+    width: 28px; height: 28px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    font-weight: 700;
+    color: #fff;
+    flex-shrink: 0;
+    letter-spacing: 0;
+  }
+  .ov-pay-body { flex: 1; min-width: 0; }
+  .ov-pay-firm {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-0);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .ov-pay-date { font-size: 11px; color: var(--text-3); }
+  .ov-pay-amount {
+    font-size: 13px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
+    flex-shrink: 0;
+    color: var(--jade-1);
+  }
+
+  /* Goals 2-col grid */
+  .ov-goals-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  @media (max-width: 540px) { .ov-goals-grid { grid-template-columns: 1fr; } }
+
+  .ov-goal-card {
+    background: var(--glass);
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    padding: 16px;
+    position: relative;
+    overflow: hidden;
+  }
+  .ov-goal-card::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+    pointer-events: none;
+  }
+  .ov-goal-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+  .ov-goal-name {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-3);
+  }
+  .ov-goal-pct {
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--jade-1);
+  }
+  .ov-goal-pct.done { color: var(--lav-2); }
+  .ov-goal-amounts {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+    margin-bottom: 10px;
+  }
+  .ov-goal-current {
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    color: var(--text-0);
+    font-variant-numeric: tabular-nums;
+  }
+  .ov-goal-of {
+    font-size: 12px;
+    color: var(--text-3);
+  }
+  .ov-goal-bar-track {
+    height: 4px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+  .ov-goal-bar-fill {
+    height: 100%;
+    border-radius: 99px;
+    background: linear-gradient(90deg, var(--jade-2), var(--jade-1));
+    width: 0%;
+    transition: width .9s cubic-bezier(0.16,1,.3,1);
+  }
+  .ov-goal-bar-fill.done {
+    background: linear-gradient(90deg, var(--jade-1), var(--lav-2));
+  }
+  [data-theme="light"] .ov-goal-bar-track { background: rgba(0,0,0,0.08); }
+
+  /* Firm mini-cards grid */
+  .ov-firms-section { margin-bottom: 14px; }
+  .ov-section-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .ov-section-title {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text-3);
+  }
+  .ov-section-link {
+    font-size: 12px;
+    color: var(--jade-1);
+    font-weight: 600;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .ov-section-link:hover { opacity: 0.8; }
+
+  .ov-firm-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 10px;
+  }
+  .ov-firm-card {
+    background: var(--glass);
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    padding: 16px;
+    cursor: pointer;
+    transition: border-color .15s, transform .15s;
+    position: relative;
+    overflow: hidden;
+  }
+  .ov-firm-card::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+    pointer-events: none;
+  }
+  .ov-firm-card:hover { border-color: var(--border-strong); transform: translateY(-1px); }
+  .ov-firm-avatar {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: 12px;
+    letter-spacing: 0;
+  }
+  .ov-firm-name {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-0);
+    margin-bottom: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .ov-firm-accts {
+    font-size: 11px;
+    color: var(--text-3);
+    margin-bottom: 12px;
+  }
+  .ov-firm-total {
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    color: var(--text-0);
+    font-variant-numeric: tabular-nums;
+    margin-bottom: 2px;
+  }
+  .ov-firm-payout-meta {
+    font-size: 11px;
+    color: var(--text-3);
+  }
+  .ov-firm-status-chips {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+  }
+  .ov-firm-chip {
+    font-size: 9px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 99px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .ov-firm-chip.funded {
+    background: rgba(255,51,51,0.12);
+    color: var(--jade-1);
+    border: 1px solid rgba(255,51,51,0.2);
+  }
+  .ov-firm-chip.eval {
+    background: rgba(245,158,11,0.1);
+    color: var(--amber-1);
+    border: 1px solid rgba(245,158,11,0.2);
+  }
+  .ov-firm-chip.blown {
+    background: rgba(244,63,94,0.1);
+    color: var(--rose-1);
+    border: 1px solid rgba(244,63,94,0.2);
+  }
+  .ov-firm-chip.active {
+    background: rgba(165,180,252,0.1);
+    color: var(--lav-2);
+    border: 1px solid rgba(165,180,252,0.2);
+  }
+
+  /* Empty firms state */
+  .ov-empty-firms {
+    text-align: center;
+    padding: 32px 16px;
+    color: var(--text-3);
+    font-size: 13px;
+    background: var(--glass);
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+  }
+
 </style>
 </head>
 <body>
@@ -5296,14 +5784,293 @@ function renderPassRateSection() {
   );
 }
 
+/* ----------------------------------------------------------------
+   OVERVIEW DASHBOARD — redesigned
+   ---------------------------------------------------------------- */
 function renderPageDashboard(app) {
-  app.appendChild(renderHero());
-  app.appendChild(renderBusinessROI());
-  app.appendChild(renderRings());
-  app.appendChild(renderProjected());
-  app.appendChild(renderUpcoming());
-  app.appendChild(renderFeatures());
-  app.appendChild(renderAchievementStrip());
+  app.appendChild(renderOvHeader());
+  app.appendChild(renderOvKPI());
+
+  const mainGrid = el("div", { class: "ov-main" });
+  mainGrid.appendChild(renderOvHero());
+  mainGrid.appendChild(renderOvRecentPanel());
+  app.appendChild(mainGrid);
+
+  app.appendChild(renderOvGoals());
+  app.appendChild(renderOvFirms());
+}
+
+function renderOvHeader() {
+  const displayName = state.profile.username || state.profile.firstName || null;
+  const greet = displayName ? `Hi, ${displayName}` : "Dashboard";
+  return el("div", { class: "ov-header" },
+    el("div", { class: "ov-title" }, greet),
+    el("div", { class: "ov-subtitle" }, "Overview of your funded trading performance")
+  );
+}
+
+function renderOvKPI() {
+  const lifetime = lifetimeWithdrawals();
+  const spend = lifetimeSpend();
+  const net = netProfit();
+  const pr = accountPassRate();
+  const streak = withdrawalStreak();
+  const avg = avgPayout();
+  const activeFirms = state.firms.length;
+  const fees = challengeFees();
+  const roi = fees > 0 ? ((lifetime - fees) / fees) * 100 : null;
+
+  const netSign = net >= 0 ? "+" : "−";
+  const netClass = net > 0 ? "pos" : net < 0 ? "neg" : "";
+  const roiClass = roi === null ? "" : roi >= 0 ? "pos" : "neg";
+
+  const kpis = [
+    { label: "Total Payouts", value: fmtGBP(lifetime, { short: lifetime >= 1000 }), sub: `${received().length} withdrawals`, cls: "" },
+    { label: "Total Spend", value: fmtGBP(spend, { short: spend >= 1000 }), sub: "fees & purchases", cls: spend > 0 ? "neg" : "" },
+    { label: "Net P&L", value: (net !== 0 || lifetime > 0 || spend > 0) ? netSign + fmtGBP(Math.abs(net), { short: Math.abs(net) >= 1000 }) : "—", sub: "payouts minus costs", cls: netClass },
+    { label: "Fee ROI", value: roi !== null ? (roi >= 0 ? "+" : "") + roi.toFixed(0) + "%" : "—", sub: "return on challenge fees", cls: roiClass },
+    { label: "Pass Rate", value: pr ? pr.rate + "%" : "—", sub: pr ? `${pr.passed}/${pr.total} accounts` : "no data yet", cls: "lav" },
+    { label: "Streak", value: streak > 0 ? `${streak} mo` : "—", sub: "consecutive months", cls: "" },
+    { label: "Avg Payout", value: avg > 0 ? fmtGBP(avg, { short: avg >= 1000 }) : "—", sub: "per withdrawal", cls: "" },
+    { label: "Firms", value: activeFirms > 0 ? String(activeFirms) : "—", sub: `${state.accounts.length} account${state.accounts.length !== 1 ? "s" : ""}`, cls: "" },
+  ];
+
+  const strip = el("div", { class: "kpi-strip" });
+  kpis.forEach(({ label, value, sub, cls }) => {
+    strip.appendChild(
+      el("div", { class: "kpi-item" },
+        el("div", { class: "kpi-label" }, label),
+        el("div", { class: `kpi-value${cls ? " " + cls : ""}` }, value),
+        el("div", { class: "kpi-sub" }, sub)
+      )
+    );
+  });
+  return strip;
+}
+
+function renderOvHero() {
+  const lifetime = lifetimeWithdrawals();
+  const spend = lifetimeSpend();
+  const net = netProfit();
+  const monthVal = earnedThisMonth();
+  const delta = pctDeltaMonthOverMonth();
+  const pr = accountPassRate();
+  const activeAccts = state.accounts.filter(a => a.health === "active").length;
+
+  const noData = lifetime === 0 && spend === 0;
+  const netSign = net >= 0 ? "+" : "−";
+  const netAmtClass = net > 0 ? "pos" : net < 0 ? "neg" : "neutral";
+
+  let deltaEl = null;
+  if (!noData && (monthVal > 0 || earnedLastMonth() > 0)) {
+    const d = delta;
+    const cls = d > 0 ? "pos" : d < 0 ? "neg" : "flat";
+    const txt = d > 0 ? `↑ ${d.toFixed(0)}%` : d < 0 ? `↓ ${Math.abs(d).toFixed(0)}%` : "0%";
+    deltaEl = el("span", { class: "ov-hero-delta " + cls }, txt);
+  }
+
+  const heroCard = el("div", { class: "ov-hero" });
+
+  const top = el("div", { class: "ov-hero-top" });
+
+  // Left: big number + label
+  const left = el("div", {});
+  left.appendChild(el("div", { class: "ov-hero-label" }, "Net Profit · Payouts minus costs"));
+  const amountLine = el("div", { style: "display:flex;align-items:baseline;gap:6px;flex-wrap:wrap;" });
+  amountLine.appendChild(
+    el("div", { class: `ov-hero-amount num ${netAmtClass}` },
+      noData ? "—" : netSign + fmtGBP(Math.abs(net), { short: false })
+    )
+  );
+  if (deltaEl) amountLine.appendChild(deltaEl);
+  left.appendChild(amountLine);
+  left.appendChild(
+    el("div", { class: "ov-hero-meta" },
+      noData
+        ? "Add a payout and spending to start tracking"
+        : `${fmtGBP(lifetime)} in · ${fmtGBP(spend)} costs`
+    )
+  );
+  top.appendChild(left);
+
+  // Right: mini stat pills
+  const stats = el("div", { class: "ov-hero-stats" });
+  [
+    { icon: "💸", label: "Payouts", value: fmtGBP(lifetime, { short: true }) },
+    { icon: "💳", label: "Invested", value: fmtGBP(spend, { short: true }) },
+    { icon: "🎯", label: "Pass Rate", value: pr ? pr.rate + "%" : "—" },
+    { icon: "✅", label: "Active", value: activeAccts > 0 ? String(activeAccts) : String(state.accounts.length) },
+  ].forEach(({ icon, label, value }) => {
+    stats.appendChild(
+      el("div", { class: "ov-hero-stat" },
+        el("div", { class: "ov-hero-stat-icon" }, icon),
+        el("div", { class: "ov-hero-stat-label" }, label),
+        el("div", { class: "ov-hero-stat-value" }, value)
+      )
+    );
+  });
+  top.appendChild(stats);
+
+  heroCard.appendChild(top);
+
+  // Bar chart
+  const chartWrap = el("div", { class: "ov-chart-wrap" });
+  chartWrap.appendChild(renderChart());
+  heroCard.appendChild(chartWrap);
+
+  return heroCard;
+}
+
+function renderOvRecentPanel() {
+  const recent = recentSettled().slice(0, 8);
+  const panel = el("div", { class: "ov-recent" });
+
+  panel.appendChild(
+    el("div", { class: "ov-recent-head" },
+      el("div", { class: "ov-recent-title" }, "Recent Payouts"),
+      el("button", { class: "ov-recent-link", onclick: () => navigateTo("payouts") }, "View all →")
+    )
+  );
+
+  if (!recent.length) {
+    panel.appendChild(
+      el("div", { style: "padding:24px 16px;text-align:center;color:var(--text-4);font-size:13px;" },
+        "No payouts recorded yet"
+      )
+    );
+  } else {
+    recent.forEach(p => {
+      const firm = getFirm(p.firmId);
+      const row = el("div", { class: "ov-pay-row", onclick: () => openPayoutSheet(p.id) },
+        el("div", { class: "ov-pay-avatar", style: `background:${firmAvatar(firm)};` },
+          firmInitials(firm?.name)
+        ),
+        el("div", { class: "ov-pay-body" },
+          el("div", { class: "ov-pay-firm" }, firm?.name || "Unknown firm"),
+          el("div", { class: "ov-pay-date" }, fmtDateShort(p.date))
+        ),
+        el("div", { class: "ov-pay-amount" },
+          p.status === "received" ? "+" + fmtGBP(p.amount) : fmtGBP(p.amount)
+        )
+      );
+      panel.appendChild(row);
+    });
+  }
+
+  return panel;
+}
+
+function renderOvGoals() {
+  const g = state.profile.goals;
+  const now = {
+    daily: earnedToday(),
+    weekly: earnedThisWeek(),
+    monthly: earnedThisMonth(),
+    annual: earnedThisYear(),
+  };
+  const goals = [
+    { key: "daily",   label: "Today",      current: now.daily,   target: g.daily },
+    { key: "weekly",  label: "This Week",  current: now.weekly,  target: g.weekly },
+    { key: "monthly", label: "This Month", current: now.monthly, target: g.monthly },
+    { key: "annual",  label: "This Year",  current: now.annual,  target: g.annual },
+  ];
+
+  const section = el("div", {});
+  section.appendChild(
+    el("div", { class: "ov-section-head" },
+      el("div", { class: "ov-section-title" }, "Income Goals"),
+      el("button", { class: "ov-section-link", onclick: () => openSettingsSheet("goals") }, "Edit targets")
+    )
+  );
+
+  const grid = el("div", { class: "ov-goals-grid" });
+  goals.forEach(({ label, current, target }) => {
+    const hasGoal = target > 0;
+    const pct = hasGoal ? Math.min((current / target) * 100, 100) : 0;
+    const pctDisplay = !hasGoal ? "—" : (pct >= 100 ? "✓" : pct.toFixed(0) + "%");
+    const done = hasGoal && pct >= 100;
+
+    const card = el("div", { class: "ov-goal-card" },
+      el("div", { class: "ov-goal-row" },
+        el("div", { class: "ov-goal-name" }, label),
+        el("div", { class: `ov-goal-pct${done ? " done" : ""}` }, pctDisplay)
+      ),
+      el("div", { class: "ov-goal-amounts" },
+        el("div", { class: "ov-goal-current" }, fmtGBP(current, { short: current >= 10000 })),
+        el("div", { class: "ov-goal-of" }, hasGoal ? `of ${fmtGBP(target, { short: target >= 10000 })}` : "no target set")
+      ),
+      el("div", { class: "ov-goal-bar-track" },
+        el("div", {
+          class: `ov-goal-bar-fill${done ? " done" : ""}`,
+          "data-ov-goal-pct": pct.toFixed(2),
+          style: "width:0%"
+        })
+      )
+    );
+    grid.appendChild(card);
+  });
+
+  section.appendChild(grid);
+  return section;
+}
+
+function renderOvFirms() {
+  const section = el("div", { class: "ov-firms-section" });
+  section.appendChild(
+    el("div", { class: "ov-section-head" },
+      el("div", { class: "ov-section-title" }, `Firms & Accounts (${state.firms.length})`),
+      el("button", { class: "ov-section-link", onclick: () => navigateTo("firms") }, "Manage →")
+    )
+  );
+
+  if (!state.firms.length) {
+    section.appendChild(
+      el("div", { class: "ov-empty-firms" }, "No firms added yet — tap Manage to add your first firm")
+    );
+    return section;
+  }
+
+  const grid = el("div", { class: "ov-firm-grid" });
+
+  state.firms.forEach(firm => {
+    const firmPayouts = received().filter(p => p.firmId === firm.id);
+    const firmTotal = firmPayouts.reduce((s, p) => s + Number(p.amount || 0), 0);
+    const firmAccounts = state.accounts.filter(a => a.firmId === firm.id);
+    const funded = firmAccounts.filter(a => a.health === "funded");
+    const evals  = firmAccounts.filter(a => a.health === "eval");
+    const blown  = firmAccounts.filter(a => a.health === "blown");
+    const active = firmAccounts.filter(a => a.health === "active");
+
+    const chips = el("div", { class: "ov-firm-status-chips" });
+    if (funded.length)  chips.appendChild(el("span", { class: "ov-firm-chip funded" }, `${funded.length} Funded`));
+    if (active.length)  chips.appendChild(el("span", { class: "ov-firm-chip active" }, `${active.length} Active`));
+    if (evals.length)   chips.appendChild(el("span", { class: "ov-firm-chip eval" },   `${evals.length} Eval`));
+    if (blown.length)   chips.appendChild(el("span", { class: "ov-firm-chip blown" },  `${blown.length} Blown`));
+
+    const card = el("div", { class: "ov-firm-card", onclick: () => navigateTo("firms") },
+      el("div", { class: "ov-firm-avatar", style: `background:${firmAvatar(firm)};` },
+        firmInitials(firm.name)
+      ),
+      el("div", { class: "ov-firm-name" }, firm.name),
+      el("div", { class: "ov-firm-accts" },
+        `${firmAccounts.length} account${firmAccounts.length !== 1 ? "s" : ""}`
+      ),
+      el("div", { class: "ov-firm-total" },
+        firmTotal > 0 ? fmtGBP(firmTotal, { short: firmTotal >= 10000 }) : "—"
+      ),
+      el("div", { class: "ov-firm-payout-meta" },
+        firmPayouts.length > 0
+          ? `${firmPayouts.length} payout${firmPayouts.length !== 1 ? "s" : ""} received`
+          : "No payouts yet"
+      ),
+      chips
+    );
+
+    grid.appendChild(card);
+  });
+
+  section.appendChild(grid);
+  return section;
 }
 
 function renderPagePayouts(app) {
@@ -5526,6 +6293,9 @@ function render() {
   requestAnimationFrame(() => {
     document.querySelectorAll(".goal-bar-fill[data-target-width]").forEach(f => {
       f.style.width = f.getAttribute("data-target-width") + "%";
+    });
+    document.querySelectorAll(".ov-goal-bar-fill[data-ov-goal-pct]").forEach(f => {
+      f.style.width = f.getAttribute("data-ov-goal-pct") + "%";
     });
     document.querySelectorAll(".bc-bar[data-target-height]").forEach(b => {
       b.style.height = b.getAttribute("data-target-height") + "%";
